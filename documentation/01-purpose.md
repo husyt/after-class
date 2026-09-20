@@ -2,7 +2,7 @@
 
 ## Client Information
 
-**Client:** [School Name / Assigned Client]
+**Client:** [UPHSD / CLIENT 10 – EqualPath Youth Foundation]
 **Industry:** Education / Learning
 **Assigned via:** Draw lots (SIA Project)
 
@@ -17,11 +17,11 @@ Students today struggle with:
 
 ## Target Users
 
-| User Type | Description | Primary Needs |
-|---|---|---|
-| **Students** | Primary users, ages 12-20 | Fun, gamified learning; visible progress |
-| **Teachers** | Secondary users, educators | Monitor student performance, view reports |
-| **Administrators** | System managers | Manage users, view system-wide analytics |
+| User Type          | Description                | Primary Needs                             |
+|---                 |---                         |---                                        |
+| **Students**       | Primary users, ages 12-20  | Fun, gamified learning; visible progress  |
+| **Teachers**       | Secondary users, educators | Monitor student performance, view reports |
+| **Administrators** | System managers            | Manage users, view system-wide analytics  |
 
 ## Purpose of the Proposed System
 
@@ -34,12 +34,12 @@ CoreSync is a **game-integrated learning platform** that:
 
 ## How the Game Relates to the Client's Needs
 
-| Client Need | How CoreSync Addresses It |
-|---|---|
-| Low engagement | Games reward play with XP, levels, and achievements |
+| Client Need          | How CoreSync Addresses It                                        |
+|---                   |---                                                               |
+| Low engagement       | Games reward play with XP, levels, and achievements              |
 | No progress tracking | Every game session is logged with score, duration, level reached |
-| Fragmented tools | One login handles authentication, game access, and reports |
-| Teacher visibility | Reports page shows per-student and per-game performance |
+| Fragmented tools     | One login handles authentication, game access, and reports       |
+| Teacher visibility   | Reports page shows per-student and per-game performance          |
 
 ## Expected Benefits
 
@@ -100,10 +100,10 @@ CoreSync is a **game-integrated learning platform** that:
 
 ## Success Metrics
 
-| Metric | Target |
-|---|---|
-| Login success rate | > 95% |
-| Average session duration | > 5 minutes |
-| Games played per user per week | > 3 |
-| Report generation time | < 2 seconds |
-| System uptime | > 99% |
+| Metric                         | Target      |
+|---                             |---          |
+| Login success rate             | > 95%       |
+| Average session duration       | > 5 minutes |
+| Games played per user per week | > 3         |
+| Report generation time         | < 2 seconds |
+| System uptime                  | > 99%       |

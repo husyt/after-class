@@ -294,18 +294,18 @@ Automatic security features can interfere with testing. Always have a manual ove
 
 ## Summary Table
 
-| # | Challenge | Root Cause | Solution |
-|---|---|---|---|
-| 1 | Godot → PHP | iframe isolation | postMessage API |
-| 2 | Password verify fails | Truncated hash column | `VARCHAR(255)` + full hash |
-| 3 | Black video background | Relative path | Absolute `/after-class/...` |
-| 4 | MySQL won't start | Port 3306 in use | Change to 3307 |
-| 5 | QR expires/reach | Short timeout + localhost | 5-min expiry + LAN IP |
-| 6 | PHPMailer auth fails | No App Password | Generate Gmail App Password |
-| 7 | Scrollbar not showing | `overflow: hidden` | Change to `overflow-y: scroll` |
-| 8 | Session lost between pages | Frequent regeneration | Regenerate every 5 min |
-| 9 | QR not rendering | Load order | Load library first |
-| 10 | Admin locked during tests | Aggressive lockout | Add admin exception |
+| # | Challenge                     | Root Cause                | Solution                       |
+|---|---                            |---                        |---                             |
+| 1 | Godot → PHP                   | iframe isolation          | postMessage API                |
+| 2 | Password verify fails         | Truncated hash column     | `VARCHAR(255)` + full hash     |  
+| 3 | Black video background        | Relative path             | Absolute `/after-class/...`    |
+| 4 | MySQL won't start             | Port 3306 in use          | Change to 3307                 |
+| 5 | QR expires/reach              | Short timeout + localhost | 5-min expiry + LAN IP          |
+| 6 | PHPMailer auth fails          | No App Password           | Generate Gmail App Password    |
+| 7 | Scrollbar not showing         | `overflow: hidden`        | Change to `overflow-y: scroll` |
+| 8 | Session lost between pages    | Frequent regeneration     | Regenerate every 5 min         |
+| 9 | QR not rendering              | Load order                | Load library first             |
+| 10 | Admin locked during tests    | Aggressive lockout        | Add admin exception            |
 
 ---
 

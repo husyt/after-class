@@ -8,14 +8,14 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 
 ## Frontend
 
-| Technology | Version | Purpose |
-|---|---|---|
-| **HTML5** | Latest | Semantic markup for all pages |
-| **CSS3** | Latest | Custom styling, animations, responsive design |
-| **JavaScript** | ES6+ | Client-side validation, dynamic UI, QR code logic |
-| **Web APIs** | — | Fetch API, postMessage, localStorage, Clipboard API |
-| **QRCode.js** | 1.0.0 | QR code generation for passwordless login |
-| **Inter Font** | — | Modern, clean typography via Google Fonts |
+| Technology       | Version | Purpose                                             |
+|---               |---      |---                                                  |
+| **HTML5**        | Latest  | Semantic markup for all pages                       |
+| **CSS3**         | Latest  | Custom styling, animations, responsive design       |
+| **JavaScript**   | ES6+    | Client-side validation, dynamic UI, QR code logic   |
+| **Web APIs**     |    —    | Fetch API, postMessage, localStorage, Clipboard API |
+| **QRCode.js**    | 1.0.0   | QR code generation for passwordless login           |
+| **Inter Font**   |    —    | Modern, clean typography via Google Fonts           |
 
 ### Key Frontend Features
 - **Custom CSS scrollbars** with `::-webkit-scrollbar`
@@ -28,12 +28,12 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 
 ## Backend
 
-| Technology | Version | Purpose |
-|---|---|---|
-| **PHP** | 8.2.12 | Server-side logic, routing, session handling |
-| **Apache** | 2.4.58 | Web server (via XAMPP) |
-| **Composer** | Latest | Dependency management |
-| **PHPMailer** | 7.1.1 | Transactional email (OTP, password reset) |
+| Technology    | Version | Purpose                                      |
+|---            |---      |---                                           |
+| **PHP**       | 8.2.12  | Server-side logic, routing, session handling |
+| **Apache**    | 2.4.58  | Web server (via XAMPP)                       |
+| **Composer**  | Latest  | Dependency management                        |
+| **PHPMailer** | 7.1.1   | Transactional email (OTP, password reset)    |
 
 ### Key Backend Features
 - **PDO Prepared Statements** — SQL injection prevention
@@ -46,10 +46,10 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 
 ## Database
 
-| Technology | Version | Purpose |
-|---|---|---|
-| **MySQL** | 8.0 | Relational database |
-| **phpMyAdmin** | 5.x | Database administration GUI |
+| Technology     | Version | Purpose                     |
+|---             |---      |---                          |
+| **MySQL**      | 8.0     | Relational database         |
+| **phpMyAdmin** | 5.x     | Database administration GUI |
 
 ### Tables
 - `users` — accounts, roles, stats
@@ -69,22 +69,22 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 
 ## Server / Development Environment
 
-| Tool | Purpose |
-|---|---|
-| **XAMPP** | Local development stack (Apache + MySQL + PHP) |
-| **Apache** | HTTP server on port 80 |
-| **MySQL** | Database server on port 3306 |
-| **Windows** | Development OS |
+| Tool        | Purpose                                        |
+|---          |---                                             |
+| **XAMPP**   | Local development stack (Apache + MySQL + PHP) |
+| **Apache**  | HTTP server on port 80                         |
+| **MySQL**   | Database server on port 3306                   |
+| **Windows** | Development OS                                 |
 
 ---
 
 ## Game Engine
 
-| Technology | Version | Purpose |
-|---|---|---|
-| **Godot** | 4.x | 2D game engine |
-| **GDScript** | — | Godot's native scripting language |
-| **HTML5 Export** | — | Compiles game to WebAssembly for browser play |
+| Technology       | Version | Purpose                                       |
+|---               |---      |---                                            |
+| **Godot**        | 4.x     | 2D game engine                                |
+| **GDScript**     |    —    | Godot's native scripting language             |
+| **HTML5 Export** |    —    | Compiles game to WebAssembly for browser play |
 
 ### Integration Method
 The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it uses `JavaScriptBridge.eval()` to call `window.parent.postMessage()` — sending the score to the parent PHP page. The parent page then POSTs the score to `save_score.php` for database storage.
@@ -93,17 +93,17 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 
 ## Development Tools
 
-| Tool | Purpose |
-|---|---|
-| **Visual Studio Code** | Primary code editor |
+| Tool                   | Purpose                                            |
+|---                     |---                                                 |
+| **Visual Studio Code** | Primary code editor                                |
 | **VS Code Extensions** | PHP Intelephense, PHP Debug, SQLTools, Live Server |
-| **Git** | Version control |
-| **GitHub** | Remote repository hosting |
-| **GitHub Desktop** | Git GUI client |
-| **Trello** | Project management |
-| **draw.io / Mermaid** | Diagram creation |
-| **Postman** | API testing (optional) |
-| **Chrome DevTools** | Debugging and testing |
+| **Git**                | Version control                                    |
+| **GitHub**             | Remote repository hosting                          |
+| **GitHub Desktop**     | Git GUI client                                     |
+| **Trello**             | Project management                                 |
+| **draw.io / Mermaid**  | Diagram creation                                   |
+| **Postman**            | API testing (optional)                             |
+| **Chrome DevTools**    | Debugging and testing                              |
 
 ---
 
@@ -142,45 +142,45 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 
 ## Why These Technologies?
 
-| Choice | Reason |
-|---|---|
-| **PHP** | Widely used for education, easy to learn, great MySQL support |
-| **MySQL** | Free, reliable, industry-standard relational DB |
-| **XAMPP** | One-click local server setup, ideal for students |
-| **Godot** | Free, open-source, exports to Web, GDScript is beginner-friendly |
-| **Vanilla JS** | No build step, no framework, runs everywhere |
-| **PHPMailer** | Most popular PHP email library, handles SMTP auth correctly |
-| **PostgreSQL vs MySQL** | MySQL chosen for simpler setup on Windows |
-| **MySQL vs MongoDB** | MySQL chosen because data is highly relational |
+| Choice                  | Reason                                                           |
+|---                      |---                                                               |
+| **PHP**                 | Widely used for education, easy to learn, great MySQL support    |
+| **MySQL**               | Free, reliable, industry-standard relational DB                  |
+| **XAMPP**               | One-click local server setup, ideal for students                 |
+| **Godot**               | Free, open-source, exports to Web, GDScript is beginner-friendly |
+| **Vanilla JS**          | No build step, no framework, runs everywhere                     |
+| **PHPMailer**           | Most popular PHP email library, handles SMTP auth correctly      |
+| **PostgreSQL vs MySQL** | MySQL chosen for simpler setup on Windows                        |
+| **MySQL vs MongoDB**    | MySQL chosen because data is highly relational                   |
 
 ---
 
 ## Security Technologies
 
-| Feature | Implementation |
-|---|---|
-| Password hashing | `password_hash()` with PASSWORD_DEFAULT (bcrypt) |
-| SQL injection prevention | PDO prepared statements with bound parameters |
-| XSS prevention | `htmlspecialchars()` on all output |
-| CSRF mitigation | Session-based tokens, SameSite cookies |
-| Session security | `session_regenerate_id()`, httponly cookies, 30-min timeout |
-| Rate limiting | 5-attempt login lockout for 15 minutes |
-| 2FA | Email OTP via PHPMailer |
-| Password reset | 256-bit hex tokens with 1-hour expiration |
-| QR login | 256-bit hex tokens with 5-minute expiration |
+| Feature                  | Implementation                                              |
+|---                       |---                                                          |
+| Password hashing         | `password_hash()` with PASSWORD_DEFAULT (bcrypt)            |
+| SQL injection prevention | PDO prepared statements with bound parameters               |
+| XSS prevention           | `htmlspecialchars()` on all output                          |
+| CSRF mitigation          | Session-based tokens, SameSite cookies                      |
+| Session security         | `session_regenerate_id()`, httponly cookies, 30-min timeout |
+| Rate limiting            | 5-attempt login lockout for 15 minutes                      |
+| 2FA                      | Email OTP via PHPMailer                                     |
+| Password reset           | 256-bit hex tokens with 1-hour expiration                   |
+| QR login                 | 256-bit hex tokens with 5-minute expiration                 |
 
 ---
 
 ## Browser Support
 
-| Browser | Minimum Version | Tested |
-|---|---|---|
-| Chrome | 90+ | ✅ |
-| Firefox | 88+ | ✅ |
-| Edge | 90+ | ✅ |
-| Safari | 14+ | ⚠️ (untested) |
-| Mobile Chrome | 90+ | ✅ |
-| Mobile Safari | 14+ | ⚠️ (untested) |
+| Browser       | Minimum Version | Tested         |
+|---            |---              |---             |
+| Chrome        | 90+             | ✅            |
+| Firefox       | 88+             | ✅            |
+| Edge          | 90+             | ✅            |
+| Safari        | 14+             | ⚠️ (untested) |
+| Mobile Chrome | 90+             | ✅            |
+| Mobile Safari | 14+             | ⚠️ (untested) |
 
 **Requires:** ES6 JavaScript, CSS Grid, Flexbox, WebAssembly (for Godot game), Fetch API.
 
@@ -188,11 +188,11 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 
 ## Hosting / Deployment
 
-| Environment | Setup |
-|---|---|
-| **Local Development** | XAMPP on Windows |
-| **Production (future)** | Any LAMP/LEMP host with PHP 8+ and MySQL |
-| **Alternative** | Docker container with Apache + PHP + MySQL |
+| Environment             | Setup                                      |
+|---                      |---                                         |
+| **Local Development**   | XAMPP on Windows                           |
+| **Production (future)** | Any LAMP/LEMP host with PHP 8+ and MySQL   |
+| **Alternative**         | Docker container with Apache + PHP + MySQL |
 
 **Note:** The project is currently only runnable on a local XAMPP server. Production deployment would require:
 - Configuring HTTPS
