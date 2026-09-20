@@ -3,22 +3,23 @@
    Organized CSS Stylesheet
    ============================================================
    TABLE OF CONTENTS
-   1. Reset & Variables
-   2. Base Layout
-   3. Live Video Background
-   4. Top Navigation
-   5. Dashboard Content
-   6. Game Tiles
-   7. Action Bar
-   8. Info Modal
-   9. Library Page
-   10. Profile Page
-   11. Edit Profile Modal
-   12. More Dropdown Menu
-   13. Toast Notifications
-   14. Custom Scrollbars
-   15. Accessibility (Reduce Motion)
-   16. Responsive Breakpoints
+   1.  Reset & Variables
+   2.  Base Layout
+   3.  Live Video Background
+   4.  Top Navigation
+   5.  Dashboard Content
+   6.  Game Tiles
+   7.  Action Bar
+   8.  Info Modal
+   9.  Report Issue Modal
+   10. Library Page
+   11. Profile Page
+   12. Edit Profile Modal
+   13. More Dropdown Menu
+   14. Toast Notifications
+   15. Custom Scrollbars
+   16. Accessibility (Reduce Motion)
+   17. Responsive Breakpoints
    ============================================================ */
 
 
@@ -62,6 +63,8 @@ body {
 
 html {
     overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed #0a0a0f;
 }
 
 
@@ -117,7 +120,7 @@ html {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 32px;
+    padding: 20px 36px;
     background: rgba(10, 10, 15, 0.5);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -133,14 +136,14 @@ html {
 .nav-right {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .logo-mark {
-    width: 36px;
-    height: 36px;
+    width: 48px;
+    height: 48px;
     background: var(--primary);
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -148,19 +151,19 @@ html {
 }
 
 .logo-mark svg {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
 }
 
 .nav-tabs {
     display: flex;
-    gap: 8px;
+    gap: 10px;
 }
 
 .nav-tab {
-    width: 44px;
-    height: 44px;
-    border-radius: 10px;
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
     background: transparent;
     border: none;
     color: var(--text-mid);
@@ -170,6 +173,11 @@ html {
     justify-content: center;
     transition: all 0.2s;
     text-decoration: none;
+}
+
+.nav-tab svg {
+    width: 26px;
+    height: 26px;
 }
 
 .nav-tab:hover {
@@ -183,8 +191,8 @@ html {
 }
 
 .icon-btn {
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: transparent;
     border: none;
@@ -197,14 +205,19 @@ html {
     text-decoration: none;
 }
 
+.icon-btn svg {
+    width: 26px;
+    height: 26px;
+}
+
 .icon-btn:hover {
     background: rgba(255, 255, 255, 0.06);
     color: white;
 }
 
 .user-avatar {
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background: #2a2a35;
     display: flex;
@@ -212,6 +225,11 @@ html {
     justify-content: center;
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.user-avatar svg {
+    width: 28px;
+    height: 28px;
 }
 
 
@@ -223,7 +241,7 @@ html {
     position: relative;
     z-index: 5;
     padding: 40px 64px;
-    min-height: calc(100vh - 72px);
+    min-height: calc(100vh - 90px);
     display: flex;
     flex-direction: column;
 }
@@ -280,10 +298,10 @@ html {
 
 .game-row {
     display: flex;
-    gap: 24px;
+    gap: 28px;
     flex: 1;
     align-items: center;
-    padding: 40px 60px;
+    padding: 50px 70px;
     overflow-x: auto;
     overflow-y: visible;
     scrollbar-width: none;
@@ -295,15 +313,15 @@ html {
 
 .game-tile {
     flex-shrink: 0;
-    width: 300px;
-    height: 380px;
-    border-radius: 20px;
+    width: 340px;
+    height: 430px;
+    border-radius: 22px;
     overflow: hidden;
     cursor: pointer;
     position: relative;
     transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1),
                 box-shadow 0.45s ease;
-    transform: scale(0.92);
+    transform: scale(0.9);
     transform-origin: center center;
     opacity: 0.6;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -312,13 +330,13 @@ html {
 .game-tile.active {
     transform: scale(1);
     opacity: 1;
-    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7),
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.75),
                 0 0 0 2px rgba(255, 255, 255, 0.15);
 }
 
 .game-tile:hover:not(.active) {
     opacity: 0.85;
-    transform: scale(0.96);
+    transform: scale(0.94);
 }
 
 .tile-thumb {
@@ -348,10 +366,10 @@ html {
 
 .tile-label {
     position: absolute;
-    bottom: 24px;
-    left: 24px;
-    right: 24px;
-    font-size: 20px;
+    bottom: 26px;
+    left: 26px;
+    right: 26px;
+    font-size: 22px;
     font-weight: 800;
     letter-spacing: 0.5px;
     text-transform: uppercase;
@@ -365,7 +383,7 @@ html {
 
 .action-bar {
     display: flex;
-    gap: 12px;
+    gap: 16px;
     padding: 20px 0;
     opacity: 0;
     transform: translateY(10px);
@@ -382,24 +400,34 @@ html {
 .action-btn {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 24px;
+    gap: 14px;
+    padding: 18px 34px;
     border-radius: 999px;
     border: none;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
     transition: all 0.2s ease;
 }
 
+.action-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
 .action-btn.primary {
     background: var(--play-green);
     color: #0a1a10;
-    padding: 12px 32px;
-    font-size: 15px;
-    box-shadow: 0 8px 24px rgba(46, 204, 113, 0.35);
+    padding: 18px 42px;
+    font-size: 18px;
+    box-shadow: 0 10px 28px rgba(46, 204, 113, 0.4);
+}
+
+.action-btn.primary svg {
+    width: 24px;
+    height: 24px;
 }
 
 .action-btn.primary:hover {
@@ -633,7 +661,176 @@ html {
 
 
 /* ============================================================
-   9. LIBRARY PAGE
+   9. REPORT ISSUE MODAL
+   ============================================================ */
+
+.report-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.report-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.report-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.report-modal-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 520px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    background: linear-gradient(180deg, #14141a 0%, #0a0a0f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    transform: translateY(20px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.report-modal.open .report-modal-panel {
+    transform: translateY(0) scale(1);
+}
+
+.report-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.report-modal-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.report-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f39c12, #d13639);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 20px;
+    box-shadow: 0 12px 32px rgba(243, 156, 18, 0.35);
+}
+
+.report-modal-panel h2 {
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.report-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.report-modal-panel .form-group {
+    margin-bottom: 20px;
+}
+
+.report-modal-panel .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+.report-modal-panel .form-group input,
+.report-modal-panel .form-group textarea,
+.report-modal-panel .form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    resize: vertical;
+}
+
+.report-modal-panel .form-group textarea {
+    min-height: 110px;
+    line-height: 1.5;
+}
+
+.report-modal-panel .form-group input:focus,
+.report-modal-panel .form-group textarea:focus,
+.report-modal-panel .form-group select:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.report-modal-panel .form-group input.error,
+.report-modal-panel .form-group textarea.error {
+    border-color: #d13639;
+    background: rgba(209, 54, 57, 0.1);
+}
+
+.report-select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    padding-right: 40px !important;
+    cursor: pointer;
+}
+
+.report-select option {
+    background: #1a1a25;
+    color: white;
+    padding: 10px;
+}
+
+.report-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+
+/* ============================================================
+   10. LIBRARY PAGE
    ============================================================ */
 
 .filter-bar {
@@ -675,7 +872,7 @@ html {
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 36px;
@@ -696,10 +893,6 @@ html {
 .filter-select option:checked {
     background: linear-gradient(#d13639, #d13639);
     color: #ffffff;
-}
-
-.filter-select option:hover {
-    background-color: #2a2a35;
 }
 
 .filter-input {
@@ -810,7 +1003,7 @@ html {
 
 
 /* ============================================================
-   10. PROFILE PAGE
+   11. PROFILE PAGE
    ============================================================ */
 
 .profile-header {
@@ -880,7 +1073,6 @@ html {
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* Display Name & Pronouns Cards */
 .profile-info-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -956,7 +1148,6 @@ html {
     color: white;
 }
 
-/* Account Details Grid */
 .account-details-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -988,7 +1179,6 @@ html {
     word-break: break-word;
 }
 
-/* Profile Sections (Account Details, Activity) */
 .profile-section {
     padding: 24px 28px;
     background: var(--surface);
@@ -1059,94 +1249,36 @@ html {
     padding-bottom: 40px;
 }
 
-/* Profile — Compact Fit-to-Screen Layout */
+/* Profile compact layout */
 .profile-page .dashboard,
 .profile-page main.dashboard {
     padding: 24px 48px;
-    height: calc(100vh - 72px);
+    height: calc(100vh - 90px);
     min-height: 0;
     overflow: hidden;
 }
 
-.profile-page .section-head {
-    margin-bottom: 20px;
-}
-
-.profile-page .profile-header {
-    padding: 20px 24px;
-    margin-bottom: 16px;
-}
-
-.profile-page .profile-avatar {
-    width: 68px;
-    height: 68px;
-}
-
-.profile-page .profile-avatar svg {
-    width: 34px;
-    height: 34px;
-}
-
-.profile-page .profile-meta h2 {
-    font-size: 24px;
-    margin-bottom: 6px;
-}
-
-.profile-page .profile-last-seen {
-    font-size: 11px;
-}
-
-.profile-page .profile-info-cards {
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.profile-page .info-card {
-    padding: 14px 20px;
-}
-
-.profile-page .info-card-value {
-    font-size: 15px;
-}
-
-.profile-page .profile-section {
-    padding: 16px 22px;
-    margin-bottom: 16px;
-}
-
-.profile-page .profile-section h3 {
-    margin-bottom: 12px;
-}
-
-.profile-page .account-details-grid {
-    gap: 10px;
-}
-
-.profile-page .account-detail {
-    padding: 8px 0;
-}
-
-.profile-page .account-detail-value {
-    font-size: 13px;
-}
-
-.profile-page .activity-list li {
-    padding: 8px 0;
-    font-size: 12px;
-}
-
-.profile-page .activity-dot {
-    width: 6px;
-    height: 6px;
-}
-
-.profile-page .activity-time {
-    font-size: 10px;
-}
+.profile-page .section-head { margin-bottom: 20px; }
+.profile-page .profile-header { padding: 20px 24px; margin-bottom: 16px; }
+.profile-page .profile-avatar { width: 68px; height: 68px; }
+.profile-page .profile-avatar svg { width: 34px; height: 34px; }
+.profile-page .profile-meta h2 { font-size: 24px; margin-bottom: 6px; }
+.profile-page .profile-last-seen { font-size: 11px; }
+.profile-page .profile-info-cards { gap: 12px; margin-bottom: 16px; }
+.profile-page .info-card { padding: 14px 20px; }
+.profile-page .info-card-value { font-size: 15px; }
+.profile-page .profile-section { padding: 16px 22px; margin-bottom: 16px; }
+.profile-page .profile-section h3 { margin-bottom: 12px; }
+.profile-page .account-details-grid { gap: 10px; }
+.profile-page .account-detail { padding: 8px 0; }
+.profile-page .account-detail-value { font-size: 13px; }
+.profile-page .activity-list li { padding: 8px 0; font-size: 12px; }
+.profile-page .activity-dot { width: 6px; height: 6px; }
+.profile-page .activity-time { font-size: 10px; }
 
 
 /* ============================================================
-   11. EDIT PROFILE MODAL
+   12. EDIT PROFILE MODAL
    ============================================================ */
 
 .edit-modal {
@@ -1272,7 +1404,7 @@ html {
 
 
 /* ============================================================
-   12. MORE DROPDOWN MENU
+   13. MORE DROPDOWN MENU
    ============================================================ */
 
 .more-wrapper {
@@ -1350,7 +1482,7 @@ html {
 
 
 /* ============================================================
-   13. TOAST NOTIFICATIONS
+   14. TOAST NOTIFICATIONS
    ============================================================ */
 
 .toast-container {
@@ -1385,9 +1517,7 @@ html {
     max-width: 400px;
 }
 
-.toast.show {
-    transform: translateX(0);
-}
+.toast.show { transform: translateX(0); }
 
 .toast-icon {
     width: 24px;
@@ -1400,32 +1530,16 @@ html {
     font-size: 14px;
 }
 
-.toast.success .toast-icon {
-    background: var(--play-green);
-    color: #0a1a10;
-}
-
-.toast.info .toast-icon {
-    background: #3498db;
-    color: white;
-}
-
-.toast.warning .toast-icon {
-    background: #f39c12;
-    color: #1a0f00;
-}
-
-.toast.error .toast-icon {
-    background: var(--primary);
-    color: white;
-}
+.toast.success .toast-icon { background: var(--play-green); color: #0a1a10; }
+.toast.info .toast-icon { background: #3498db; color: white; }
+.toast.warning .toast-icon { background: #f39c12; color: #1a0f00; }
+.toast.error .toast-icon { background: var(--primary); color: white; }
 
 
 /* ============================================================
-   14. CUSTOM SCROLLBARS
+   15. CUSTOM SCROLLBARS
    ============================================================ */
 
-/* Page-level scrollbar */
 html::-webkit-scrollbar,
 body::-webkit-scrollbar {
     width: 12px;
@@ -1454,70 +1568,42 @@ body::-webkit-scrollbar-corner {
     background: #0a0a0f;
 }
 
-/* Firefox */
-html {
-    scrollbar-width: thin;
-    scrollbar-color: #7c3aed #0a0a0f;
-}
-
 /* Info modal panel */
-.info-modal-panel::-webkit-scrollbar {
-    width: 8px;
-}
-
-.info-modal-panel::-webkit-scrollbar-track {
-    background: transparent;
-    margin: 12px 0;
-}
-
+.info-modal-panel::-webkit-scrollbar { width: 8px; }
+.info-modal-panel::-webkit-scrollbar-track { background: transparent; margin: 12px 0; }
 .info-modal-panel::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 4px;
 }
-
 .info-modal-panel::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
 /* Settings drawer body */
-.settings-body::-webkit-scrollbar {
-    width: 6px;
-}
-
-.settings-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-
+.settings-body::-webkit-scrollbar { width: 6px; }
+.settings-body::-webkit-scrollbar-track { background: transparent; }
 .settings-body::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.12);
     border-radius: 3px;
 }
-
 .settings-body::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.25);
 }
 
 /* Edit modal panel */
-.edit-modal-panel::-webkit-scrollbar {
-    width: 6px;
-}
-
-.edit-modal-panel::-webkit-scrollbar-track {
-    background: transparent;
-}
-
+.edit-modal-panel::-webkit-scrollbar { width: 6px; }
+.edit-modal-panel::-webkit-scrollbar-track { background: transparent; }
 .edit-modal-panel::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.15);
     border-radius: 3px;
 }
-
 .edit-modal-panel::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
 }
 
 
 /* ============================================================
-   15. ACCESSIBILITY — REDUCE MOTION
+   16. ACCESSIBILITY — REDUCE MOTION
    ============================================================ */
 
 .reduce-motion *,
@@ -1542,7 +1628,6 @@ html {
     transform: scale(1) !important;
 }
 
-/* Disabled settings sliders */
 .settings-range:disabled {
     opacity: 0.4;
     cursor: not-allowed;
@@ -1561,7 +1646,7 @@ html {
 
 
 /* ============================================================
-   16. RESPONSIVE BREAKPOINTS
+   17. RESPONSIVE BREAKPOINTS
    ============================================================ */
 
 /* Tablet */
@@ -1570,21 +1655,75 @@ html {
         padding: 24px;
     }
     .topnav {
-        padding: 12px 20px;
+        padding: 16px 20px;
+    }
+    .logo-mark {
+        width: 40px;
+        height: 40px;
+    }
+    .nav-tab {
+        width: 48px;
+        height: 48px;
+    }
+    .nav-tab svg {
+        width: 22px;
+        height: 22px;
+    }
+    .icon-btn {
+        width: 44px;
+        height: 44px;
+    }
+    .user-avatar {
+        width: 44px;
+        height: 44px;
     }
     .game-tile {
-        width: 260px;
-        height: 340px;
+        width: 280px;
+        height: 360px;
     }
     .game-row {
-        gap: 16px;
+        gap: 20px;
+        padding: 40px 50px;
     }
     .section-head h1 {
         font-size: 24px;
     }
+    .action-btn {
+        padding: 14px 26px;
+        font-size: 15px;
+    }
+    .action-btn.primary {
+        padding: 14px 30px;
+        font-size: 16px;
+    }
 }
 
-/* Info Modal on Mobile */
+/* Small Tablet / Large Phone */
+@media (max-width: 700px) {
+    .filter-bar {
+        flex-direction: column;
+    }
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .profile-meta {
+        text-align: center;
+    }
+    .profile-tags {
+        justify-content: center;
+    }
+    .game-tile {
+        width: 240px;
+        height: 320px;
+    }
+    .game-row {
+        gap: 16px;
+        padding: 30px 40px;
+    }
+}
+
+/* Mobile */
 @media (max-width: 600px) {
     .info-modal-panel {
         padding: 32px 24px;
@@ -1607,22 +1746,8 @@ html {
     .info-card {
         padding: 16px 18px;
     }
-}
-
-/* Small Mobile */
-@media (max-width: 700px) {
-    .filter-bar {
-        flex-direction: column;
-    }
-    .profile-header {
-        flex-direction: column;
-        text-align: center;
-    }
-    .profile-meta {
-        text-align: center;
-    }
-    .profile-tags {
-        justify-content: center;
+    .report-modal-panel {
+        padding: 28px 22px;
     }
 }
 
@@ -1642,175 +1767,4 @@ html {
         min-width: auto;
         width: 100%;
     }
-}
-
-/* ============================================================
-   LARGER CLICK TARGETS — Top Nav & Action Bar (v2)
-   ============================================================ */
-
-/* ---- TOP NAV ICONS ---- */
-
-.logo-mark {
-    width: 48px;
-    height: 48px;
-    border-radius: 10px;
-}
-
-.logo-mark svg {
-    width: 26px;
-    height: 26px;
-}
-
-.nav-tabs {
-    gap: 10px;
-}
-
-.nav-tab {
-    width: 58px;
-    height: 58px;
-    border-radius: 14px;
-}
-
-.nav-tab svg {
-    width: 26px;
-    height: 26px;
-}
-
-.icon-btn {
-    width: 52px;
-    height: 52px;
-}
-
-.icon-btn svg {
-    width: 26px;
-    height: 26px;
-}
-
-.user-avatar {
-    width: 52px;
-    height: 52px;
-}
-
-.user-avatar svg {
-    width: 28px;
-    height: 28px;
-}
-
-.nav-right {
-    gap: 14px;
-}
-
-.topnav {
-    padding: 20px 36px;
-}
-
-/* ---- BOTTOM ACTION BUTTONS ---- */
-
-.action-btn {
-    padding: 18px 34px;
-    font-size: 17px;
-    gap: 14px;
-    font-weight: 700;
-}
-
-.action-btn svg {
-    width: 22px;
-    height: 22px;
-}
-
-.action-btn.primary {
-    padding: 18px 42px;
-    font-size: 18px;
-    box-shadow: 0 10px 28px rgba(46, 204, 113, 0.4);
-}
-
-.action-btn.primary svg {
-    width: 24px;
-    height: 24px;
-}
-
-.action-bar {
-    gap: 16px;
-}
-
-/* ============================================================
-   LARGER GAME TILES
-   ============================================================ */
-
-.game-row {
-    gap: 28px;
-    padding: 50px 70px;
-}
-
-.game-tile {
-    width: 340px;
-    height: 430px;
-    border-radius: 22px;
-}
-
-/* Keep the "inactive" tile a bit smaller so the active one stands out */
-.game-tile:not(.active) {
-    transform: scale(0.9);
-}
-
-.game-tile.active {
-    transform: scale(1);
-    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.75),
-                0 0 0 2px rgba(255, 255, 255, 0.15);
-}
-
-.game-tile:hover:not(.active) {
-    transform: scale(0.94);
-}
-
-/* Bigger title text on tiles */
-.tile-label {
-    font-size: 22px;
-    bottom: 26px;
-    left: 26px;
-    right: 26px;
-}
-
-/* ============================================================
-   REPORTS PAGE — allow full height (scrollable)
-   ============================================================ */
-
-.reports-page .dashboard,
-.reports-page main.dashboard {
-    height: auto;
-    min-height: calc(100vh - 90px);
-    overflow: visible;
-    padding: 32px 48px 60px;
-}
-
-/* Ensure report sections don't get clipped */
-.reports-page .report-table-wrap {
-    overflow: visible;
-}
-
-.reports-page .report-table {
-    width: 100%;
-}
-
-/* If needed, allow the page to scroll */
-.reports-page body,
-body.reports-page {
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-/* ============================================================
-   GAME PAGE ICONS — ensure visibility over video background
-   ============================================================ */
-
-.game-page .topnav .icon-btn,
-.game-page .topnav .user-avatar {
-    position: relative;
-    z-index: 100;
-    background: rgba(10, 10, 15, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-.game-page .topnav .icon-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
 }

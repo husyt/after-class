@@ -30,12 +30,9 @@ $message_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
-    // --------------------------------
-    // DELETE USER
-    // --------------------------------
+    // Delete user
     if ($_POST['action'] === 'delete_user') {
         $target_id = (int)($_POST['user_id'] ?? 0);
-        
         if ($target_id === (int)$_SESSION['user_id']) {
             $message = 'You cannot delete your own account.';
             $message_type = 'error';
@@ -48,15 +45,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 
-    // --------------------------------
-    // CHANGE USER ROLE
-    // --------------------------------
+    // Change user role
     if ($_POST['action'] === 'change_role') {
         $target_id = (int)($_POST['user_id'] ?? 0);
         $new_role = $_POST['new_role'] ?? '';
-        
         $allowed_roles = ['admin', 'teacher', 'student'];
-        
+
         if (!in_array($new_role, $allowed_roles, true)) {
             $message = 'Invalid role.';
             $message_type = 'error';
@@ -72,9 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
 
-    // --------------------------------
-    // TOGGLE 2FA
-    // --------------------------------
+    // Toggle 2FA
     if ($_POST['action'] === 'toggle_2fa') {
         $target_id = (int)($_POST['user_id'] ?? 0);
         $enable = isset($_POST['enable']) ? (int)(bool)$_POST['enable'] : 0;
@@ -85,13 +77,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         } elseif ($target_id > 0) {
             $stmt = $pdo->prepare("UPDATE users SET two_factor_enabled = ? WHERE id = ?");
             $stmt->execute([$enable, $target_id]);
-
             logActivity(
                 $pdo,
                 $_SESSION['user_id'],
                 ($enable ? 'Enabled' : 'Disabled') . " 2FA for user ID $target_id"
             );
-
             $message = $enable ? '2FA enabled for user.' : '2FA disabled for user.';
             $message_type = 'success';
         }
@@ -99,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 // ============================================
-// FETCH ALL USERS (after actions, so list is fresh)
+// FETCH DATA
 // ============================================
 $stmt = $pdo->query(
     "SELECT id, username, email, role, level, xp, high_score, games_played, 
@@ -108,9 +98,6 @@ $stmt = $pdo->query(
 );
 $users = $stmt->fetchAll();
 
-// ============================================
-// RECENT ACTIVITY (50 most recent)
-// ============================================
 $stmt = $pdo->query(
     "SELECT a.id, a.activity, a.ip_address, a.created_at, u.username 
      FROM activity_logs a
@@ -118,6 +105,34 @@ $stmt = $pdo->query(
      ORDER BY a.created_at DESC LIMIT 50"
 );
 $activities = $stmt->fetchAll();
+
+$stmt = $pdo->query(
+    "SELECT r.*, 
+            u.username as reporter_name, 
+            u.email as reporter_email
+     FROM issue_reports r
+     LEFT JOIN users u ON u.id = r.user_id
+     ORDER BY 
+        CASE r.status 
+            WHEN 'open' THEN 1 
+            WHEN 'in_review' THEN 2 
+            WHEN 'resolved' THEN 3 
+            WHEN 'dismissed' THEN 4 
+        END,
+        CASE r.severity 
+            WHEN 'critical' THEN 1 
+            WHEN 'high' THEN 2 
+            WHEN 'medium' THEN 3 
+            WHEN 'low' THEN 4 
+        END,
+        r.created_at DESC"
+);
+$issue_reports = $stmt->fetchAll();
+
+$open_reports_count = 0;
+foreach ($issue_reports as $r) {
+    if ($r['status'] === 'open') $open_reports_count++;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -179,7 +194,6 @@ $activities = $stmt->fetchAll();
         .admin-panel { display: none; }
         .admin-panel.active { display: block; }
 
-        /* Stats cards */
         .admin-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -206,7 +220,6 @@ $activities = $stmt->fetchAll();
             color: white;
         }
 
-        /* Users table */
         .admin-table-wrap {
             background: rgba(20, 20, 30, 0.6);
             border: 1px solid rgba(255,255,255,0.06);
@@ -275,7 +288,6 @@ $activities = $stmt->fetchAll();
             background: rgba(209,54,57,0.15);
         }
 
-        /* 2FA toggle */
         .tfa-toggle {
             display: inline-flex;
             align-items: center;
@@ -291,15 +303,12 @@ $activities = $stmt->fetchAll();
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .tfa-toggle.on {
             background: rgba(46, 204, 113, 0.15);
             border-color: rgba(46, 204, 113, 0.4);
             color: #2ecc71;
         }
-        .tfa-toggle.on:hover {
-            background: rgba(46, 204, 113, 0.25);
-        }
+        .tfa-toggle.on:hover { background: rgba(46, 204, 113, 0.25); }
         .tfa-toggle.off {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(255, 255, 255, 0.1);
@@ -330,7 +339,6 @@ $activities = $stmt->fetchAll();
             color: rgba(255, 255, 255, 0.4);
         }
 
-        /* Activity list */
         .admin-activity {
             display: flex;
             flex-direction: column;
@@ -363,11 +371,125 @@ $activities = $stmt->fetchAll();
             color: rgba(255,255,255,0.4);
             font-family: monospace;
         }
+
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            height: 18px;
+            padding: 0 5px;
+            margin-left: 6px;
+            background: #d13639;
+            color: white;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* Issue Reports */
+        .issue-reports-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .issue-report-card {
+            padding: 20px 24px;
+            background: rgba(20, 20, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-left: 4px solid #3498db;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+        .issue-report-card:hover { background: rgba(20, 20, 30, 0.8); }
+        .issue-report-card.status-resolved { border-left-color: #2ecc71; opacity: 0.7; }
+        .issue-report-card.status-dismissed { border-left-color: #666; opacity: 0.5; }
+        .issue-report-card.status-in_review { border-left-color: #f39c12; }
+
+        .issue-report-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+        .issue-report-left {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .issue-status,
+        .issue-severity,
+        .issue-game {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .issue-status.status-open { background: rgba(52,152,219,0.2); color: #3498db; }
+        .issue-status.status-in_review { background: rgba(243,156,18,0.2); color: #f39c12; }
+        .issue-status.status-resolved { background: rgba(46,204,113,0.2); color: #2ecc71; }
+        .issue-status.status-dismissed { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); }
+        .issue-severity.severity-low { background: rgba(46,204,113,0.15); color: #2ecc71; }
+        .issue-severity.severity-medium { background: rgba(243,156,18,0.15); color: #f39c12; }
+        .issue-severity.severity-high { background: rgba(209,54,57,0.2); color: #ff7c7f; }
+        .issue-severity.severity-critical { background: #d13639; color: white; }
+        .issue-game { background: rgba(124,58,237,0.2); color: #a78bfa; }
+        .issue-report-meta {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            font-family: monospace;
+        }
+        .issue-subject {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 10px;
+        }
+        .issue-description {
+            font-size: 13px;
+            color: rgba(255,255,255,0.75);
+            line-height: 1.6;
+            margin-bottom: 12px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+        }
+        .issue-reporter {
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 12px;
+        }
+        .issue-reporter strong { color: rgba(255,255,255,0.85); }
+        .issue-admin-notes {
+            padding: 12px 16px;
+            background: rgba(46,204,113,0.08);
+            border-left: 3px solid #2ecc71;
+            border-radius: 6px;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+        .issue-admin-notes strong {
+            color: #2ecc71;
+            display: block;
+            margin-bottom: 4px;
+        }
+        .issue-report-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
     </style>
 </head>
 <body class="profile-page">
 
-<!-- ============ TOP NAV ============ -->
 <header class="topnav">
     <div class="nav-left">
         <div class="logo-mark">
@@ -377,75 +499,46 @@ $activities = $stmt->fetchAll();
         </div>
         <nav class="nav-tabs">
             <a href="dashboard.php" class="nav-tab" title="Home">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
             </a>
             <a href="library.php" class="nav-tab" title="Library">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="3" width="7" height="7"/>
-                    <rect x="14" y="3" width="7" height="7"/>
-                    <rect x="14" y="14" width="7" height="7"/>
-                    <rect x="3" y="14" width="7" height="7"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             </a>
             <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/></svg>
             </a>
             <a href="admin.php" class="nav-tab active" title="Admin Panel">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/></svg>
             </a>
             <a href="profile.php" class="nav-tab" title="Profile">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="8" r="4"/>
-                    <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-                </svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
             </a>
         </nav>
     </div>
-
     <div class="nav-right">
         <button class="icon-btn" aria-label="Settings">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"/>
-                <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
-            </svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         </button>
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
         </div>
         <a href="logout.php" class="icon-btn" aria-label="Sign out">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-                <path d="M16 17l5-5-5-5M21 12H9"/>
-            </svg>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
         </a>
     </div>
 </header>
 
-<!-- ============ MAIN ============ -->
 <main class="dashboard">
 
     <div class="section-head">
         <div class="section-head-left">
             <a href="dashboard.php" class="back-link-small" title="Back">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 Back
             </a>
             <h1>Admin Panel</h1>
             <span class="admin-badge">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
-                </svg>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/></svg>
                 Admin Only
             </span>
         </div>
@@ -458,23 +551,23 @@ $activities = $stmt->fetchAll();
         </div>
     <?php endif; ?>
 
-    <!-- Tabs -->
     <div class="admin-tabs">
         <button class="admin-tab active" data-panel="overview">Overview</button>
         <button class="admin-tab" data-panel="users">Users</button>
         <button class="admin-tab" data-panel="activity">Activity Logs</button>
+        <button class="admin-tab" data-panel="issues">
+            Issue Reports
+            <?php if ($open_reports_count > 0): ?>
+                <span class="tab-badge"><?= $open_reports_count ?></span>
+            <?php endif; ?>
+        </button>
         <a href="reports.php" class="admin-tab">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 3v18h18"/>
-                <path d="M18 17V9M13 17V5M8 17v-3"/>
-            </svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
             Reports
         </a>
     </div>
 
-    <!-- ==========================================
-         PANEL: OVERVIEW
-         ========================================== -->
+    <!-- PANEL: OVERVIEW -->
     <div class="admin-panel active" data-panel="overview">
         <div class="admin-stats">
             <div class="admin-stat">
@@ -496,9 +589,7 @@ $activities = $stmt->fetchAll();
         </div>
     </div>
 
-    <!-- ==========================================
-         PANEL: USERS
-         ========================================== -->
+    <!-- PANEL: USERS -->
     <div class="admin-panel" data-panel="users">
         <div class="admin-table-wrap">
             <table class="admin-table">
@@ -522,8 +613,6 @@ $activities = $stmt->fetchAll();
                         <td><?= $u['id'] ?></td>
                         <td><strong><?= htmlspecialchars($u['username']) ?></strong></td>
                         <td><?= htmlspecialchars($u['email']) ?></td>
-
-                        <!-- Role -->
                         <td>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="action" value="change_role">
@@ -536,8 +625,6 @@ $activities = $stmt->fetchAll();
                                 </select>
                             </form>
                         </td>
-
-                        <!-- 2FA Toggle -->
                         <td>
                             <?php if ($u['id'] == $_SESSION['user_id']): ?>
                                 <span class="tfa-badge <?= $u['two_factor_enabled'] ? 'on' : 'off' ?>">
@@ -556,7 +643,6 @@ $activities = $stmt->fetchAll();
                                 </form>
                             <?php endif; ?>
                         </td>
-
                         <td><?= $u['level'] ?></td>
                         <td><?= number_format($u['xp']) ?></td>
                         <td><?= number_format($u['high_score']) ?></td>
@@ -580,36 +666,99 @@ $activities = $stmt->fetchAll();
         </div>
     </div>
 
-    <!-- ==========================================
-         PANEL: ACTIVITY LOGS
-         ========================================== -->
+    <!-- PANEL: ACTIVITY LOGS -->
     <div class="admin-panel" data-panel="activity">
         <div class="admin-activity">
             <?php if (empty($activities)): ?>
-                <p style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">
-                    No activity yet.
-                </p>
+                <p style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">No activity yet.</p>
             <?php else: ?>
                 <?php foreach ($activities as $a): ?>
                     <div class="admin-activity-row">
-                        <div class="admin-activity-user">
-                            <?= htmlspecialchars($a['username'] ?? 'System') ?>
-                        </div>
-                        <div class="admin-activity-text">
-                            <?= htmlspecialchars($a['activity']) ?>
-                        </div>
-                        <div class="admin-activity-time">
-                            <?= date('M j, g:i A', strtotime($a['created_at'])) ?>
-                        </div>
+                        <div class="admin-activity-user"><?= htmlspecialchars($a['username'] ?? 'System') ?></div>
+                        <div class="admin-activity-text"><?= htmlspecialchars($a['activity']) ?></div>
+                        <div class="admin-activity-time"><?= date('M j, g:i A', strtotime($a['created_at'])) ?></div>
                     </div>
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
     </div>
 
+    <!-- PANEL: ISSUE REPORTS -->
+    <div class="admin-panel" data-panel="issues">
+        <?php if (empty($issue_reports)): ?>
+            <div class="admin-table-wrap" style="padding:60px;text-align:center;">
+                <p style="color:rgba(255,255,255,0.4);font-size:14px;">No issue reports yet.</p>
+            </div>
+        <?php else: ?>
+            <div class="issue-reports-list">
+                <?php foreach ($issue_reports as $r): ?>
+                    <div class="issue-report-card status-<?= htmlspecialchars($r['status']) ?>">
+                        <div class="issue-report-header">
+                            <div class="issue-report-left">
+                                <span class="issue-status status-<?= htmlspecialchars($r['status']) ?>">
+                                    <?= ucfirst(str_replace('_', ' ', $r['status'])) ?>
+                                </span>
+                                <span class="issue-severity severity-<?= htmlspecialchars($r['severity']) ?>">
+                                    <?= ucfirst($r['severity']) ?>
+                                </span>
+                                <?php if ($r['game_id']): ?>
+                                    <span class="issue-game">
+                                        <?= htmlspecialchars(strtoupper(str_replace('-', ' ', $r['game_id']))) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                            <div class="issue-report-meta">
+                                #<?= $r['id'] ?> · <?= date('M j, Y · g:i A', strtotime($r['created_at'])) ?>
+                            </div>
+                        </div>
+
+                        <h4 class="issue-subject"><?= htmlspecialchars($r['subject']) ?></h4>
+
+                        <p class="issue-description">
+                            <?= nl2br(htmlspecialchars($r['description'])) ?>
+                        </p>
+
+                        <div class="issue-reporter">
+                            <strong><?= htmlspecialchars($r['reporter_name'] ?? 'Unknown') ?></strong>
+                            · <?= htmlspecialchars($r['reporter_email'] ?? '—') ?>
+                        </div>
+
+                        <?php if ($r['admin_notes']): ?>
+                            <div class="issue-admin-notes">
+                                <strong>Admin Notes:</strong>
+                                <?= nl2br(htmlspecialchars($r['admin_notes'])) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="issue-report-actions">
+                            <?php if ($r['status'] === 'open'): ?>
+                                <button class="admin-action-btn" onclick="resolveReport(<?= $r['id'] ?>, 'in_review')">
+                                    Mark In Review
+                                </button>
+                            <?php endif; ?>
+
+                            <?php if ($r['status'] !== 'resolved' && $r['status'] !== 'dismissed'): ?>
+                                <button class="admin-action-btn" style="background:rgba(46,204,113,0.15);color:#2ecc71;border-color:rgba(46,204,113,0.4);"
+                                        onclick="resolveReportWithNotes(<?= $r['id'] ?>, 'resolved')">
+                                    ✓ Resolve
+                                </button>
+                                <button class="admin-action-btn" onclick="resolveReport(<?= $r['id'] ?>, 'dismissed')">
+                                    Dismiss
+                                </button>
+                            <?php endif; ?>
+
+                            <button class="admin-action-btn danger" onclick="deleteReport(<?= $r['id'] ?>)">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+
 </main>
 
-<!-- Background layer -->
 <div class="bg-layer" id="bgLayer">
     <video class="bg-video" autoplay muted loop playsinline preload="auto">
         <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
@@ -620,9 +769,8 @@ $activities = $stmt->fetchAll();
 
 <script src="js/settings.js"></script>
 <script>
-// Tab switching
 document.querySelectorAll('.admin-tab').forEach(tab => {
-    if (!tab.dataset.panel) return; // skip Report link
+    if (!tab.dataset.panel) return;
     tab.addEventListener('click', () => {
         document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
@@ -630,6 +778,55 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
         document.querySelector(`.admin-panel[data-panel="${tab.dataset.panel}"]`).classList.add('active');
     });
 });
+
+async function resolveReport(reportId, action) {
+    if (!confirm(`Mark report #${reportId} as "${action.replace('_', ' ')}"?`)) return;
+    try {
+        const res = await fetch('resolve_report.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ report_id: reportId, action: action })
+        });
+        const data = await res.json();
+        if (data.success) location.reload();
+        else alert('Failed: ' + (data.error || 'Unknown error'));
+    } catch (err) {
+        alert('Network error: ' + err.message);
+    }
+}
+
+async function resolveReportWithNotes(reportId, action) {
+    const notes = prompt('Add admin notes (optional):');
+    if (notes === null) return;
+    try {
+        const res = await fetch('resolve_report.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ report_id: reportId, action: action, notes: notes })
+        });
+        const data = await res.json();
+        if (data.success) location.reload();
+        else alert('Failed: ' + (data.error || 'Unknown error'));
+    } catch (err) {
+        alert('Network error: ' + err.message);
+    }
+}
+
+async function deleteReport(reportId) {
+    if (!confirm(`Delete report #${reportId}? This cannot be undone.`)) return;
+    try {
+        const res = await fetch('resolve_report.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ report_id: reportId, action: 'delete' })
+        });
+        const data = await res.json();
+        if (data.success) location.reload();
+        else alert('Failed: ' + (data.error || 'Unknown error'));
+    } catch (err) {
+        alert('Network error: ' + err.message);
+    }
+}
 </script>
 </body>
 </html>

@@ -23,7 +23,7 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoreSync | Sign In</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=<?= time() ?>">
 </head>
 <body>
 <div class="login-wrapper">
@@ -88,9 +88,13 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
                     </div>
                     <span class="field-error" id="password-error"></span>
                 </div>
-                <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:8px;">
-    🔒 You'll receive a verification code by email.
-</p>
+               <div class="email-notice" title="You'll receive a verification code by email.">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0110 0v4"/>
+    </svg>
+    <span>2FA code sent by email</span>
+</div>
                 <div class="social-row">
                     <button type="button" class="social-btn fb">f</button>
                     <button type="button" class="social-btn google">G</button>

@@ -45,8 +45,8 @@ $games = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | CoreSync</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+   <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
+<link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -285,6 +285,65 @@ $games = [
     </div>
 </div>
 
+<!-- ============ REPORT ISSUE MODAL ============ -->
+<div class="report-modal" id="reportModal" aria-hidden="true">
+    <div class="report-modal-backdrop" id="reportBackdrop"></div>
+    <div class="report-modal-panel" role="dialog">
+        <button class="report-modal-close" id="reportClose" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <div class="report-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/>
+            </svg>
+        </div>
+
+        <h2>Report an Issue</h2>
+        <p class="report-sub">Tell us what went wrong and we'll look into it.</p>
+
+        <form id="reportForm">
+            <div class="form-group">
+                <label for="reportSubject">Subject</label>
+                <input type="text" id="reportSubject" 
+                       placeholder="e.g. Game won't load" 
+                       required maxlength="150">
+                <span class="field-error" id="reportSubjectError"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="reportSeverity">Severity</label>
+                <select id="reportSeverity" class="report-select">
+                    <option value="low">Low — Minor issue</option>
+                    <option value="medium" selected>Medium — Affects gameplay</option>
+                    <option value="high">High — Blocks progress</option>
+                    <option value="critical">Critical — System broken</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="reportDescription">Description</label>
+                <textarea id="reportDescription" 
+                          placeholder="Describe the issue in detail..."
+                          required maxlength="2000" rows="5"></textarea>
+                <span class="field-error" id="reportDescriptionError"></span>
+            </div>
+
+            <div class="report-modal-actions">
+                <button type="button" class="action-btn secondary" id="reportCancel">Cancel</button>
+                <button type="submit" class="action-btn primary" id="reportSubmit">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                    Send Report
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 
 <script>
     window.GAMES = <?= json_encode($games, JSON_UNESCAPED_SLASHES) ?>;
@@ -293,8 +352,8 @@ $games = [
 <!-- Settings drawer -->
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
-<script src="js/dashboard.js"></script>
-<script src="js/settings.js"></script>
+<script src="js/dashboard.js?v=<?= time() ?>"></script>
+<script src="js/settings.js?v=<?= time() ?>"></script>
 <div class="bg-layer" id="bgLayer">
     <!-- Background music -->
 <audio id="bgMusic" loop preload="auto">
