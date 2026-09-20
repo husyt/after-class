@@ -7,6 +7,27 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+require_once __DIR__ . '/../config/database.php';
+
+// ============================================
+// FETCH CURRENT USER + STATS
+// ============================================
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch();
+
+$stats = [
+    'level'        => (int)($user['level'] ?? 1),
+    'xp'           => (int)($user['xp'] ?? 0),
+    'high_score'   => (int)($user['high_score'] ?? 0),
+    'games_played' => (int)($user['games_played'] ?? 0),
+];
+
+// XP progress to next level
+$stats['xp_current'] = $stats['xp'] % 1000;
+$stats['xp_next']    = 1000;
+$stats['xp_percent'] = ($stats['xp_current'] / $stats['xp_next']) * 100;
+
 // ==================================================
 // GAME CATALOG
 // ==================================================
@@ -176,10 +197,96 @@ if (!$game) {
         }
         .play-btn svg { width: 22px; height: 22px; }
 
+        /* ============================================
+           STAT CARDS ON GAME PAGE
+           ============================================ */
+        .game-stats {
+            position: absolute;
+            top: 100px;
+            right: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 6;
+            max-width: 240px;
+        }
+
+        .game-stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(10, 10, 15, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .game-stat:hover {
+            border-color: rgba(255, 255, 255, 0.18);
+            transform: translateX(-2px);
+        }
+
+        .game-stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .game-stat-icon.level {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            box-shadow: 0 6px 18px rgba(124, 58, 237, 0.4);
+        }
+
+        .game-stat-icon.xp {
+            background: linear-gradient(135deg, #d13639, #f97316);
+            box-shadow: 0 6px 18px rgba(209, 54, 57, 0.4);
+        }
+
+        .game-stat-icon.score {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a0f00;
+            box-shadow: 0 6px 18px rgba(255, 215, 0, 0.4);
+        }
+
+        .game-stat-icon.games {
+            background: linear-gradient(135deg, #2ecc71, #059669);
+            box-shadow: 0 6px 18px rgba(46, 204, 113, 0.4);
+        }
+
+        .game-stat-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .game-stat-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 2px;
+        }
+
+        .game-stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+        }
+
         @media (max-width: 900px) {
             .game-page { padding: 24px; }
             .game-title { font-size: 44px; }
             .play-btn { padding: 14px 32px; font-size: 16px; }
+            .game-stats { display: none; }
         }
     </style>
 </head>
@@ -207,9 +314,14 @@ if (!$game) {
         </div>
     </div>
     <div class="nav-right">
-        <a href="dashboard.php" class="icon-btn" aria-label="Back">
+        <a href="leaderboard.php" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+            </svg>
+        </a>
+        <a href="dashboard.php" class="icon-btn" aria-label="Dashboard" title="Dashboard">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
             </svg>
         </a>
         <div class="user-avatar">
@@ -218,10 +330,69 @@ if (!$game) {
                 <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
             </svg>
         </div>
+        <a href="logout.php" class="icon-btn" aria-label="Sign out" title="Sign Out">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+                <path d="M16 17l5-5-5-5M21 12H9"/>
+            </svg>
+        </a>
     </div>
 </header>
 
 <main class="game-page">
+
+    <!-- ============ STAT CARDS (top-right corner) ============ -->
+    <div class="game-stats">
+        <div class="game-stat">
+            <div class="game-stat-icon level">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
+                </svg>
+            </div>
+            <div class="game-stat-body">
+                <div class="game-stat-label">Level</div>
+                <div class="game-stat-value"><?= $stats['level'] ?></div>
+            </div>
+        </div>
+
+        <div class="game-stat">
+            <div class="game-stat-icon xp">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+            </div>
+            <div class="game-stat-body">
+                <div class="game-stat-label">Total XP</div>
+                <div class="game-stat-value"><?= number_format($stats['xp']) ?></div>
+            </div>
+        </div>
+
+        <div class="game-stat">
+            <div class="game-stat-icon score">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                </svg>
+            </div>
+            <div class="game-stat-body">
+                <div class="game-stat-label">High Score</div>
+                <div class="game-stat-value"><?= number_format($stats['high_score']) ?></div>
+            </div>
+        </div>
+
+        <div class="game-stat">
+            <div class="game-stat-icon games">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="6" width="20" height="12" rx="4"/>
+                    <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
+                </svg>
+            </div>
+            <div class="game-stat-body">
+                <div class="game-stat-label">Played</div>
+                <div class="game-stat-value"><?= number_format($stats['games_played']) ?></div>
+            </div>
+        </div>
+    </div>
+
     <a href="dashboard.php" class="back-btn">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -236,7 +407,7 @@ if (!$game) {
         <?= htmlspecialchars($game['description'] ?? '') ?>
     </div>
 
-    <a href="#" class="play-btn">
+    <a href="play.php?id=<?= urlencode($game['id']) ?>" class="play-btn">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
         Play
     </a>

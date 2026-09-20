@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($errors)) {
         try {
             $hash = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role, two_factor_enabled) VALUES (?, ?, ?, 'student', 0)");
+            $stmt = $pdo->prepare("INSERT INTO users (username, email, password_hash, role, two_factor_enabled) VALUES (?, ?, ?, 'student', 1)");
             $stmt->execute([$username, $email, $hash]);
             
             $_SESSION['login_success'] = 'Account created! You can now sign in.';

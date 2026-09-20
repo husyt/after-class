@@ -1798,3 +1798,19 @@ body.reports-page {
     overflow-y: auto;
     overflow-x: hidden;
 }
+/* ============================================================
+   GAME PAGE ICONS — ensure visibility over video background
+   ============================================================ */
+
+.game-page .topnav .icon-btn,
+.game-page .topnav .user-avatar {
+    position: relative;
+    z-index: 100;
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.game-page .topnav .icon-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+}

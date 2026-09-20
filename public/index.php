@@ -88,7 +88,9 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
                     </div>
                     <span class="field-error" id="password-error"></span>
                 </div>
-
+                <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:8px;">
+    🔒 You'll receive a verification code by email.
+</p>
                 <div class="social-row">
                     <button type="button" class="social-btn fb">f</button>
                     <button type="button" class="social-btn google">G</button>

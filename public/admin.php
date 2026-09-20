@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/session.php';
-requireAdmin();   // ← This handles ALL the role protection
+requireAdmin();
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
@@ -14,7 +14,6 @@ $user = $stmt->fetch();
 // SYSTEM STATISTICS
 // ============================================
 $stats = [];
-
 $stats['total_users'] = (int)$pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
 $stats['total_games'] = (int)$pdo->query("SELECT COUNT(*) FROM game_sessions")->fetchColumn();
 $stats['total_sessions'] = (int)$pdo->query("SELECT COUNT(*) FROM activity_logs")->fetchColumn();
@@ -24,11 +23,87 @@ $stats['active_today'] = (int)$pdo->query(
 )->fetchColumn();
 
 // ============================================
-// FETCH ALL USERS
+// HANDLE POST ACTIONS
+// ============================================
+$message = '';
+$message_type = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+
+    // --------------------------------
+    // DELETE USER
+    // --------------------------------
+    if ($_POST['action'] === 'delete_user') {
+        $target_id = (int)($_POST['user_id'] ?? 0);
+        
+        if ($target_id === (int)$_SESSION['user_id']) {
+            $message = 'You cannot delete your own account.';
+            $message_type = 'error';
+        } elseif ($target_id > 0) {
+            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+            $stmt->execute([$target_id]);
+            logActivity($pdo, $_SESSION['user_id'], "Deleted user ID $target_id");
+            $message = 'User deleted successfully.';
+            $message_type = 'success';
+        }
+    }
+
+    // --------------------------------
+    // CHANGE USER ROLE
+    // --------------------------------
+    if ($_POST['action'] === 'change_role') {
+        $target_id = (int)($_POST['user_id'] ?? 0);
+        $new_role = $_POST['new_role'] ?? '';
+        
+        $allowed_roles = ['admin', 'teacher', 'student'];
+        
+        if (!in_array($new_role, $allowed_roles, true)) {
+            $message = 'Invalid role.';
+            $message_type = 'error';
+        } elseif ($target_id === (int)$_SESSION['user_id']) {
+            $message = 'You cannot change your own role.';
+            $message_type = 'error';
+        } elseif ($target_id > 0) {
+            $stmt = $pdo->prepare("UPDATE users SET role = ? WHERE id = ?");
+            $stmt->execute([$new_role, $target_id]);
+            logActivity($pdo, $_SESSION['user_id'], "Changed user $target_id role to $new_role");
+            $message = 'Role updated successfully.';
+            $message_type = 'success';
+        }
+    }
+
+    // --------------------------------
+    // TOGGLE 2FA
+    // --------------------------------
+    if ($_POST['action'] === 'toggle_2fa') {
+        $target_id = (int)($_POST['user_id'] ?? 0);
+        $enable = isset($_POST['enable']) ? (int)(bool)$_POST['enable'] : 0;
+
+        if ($target_id === (int)$_SESSION['user_id']) {
+            $message = 'You cannot change your own 2FA setting.';
+            $message_type = 'error';
+        } elseif ($target_id > 0) {
+            $stmt = $pdo->prepare("UPDATE users SET two_factor_enabled = ? WHERE id = ?");
+            $stmt->execute([$enable, $target_id]);
+
+            logActivity(
+                $pdo,
+                $_SESSION['user_id'],
+                ($enable ? 'Enabled' : 'Disabled') . " 2FA for user ID $target_id"
+            );
+
+            $message = $enable ? '2FA enabled for user.' : '2FA disabled for user.';
+            $message_type = 'success';
+        }
+    }
+}
+
+// ============================================
+// FETCH ALL USERS (after actions, so list is fresh)
 // ============================================
 $stmt = $pdo->query(
     "SELECT id, username, email, role, level, xp, high_score, games_played, 
-            last_login, created_at 
+            last_login, created_at, two_factor_enabled 
      FROM users ORDER BY created_at DESC"
 );
 $users = $stmt->fetchAll();
@@ -43,65 +118,6 @@ $stmt = $pdo->query(
      ORDER BY a.created_at DESC LIMIT 50"
 );
 $activities = $stmt->fetchAll();
-
-// ============================================
-// HANDLE DELETE USER
-// ============================================
-$message = '';
-$message_type = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    
-    // Delete user
-    if ($_POST['action'] === 'delete_user') {
-        $target_id = (int)($_POST['user_id'] ?? 0);
-        
-        if ($target_id === (int)$_SESSION['user_id']) {
-            $message = 'You cannot delete your own account.';
-            $message_type = 'error';
-        } elseif ($target_id > 0) {
-            $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
-            $stmt->execute([$target_id]);
-            logActivity($pdo, $_SESSION['user_id'], "Deleted user ID $target_id");
-            $message = 'User deleted successfully.';
-            $message_type = 'success';
-            // Refresh users list
-            $users = $pdo->query(
-                "SELECT id, username, email, role, level, xp, high_score, games_played, 
-                        last_login, created_at 
-                 FROM users ORDER BY created_at DESC"
-            )->fetchAll();
-        }
-    }
-    
-    // Change user role
-    if ($_POST['action'] === 'change_role') {
-        $target_id = (int)($_POST['user_id'] ?? 0);
-        $new_role = $_POST['new_role'] ?? '';
-        
-        $allowed_roles = ['admin', 'student'];
-        
-        if (!in_array($new_role, $allowed_roles)) {
-            $message = 'Invalid role.';
-            $message_type = 'error';
-        } elseif ($target_id === (int)$_SESSION['user_id']) {
-            $message = 'You cannot change your own role.';
-            $message_type = 'error';
-        } elseif ($target_id > 0) {
-            $stmt = $pdo->prepare("UPDATE users SET role = ? WHERE id = ?");
-            $stmt->execute([$new_role, $target_id]);
-            logActivity($pdo, $_SESSION['user_id'], "Changed user $target_id role to $new_role");
-            $message = 'Role updated successfully.';
-            $message_type = 'success';
-            // Refresh
-            $users = $pdo->query(
-                "SELECT id, username, email, role, level, xp, high_score, games_played, 
-                        last_login, created_at 
-                 FROM users ORDER BY created_at DESC"
-            )->fetchAll();
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -113,7 +129,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/dashboard.css">
     <style>
-        /* Admin-specific styles */
         .admin-badge {
             display: inline-flex;
             align-items: center;
@@ -150,6 +165,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
         .admin-tab:hover { color: white; }
         .admin-tab.active {
@@ -192,7 +211,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             background: rgba(20, 20, 30, 0.6);
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 14px;
-            overflow: hidden;
+            overflow-x: auto;
         }
         .admin-table {
             width: 100%;
@@ -211,6 +230,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             text-transform: uppercase;
             letter-spacing: 1.5px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
+            white-space: nowrap;
         }
         .admin-table td {
             padding: 14px 20px;
@@ -220,17 +240,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         .admin-table tr:last-child td { border-bottom: none; }
         .admin-table tr:hover { background: rgba(255,255,255,0.02); }
 
-        .role-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .role-select {
+            padding: 6px 10px;
+            background: #1a1a25;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            color: white;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
         }
-        .role-badge.admin { background: #d13639; color: white; }
-        .role-badge.student { background: #2ecc71; color: #0a1a10; }
 
         .admin-action-btn {
             padding: 6px 12px;
@@ -256,15 +275,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             background: rgba(209,54,57,0.15);
         }
 
-        .role-select {
-            padding: 4px 8px;
-            background: #1a1a25;
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            color: white;
+        /* 2FA toggle */
+        .tfa-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 66px;
+            padding: 6px 12px;
             font-family: inherit;
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border-radius: 999px;
+            border: 1px solid transparent;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tfa-toggle.on {
+            background: rgba(46, 204, 113, 0.15);
+            border-color: rgba(46, 204, 113, 0.4);
+            color: #2ecc71;
+        }
+        .tfa-toggle.on:hover {
+            background: rgba(46, 204, 113, 0.25);
+        }
+        .tfa-toggle.off {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+        .tfa-toggle.off:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .tfa-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 66px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            border-radius: 999px;
+        }
+        .tfa-badge.on {
+            background: rgba(46, 204, 113, 0.15);
+            color: #2ecc71;
+        }
+        .tfa-badge.off {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.4);
         }
 
         /* Activity list */
@@ -324,6 +387,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     <rect x="14" y="3" width="7" height="7"/>
                     <rect x="14" y="14" width="7" height="7"/>
                     <rect x="3" y="14" width="7" height="7"/>
+                </svg>
+            </a>
+            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
                 </svg>
             </a>
             <a href="admin.php" class="nav-tab active" title="Admin Panel">
@@ -391,18 +459,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <?php endif; ?>
 
     <!-- Tabs -->
-       <div class="admin-tabs">
-    <button class="admin-tab active" data-panel="overview">Overview</button>
-    <button class="admin-tab" data-panel="users">Users</button>
-    <button class="admin-tab" data-panel="activity">Activity Logs</button>
-    <a href="reports.php" class="admin-tab" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M3 3v18h18"/>
-            <path d="M18 17V9M13 17V5M8 17v-3"/>
-        </svg>
-        Reports
-    </a>
-</div>
+    <div class="admin-tabs">
+        <button class="admin-tab active" data-panel="overview">Overview</button>
+        <button class="admin-tab" data-panel="users">Users</button>
+        <button class="admin-tab" data-panel="activity">Activity Logs</button>
+        <a href="reports.php" class="admin-tab">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3v18h18"/>
+                <path d="M18 17V9M13 17V5M8 17v-3"/>
+            </svg>
+            Reports
+        </a>
+    </div>
 
     <!-- ==========================================
          PANEL: OVERVIEW
@@ -440,6 +508,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
+                        <th>2FA</th>
                         <th>Level</th>
                         <th>XP</th>
                         <th>High Score</th>
@@ -453,6 +522,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         <td><?= $u['id'] ?></td>
                         <td><strong><?= htmlspecialchars($u['username']) ?></strong></td>
                         <td><?= htmlspecialchars($u['email']) ?></td>
+
+                        <!-- Role -->
                         <td>
                             <form method="POST" style="display:inline;">
                                 <input type="hidden" name="action" value="change_role">
@@ -460,10 +531,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                                 <select name="new_role" class="role-select" onchange="this.form.submit()"
                                     <?= $u['id'] == $_SESSION['user_id'] ? 'disabled' : '' ?>>
                                     <option value="student" <?= $u['role'] === 'student' ? 'selected' : '' ?>>Student</option>
+                                    <option value="teacher" <?= $u['role'] === 'teacher' ? 'selected' : '' ?>>Teacher</option>
                                     <option value="admin"   <?= $u['role'] === 'admin'   ? 'selected' : '' ?>>Admin</option>
                                 </select>
                             </form>
                         </td>
+
+                        <!-- 2FA Toggle -->
+                        <td>
+                            <?php if ($u['id'] == $_SESSION['user_id']): ?>
+                                <span class="tfa-badge <?= $u['two_factor_enabled'] ? 'on' : 'off' ?>">
+                                    <?= $u['two_factor_enabled'] ? '✓ ON' : 'OFF' ?>
+                                </span>
+                            <?php else: ?>
+                                <form method="POST" style="display:inline;">
+                                    <input type="hidden" name="action" value="toggle_2fa">
+                                    <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                    <input type="hidden" name="enable" value="<?= $u['two_factor_enabled'] ? 0 : 1 ?>">
+                                    <button type="submit"
+                                            class="tfa-toggle <?= $u['two_factor_enabled'] ? 'on' : 'off' ?>"
+                                            title="<?= $u['two_factor_enabled'] ? 'Click to disable' : 'Click to enable' ?>">
+                                        <?= $u['two_factor_enabled'] ? '✓ ON' : 'OFF' ?>
+                                    </button>
+                                </form>
+                            <?php endif; ?>
+                        </td>
+
                         <td><?= $u['level'] ?></td>
                         <td><?= number_format($u['xp']) ?></td>
                         <td><?= number_format($u['high_score']) ?></td>
@@ -529,6 +622,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 <script>
 // Tab switching
 document.querySelectorAll('.admin-tab').forEach(tab => {
+    if (!tab.dataset.panel) return; // skip Report link
     tab.addEventListener('click', () => {
         document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));

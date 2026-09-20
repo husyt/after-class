@@ -26,10 +26,52 @@ $stmt = $pdo->prepare(
 $stmt->execute([$_SESSION['user_id']]);
 $activities = $stmt->fetchAll();
 
+// ============================================
+// GAME STATISTICS (§11)
+// ============================================
+$stmt = $pdo->prepare(
+    "SELECT 
+        COUNT(*) as total_sessions,
+        COALESCE(SUM(score), 0) as total_score,
+        COALESCE(AVG(score), 0) as avg_score,
+        COALESCE(MAX(score), 0) as high_score,
+        COALESCE(SUM(duration_seconds), 0) as total_seconds
+     FROM game_sessions
+     WHERE user_id = ?"
+);
+$stmt->execute([$_SESSION['user_id']]);
+$game_stats = $stmt->fetch();
+
+// Per-game breakdown
+$stmt = $pdo->prepare(
+    "SELECT 
+        game_id,
+        COUNT(*) as plays,
+        COALESCE(MAX(score), 0) as high_score,
+        COALESCE(AVG(score), 0) as avg_score
+     FROM game_sessions
+     WHERE user_id = ?
+     GROUP BY game_id
+     ORDER BY plays DESC"
+);
+$stmt->execute([$_SESSION['user_id']]);
+$per_game = $stmt->fetchAll();
+
 // Stats
 $level   = (int)($user['level'] ?? 1);
+$xp      = (int)($user['xp'] ?? 0);
 $joined  = $user['created_at'] ? date('M Y', strtotime($user['created_at'])) : '—';
 $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_login'])) : 'Never';
+
+// XP progress
+$xp_current = $xp % 1000;
+$xp_percent = ($xp_current / 1000) * 100;
+
+// Format playtime
+$total_seconds = (int)$game_stats['total_seconds'];
+$hours   = floor($total_seconds / 3600);
+$minutes = floor(($total_seconds % 3600) / 60);
+$playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -40,6 +82,178 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <style>
+        /* ============================================
+           GAME STATS SECTION
+           ============================================ */
+        .game-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .game-stat-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .game-stat-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        .game-stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .game-stat-icon.purple {
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+        }
+        .game-stat-icon.red {
+            background: linear-gradient(135deg, #d13639, #f97316);
+            box-shadow: 0 4px 14px rgba(209, 54, 57, 0.35);
+        }
+        .game-stat-icon.gold {
+            background: linear-gradient(135deg, #ffd700, #f59e0b);
+            color: #1a0f00;
+            box-shadow: 0 4px 14px rgba(255, 215, 0, 0.35);
+        }
+        .game-stat-icon.green {
+            background: linear-gradient(135deg, #2ecc71, #059669);
+            box-shadow: 0 4px 14px rgba(46, 204, 113, 0.35);
+        }
+
+        .game-stat-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .game-stat-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 3px;
+        }
+
+        .game-stat-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+        }
+
+        /* XP Progress Bar */
+        .xp-progress-wrap {
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .xp-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+        }
+
+        .xp-progress-track {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .xp-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #7c3aed, #a855f7);
+            border-radius: 999px;
+            transition: width 0.8s ease;
+        }
+
+        /* Per-game table */
+        .per-game-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .per-game-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .per-game-row:last-child {
+            border-bottom: none;
+        }
+
+        .per-game-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .per-game-stats {
+            display: flex;
+            gap: 20px;
+            font-size: 12px;
+        }
+
+        .per-game-stat {
+            text-align: right;
+        }
+
+        .per-game-stat-label {
+            font-size: 9px;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+
+        .per-game-stat-value {
+            font-size: 14px;
+            font-weight: 800;
+            color: #2ecc71;
+            font-family: monospace;
+        }
+
+        .empty-games {
+            text-align: center;
+            padding: 30px 20px;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 13px;
+        }
+    </style>
 </head>
 <body>
 <!-- ============ TOP NAV ============ -->
@@ -64,6 +278,11 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
+            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                </svg>
+            </a>
             <a href="profile.php" class="nav-tab active" title="Profile">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
@@ -71,12 +290,12 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
                 </svg>
             </a>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-<a href="admin.php" class="nav-tab" title="Admin">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
-    </svg>
-</a>
-<?php endif; ?>
+            <a href="admin.php" class="nav-tab" title="Admin">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
+                </svg>
+            </a>
+            <?php endif; ?>
         </nav>
     </div>
 
@@ -105,7 +324,6 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
 <!-- ============ MAIN ============ -->
 <main class="dashboard">
 
-    <!-- Section head with Back button -->
     <div class="section-head">
         <div class="section-head-left">
             <a href="dashboard.php" class="back-link-small" title="Back to Home">
@@ -146,7 +364,6 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
 
     <!-- Display Name & Pronouns -->
     <div class="profile-info-cards">
-
         <div class="info-card">
             <div class="info-card-left">
                 <div class="info-card-label">Display Name</div>
@@ -176,7 +393,105 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
                 Edit
             </button>
         </div>
+    </div>
 
+    <!-- ============================================
+         GAME STATISTICS (§11)
+         ============================================ -->
+    <div class="profile-section">
+        <h3>Game Statistics</h3>
+
+        <div class="game-stats-grid">
+            <div class="game-stat-card">
+                <div class="game-stat-icon purple">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
+                    </svg>
+                </div>
+                <div class="game-stat-info">
+                    <div class="game-stat-label">Level</div>
+                    <div class="game-stat-value"><?= $level ?></div>
+                </div>
+            </div>
+
+            <div class="game-stat-card">
+                <div class="game-stat-icon red">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                <div class="game-stat-info">
+                    <div class="game-stat-label">Total XP</div>
+                    <div class="game-stat-value"><?= number_format($xp) ?></div>
+                </div>
+            </div>
+
+            <div class="game-stat-card">
+                <div class="game-stat-icon gold">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                    </svg>
+                </div>
+                <div class="game-stat-info">
+                    <div class="game-stat-label">High Score</div>
+                    <div class="game-stat-value"><?= number_format($game_stats['high_score']) ?></div>
+                </div>
+            </div>
+
+            <div class="game-stat-card">
+                <div class="game-stat-icon green">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="6" width="20" height="12" rx="4"/>
+                        <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
+                    </svg>
+                </div>
+                <div class="game-stat-info">
+                    <div class="game-stat-label">Games Played</div>
+                    <div class="game-stat-value"><?= number_format($game_stats['total_sessions']) ?></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- XP Progress to next level -->
+        <div class="xp-progress-wrap">
+            <div class="xp-progress-header">
+                <span>Level <?= $level ?></span>
+                <span><?= $xp_current ?> / 1000 XP</span>
+            </div>
+            <div class="xp-progress-track">
+                <div class="xp-progress-fill" style="width: <?= $xp_percent ?>%"></div>
+            </div>
+        </div>
+
+        <!-- Per-game stats -->
+        <h3 style="margin-top: 24px;">Per-Game Breakdown</h3>
+        <?php if (empty($per_game)): ?>
+            <p class="empty-games">No games played yet. Start playing to see stats!</p>
+        <?php else: ?>
+            <ul class="per-game-list">
+                <?php foreach ($per_game as $g): ?>
+                    <li class="per-game-row">
+                        <div class="per-game-name">
+                            <?= htmlspecialchars(strtoupper(str_replace('-', ' ', $g['game_id']))) ?>
+                        </div>
+                        <div class="per-game-stats">
+                            <div class="per-game-stat">
+                                <div class="per-game-stat-label">Plays</div>
+                                <div class="per-game-stat-value"><?= $g['plays'] ?></div>
+                            </div>
+                            <div class="per-game-stat">
+                                <div class="per-game-stat-label">Best</div>
+                                <div class="per-game-stat-value"><?= number_format($g['high_score']) ?></div>
+                            </div>
+                            <div class="per-game-stat">
+                                <div class="per-game-stat-label">Avg</div>
+                                <div class="per-game-stat-value"><?= number_format($g['avg_score'], 0) ?></div>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
     </div>
 
     <!-- Account Details -->
@@ -260,10 +575,9 @@ $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_l
 
 <!-- Background layer -->
 <div class="bg-layer" id="bgLayer">
-    <!-- Background music -->
-<audio id="bgMusic" loop preload="auto">
-    <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
-</audio>
+    <audio id="bgMusic" loop preload="auto">
+        <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
+    </audio>
     <video class="bg-video" autoplay muted loop playsinline preload="auto">
         <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
     </video>
@@ -324,7 +638,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.style.overflow = '';
     }
 
-    // Wire up the Edit buttons using data-field
     document.querySelectorAll('.info-card-edit').forEach(btn => {
         btn.addEventListener('click', () => {
             openEdit(btn.dataset.field);
@@ -339,7 +652,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
     });
 
-    // Client-side validation
     if (form) {
         form.addEventListener('submit', (e) => {
             const val = inputField.value.trim();
