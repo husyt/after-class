@@ -420,7 +420,6 @@ $user = $stmt->fetch();
             letter-spacing: 1px;
         }
         .report-role.admin { background: #d13639; color: white; }
-        .report-role.teacher { background: #7c3aed; color: white; }
         .report-role.student { background: #2ecc71; color: #0a1a10; }
 
         /* Empty state */
