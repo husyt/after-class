@@ -1,8 +1,8 @@
 # CoreSync — Client Acceptance Document
 
 **Project:** CoreSync — Game-Integrated Learning Platform  
-**Client:** [School Name / Assigned Client]  
-**Prepared by:** [Your Name]  
+**Client:** [[UPHSD] / CLIENT 10 – EqualPath Youth Foundation]  
+**Prepared by:** [CoreSync]  
 **Date:** September 20, 2026  
 **Version:** 1.0
 
