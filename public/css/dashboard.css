@@ -1,0 +1,1800 @@
+/* ============================================================
+   CORESYNC - PS5-Style Dashboard
+   Organized CSS Stylesheet
+   ============================================================
+   TABLE OF CONTENTS
+   1. Reset & Variables
+   2. Base Layout
+   3. Live Video Background
+   4. Top Navigation
+   5. Dashboard Content
+   6. Game Tiles
+   7. Action Bar
+   8. Info Modal
+   9. Library Page
+   10. Profile Page
+   11. Edit Profile Modal
+   12. More Dropdown Menu
+   13. Toast Notifications
+   14. Custom Scrollbars
+   15. Accessibility (Reduce Motion)
+   16. Responsive Breakpoints
+   ============================================================ */
+
+
+/* ============================================================
+   1. RESET & VARIABLES
+   ============================================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #0a0a0f;
+    --bg-2: #14141a;
+    --text: #ffffff;
+    --text-mid: #a0a0b0;
+    --accent: #7c3aed;
+    --play-green: #2ecc71;
+    --primary: #d13639;
+    --surface: rgba(20, 20, 30, 0.6);
+    --surface-solid: rgba(20, 20, 30, 0.98);
+    --border-soft: rgba(255, 255, 255, 0.06);
+    --border-mid: rgba(255, 255, 255, 0.1);
+}
+
+
+/* ============================================================
+   2. BASE LAYOUT
+   ============================================================ */
+
+html,
+body {
+    height: 100%;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+}
+
+html {
+    overflow-y: scroll;
+}
+
+
+/* ============================================================
+   3. LIVE VIDEO BACKGROUND
+   ============================================================ */
+
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #0a0a0f;
+}
+
+.bg-layer .bg-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    object-position: center;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.bg-layer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(10, 10, 15, 0.55) 0%,
+        rgba(10, 10, 15, 0.35) 40%,
+        rgba(10, 10, 15, 0.85) 100%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+
+/* ============================================================
+   4. TOP NAVIGATION
+   ============================================================ */
+
+.topnav {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    background: rgba(10, 10, 15, 0.5);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-left {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-mark {
+    width: 36px;
+    height: 36px;
+    background: var(--primary);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.logo-mark svg {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-tabs {
+    display: flex;
+    gap: 8px;
+}
+
+.nav-tab {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text-mid);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.nav-tab:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+}
+
+.nav-tab.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--text-mid);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2a2a35;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+
+/* ============================================================
+   5. DASHBOARD CONTENT
+   ============================================================ */
+
+.dashboard {
+    position: relative;
+    z-index: 5;
+    padding: 40px 64px;
+    min-height: calc(100vh - 72px);
+    display: flex;
+    flex-direction: column;
+}
+
+.section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 32px;
+}
+
+.section-head h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.section-head-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-greeting {
+    font-size: 13px;
+    color: var(--text-mid);
+    font-weight: 500;
+}
+
+.back-link-small {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.back-link-small:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+
+/* ============================================================
+   6. GAME TILES
+   ============================================================ */
+
+.game-row {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    align-items: center;
+    padding: 40px 60px;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: none;
+}
+
+.game-row::-webkit-scrollbar {
+    display: none;
+}
+
+.game-tile {
+    flex-shrink: 0;
+    width: 300px;
+    height: 380px;
+    border-radius: 20px;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.3, 1),
+                box-shadow 0.45s ease;
+    transform: scale(0.92);
+    transform-origin: center center;
+    opacity: 0.6;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.game-tile.active {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7),
+                0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.game-tile:hover:not(.active) {
+    opacity: 0.85;
+    transform: scale(0.96);
+}
+
+.tile-thumb {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-color: #1a1a25;
+    position: relative;
+    transition: transform 0.6s ease;
+}
+
+.game-tile.active .tile-thumb {
+    transform: scale(1.05);
+}
+
+.tile-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0.1) 50%,
+        rgba(0, 0, 0, 0.85) 100%
+    );
+}
+
+.tile-label {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    right: 24px;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
+}
+
+
+/* ============================================================
+   7. ACTION BAR
+   ============================================================ */
+
+.action-bar {
+    display: flex;
+    gap: 12px;
+    padding: 20px 0;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+}
+
+.action-bar.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    border-radius: 999px;
+    border: none;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.action-btn.primary {
+    background: var(--play-green);
+    color: #0a1a10;
+    padding: 12px 32px;
+    font-size: 15px;
+    box-shadow: 0 8px 24px rgba(46, 204, 113, 0.35);
+}
+
+.action-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(46, 204, 113, 0.5);
+}
+
+.action-btn.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.action-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+
+/* ============================================================
+   8. INFO MODAL
+   ============================================================ */
+
+.info-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.info-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.info-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.info-modal-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 620px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: linear-gradient(180deg, #14141a 0%, #0a0a0f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 48px 44px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    transform: translateY(20px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.info-modal.open .info-modal-panel {
+    transform: translateY(0) scale(1);
+}
+
+.info-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    z-index: 2;
+}
+
+.info-modal-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.info-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.info-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--primary);
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 16px;
+    box-shadow: 0 12px 32px rgba(209, 54, 57, 0.4);
+}
+
+.info-logo svg {
+    width: 32px;
+    height: 32px;
+}
+
+.info-header h2 {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+}
+
+.info-tagline {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+.info-desc {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 32px;
+    text-align: center;
+}
+
+.info-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+}
+
+.info-stat {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.info-stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+}
+
+.info-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.info-features {
+    margin-bottom: 32px;
+}
+
+.info-features h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+.info-features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.info-features li {
+    position: relative;
+    padding: 8px 0 8px 28px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.85);
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.info-features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 14px;
+    height: 14px;
+    background: var(--play-green);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
+}
+
+.info-features li::after {
+    content: '✓';
+    position: absolute;
+    left: 3px;
+    top: 10px;
+    color: #0a1a10;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.info-footer {
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    text-align: center;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.8;
+}
+
+.info-footer strong {
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   9. LIBRARY PAGE
+   ============================================================ */
+
+.filter-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding: 16px 20px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-soft);
+    border-radius: 14px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 140px;
+}
+
+.filter-group label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.filter-select {
+    padding: 10px 14px;
+    background: #1a1a25;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.filter-select:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: #1f1f2c;
+}
+
+.filter-select option {
+    background-color: #1a1a25;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.filter-select option:checked {
+    background: linear-gradient(#d13639, #d13639);
+    color: #ffffff;
+}
+
+.filter-select option:hover {
+    background-color: #2a2a35;
+}
+
+.filter-input {
+    padding: 10px 14px;
+    background: #1a1a25;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s;
+    width: 100%;
+}
+
+.filter-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.filter-input:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: #1f1f2c;
+}
+
+.filter-input:-webkit-autofill,
+.filter-input:-webkit-autofill:hover,
+.filter-input:-webkit-autofill:focus {
+    -webkit-text-fill-color: #ffffff;
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a25 inset;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+.library-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+    padding-bottom: 40px;
+}
+
+.library-card {
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: white;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(20, 20, 30, 0.7);
+    border: 1px solid var(--border-soft);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.library-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.library-thumb {
+    height: 260px;
+    background-size: cover;
+    background-position: center;
+    background-color: #1a1a25;
+    position: relative;
+}
+
+.library-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.0) 0%, rgba(0, 0, 0, 0.6) 100%);
+}
+
+.library-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: white;
+}
+
+.library-info {
+    padding: 16px 18px 20px;
+}
+
+.library-info h3 {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.library-info p {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    line-height: 1.4;
+}
+
+.library-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   10. PROFILE PAGE
+   ============================================================ */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 28px 32px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-soft);
+    border-radius: 20px;
+    margin-bottom: 24px;
+}
+
+.profile-avatar {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+    box-shadow: 0 8px 32px rgba(209, 54, 57, 0.4);
+}
+
+.profile-avatar svg {
+    width: 44px;
+    height: 44px;
+}
+
+.profile-meta h2 {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+}
+
+.profile-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.tag {
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.tag.role {
+    background: var(--primary);
+    color: white;
+}
+
+.tag.level {
+    background: rgba(124, 58, 237, 0.8);
+    color: white;
+}
+
+.profile-last-seen {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Display Name & Pronouns Cards */
+.profile-info-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.info-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    transition: border-color 0.2s;
+}
+
+.info-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.info-card-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.info-card-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+
+.info-card-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: white;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.info-card-value.empty-value {
+    color: rgba(255, 255, 255, 0.35);
+    font-style: italic;
+    font-weight: 500;
+}
+
+.info-card-edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.75);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.info-card-edit:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+}
+
+/* Account Details Grid */
+.account-details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.account-detail {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.account-detail:last-child {
+    border-bottom: none;
+}
+
+.account-detail-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+
+.account-detail-value {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    word-break: break-word;
+}
+
+/* Profile Sections (Account Details, Activity) */
+.profile-section {
+    padding: 24px 28px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    margin-bottom: 24px;
+}
+
+.profile-section h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+}
+
+.activity-list li:last-child {
+    border-bottom: none;
+}
+
+.activity-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--play-green);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.6);
+    flex-shrink: 0;
+}
+
+.activity-text {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.activity-time {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    font-family: monospace;
+}
+
+.empty-text {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.4);
+    text-align: center;
+    padding: 20px 0;
+}
+
+.profile-actions {
+    display: flex;
+    gap: 12px;
+    padding-bottom: 40px;
+}
+
+/* Profile — Compact Fit-to-Screen Layout */
+.profile-page .dashboard,
+.profile-page main.dashboard {
+    padding: 24px 48px;
+    height: calc(100vh - 72px);
+    min-height: 0;
+    overflow: hidden;
+}
+
+.profile-page .section-head {
+    margin-bottom: 20px;
+}
+
+.profile-page .profile-header {
+    padding: 20px 24px;
+    margin-bottom: 16px;
+}
+
+.profile-page .profile-avatar {
+    width: 68px;
+    height: 68px;
+}
+
+.profile-page .profile-avatar svg {
+    width: 34px;
+    height: 34px;
+}
+
+.profile-page .profile-meta h2 {
+    font-size: 24px;
+    margin-bottom: 6px;
+}
+
+.profile-page .profile-last-seen {
+    font-size: 11px;
+}
+
+.profile-page .profile-info-cards {
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.profile-page .info-card {
+    padding: 14px 20px;
+}
+
+.profile-page .info-card-value {
+    font-size: 15px;
+}
+
+.profile-page .profile-section {
+    padding: 16px 22px;
+    margin-bottom: 16px;
+}
+
+.profile-page .profile-section h3 {
+    margin-bottom: 12px;
+}
+
+.profile-page .account-details-grid {
+    gap: 10px;
+}
+
+.profile-page .account-detail {
+    padding: 8px 0;
+}
+
+.profile-page .account-detail-value {
+    font-size: 13px;
+}
+
+.profile-page .activity-list li {
+    padding: 8px 0;
+    font-size: 12px;
+}
+
+.profile-page .activity-dot {
+    width: 6px;
+    height: 6px;
+}
+
+.profile-page .activity-time {
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   11. EDIT PROFILE MODAL
+   ============================================================ */
+
+.edit-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.edit-modal.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.edit-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.edit-modal-panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 460px;
+    background: linear-gradient(180deg, #14141a 0%, #0a0a0f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 36px 32px;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    transform: translateY(20px) scale(0.96);
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.edit-modal.open .edit-modal-panel {
+    transform: translateY(0) scale(1);
+}
+
+.edit-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.edit-modal-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.edit-modal-panel h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.edit-modal-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.edit-modal-panel .form-group {
+    margin-bottom: 24px;
+}
+
+.edit-modal-panel .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+}
+
+.edit-modal-panel .form-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.edit-modal-panel .form-group input:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.edit-modal-panel .form-group input.error {
+    border-color: #d13639;
+    background: rgba(209, 54, 57, 0.1);
+}
+
+.edit-modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+
+/* ============================================================
+   12. MORE DROPDOWN MENU
+   ============================================================ */
+
+.more-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.more-menu {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    min-width: 240px;
+    padding: 8px;
+    background: var(--surface-solid);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-mid);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.96);
+    transform-origin: bottom left;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    z-index: 100;
+}
+
+.more-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.more-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.85);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.more-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+}
+
+.more-item svg {
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.more-item.danger {
+    color: #ff7c7f;
+}
+
+.more-item.danger:hover {
+    background: rgba(209, 54, 57, 0.15);
+}
+
+.more-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.06);
+    margin: 6px 4px;
+}
+
+
+/* ============================================================
+   13. TOAST NOTIFICATIONS
+   ============================================================ */
+
+.toast-container {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--surface-solid);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-mid);
+    border-radius: 12px;
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    pointer-events: auto;
+    transform: translateX(120%);
+    transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+    min-width: 260px;
+    max-width: 400px;
+}
+
+.toast.show {
+    transform: translateX(0);
+}
+
+.toast-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.toast.success .toast-icon {
+    background: var(--play-green);
+    color: #0a1a10;
+}
+
+.toast.info .toast-icon {
+    background: #3498db;
+    color: white;
+}
+
+.toast.warning .toast-icon {
+    background: #f39c12;
+    color: #1a0f00;
+}
+
+.toast.error .toast-icon {
+    background: var(--primary);
+    color: white;
+}
+
+
+/* ============================================================
+   14. CUSTOM SCROLLBARS
+   ============================================================ */
+
+/* Page-level scrollbar */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+    background: #0a0a0f;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #7c3aed 0%, #d13639 100%);
+    border-radius: 10px;
+    border: 3px solid #0a0a0f;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #8b4bf0 0%, #e04447 100%);
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+    background: #0a0a0f;
+}
+
+/* Firefox */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed #0a0a0f;
+}
+
+/* Info modal panel */
+.info-modal-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.info-modal-panel::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 12px 0;
+}
+
+.info-modal-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+}
+
+.info-modal-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Settings drawer body */
+.settings-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.settings-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.settings-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+}
+
+.settings-body::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Edit modal panel */
+.edit-modal-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.edit-modal-panel::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.edit-modal-panel::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+}
+
+.edit-modal-panel::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+
+/* ============================================================
+   15. ACCESSIBILITY — REDUCE MOTION
+   ============================================================ */
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+}
+
+.reduce-motion .game-tile,
+.reduce-motion .game-tile .tile-thumb {
+    transform: none !important;
+}
+
+.reduce-motion .game-tile.active {
+    transform: scale(1) !important;
+}
+
+.reduce-motion .game-tile:hover:not(.active) {
+    transform: scale(1) !important;
+}
+
+/* Disabled settings sliders */
+.settings-range:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.settings-range:disabled::-webkit-slider-thumb {
+    background: #555;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+.settings-range:disabled::-moz-range-thumb {
+    background: #555;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   16. RESPONSIVE BREAKPOINTS
+   ============================================================ */
+
+/* Tablet */
+@media (max-width: 900px) {
+    .dashboard {
+        padding: 24px;
+    }
+    .topnav {
+        padding: 12px 20px;
+    }
+    .game-tile {
+        width: 260px;
+        height: 340px;
+    }
+    .game-row {
+        gap: 16px;
+    }
+    .section-head h1 {
+        font-size: 24px;
+    }
+}
+
+/* Info Modal on Mobile */
+@media (max-width: 600px) {
+    .info-modal-panel {
+        padding: 32px 24px;
+    }
+    .info-header h2 {
+        font-size: 24px;
+    }
+    .info-stats {
+        gap: 8px;
+    }
+    .info-stat {
+        padding: 12px;
+    }
+    .info-stat-value {
+        font-size: 18px;
+    }
+    .profile-info-cards {
+        grid-template-columns: 1fr;
+    }
+    .info-card {
+        padding: 16px 18px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 700px) {
+    .filter-bar {
+        flex-direction: column;
+    }
+    .profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    .profile-meta {
+        text-align: center;
+    }
+    .profile-tags {
+        justify-content: center;
+    }
+}
+
+/* Extra Small Mobile */
+@media (max-width: 500px) {
+    .more-menu {
+        left: auto;
+        right: 0;
+        transform-origin: bottom right;
+    }
+    .toast-container {
+        bottom: 20px;
+        right: 20px;
+        left: 20px;
+    }
+    .toast {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* ============================================================
+   LARGER CLICK TARGETS — Top Nav & Action Bar (v2)
+   ============================================================ */
+
+/* ---- TOP NAV ICONS ---- */
+
+.logo-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+}
+
+.logo-mark svg {
+    width: 26px;
+    height: 26px;
+}
+
+.nav-tabs {
+    gap: 10px;
+}
+
+.nav-tab {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+}
+
+.nav-tab svg {
+    width: 26px;
+    height: 26px;
+}
+
+.icon-btn {
+    width: 52px;
+    height: 52px;
+}
+
+.icon-btn svg {
+    width: 26px;
+    height: 26px;
+}
+
+.user-avatar {
+    width: 52px;
+    height: 52px;
+}
+
+.user-avatar svg {
+    width: 28px;
+    height: 28px;
+}
+
+.nav-right {
+    gap: 14px;
+}
+
+.topnav {
+    padding: 20px 36px;
+}
+
+/* ---- BOTTOM ACTION BUTTONS ---- */
+
+.action-btn {
+    padding: 18px 34px;
+    font-size: 17px;
+    gap: 14px;
+    font-weight: 700;
+}
+
+.action-btn svg {
+    width: 22px;
+    height: 22px;
+}
+
+.action-btn.primary {
+    padding: 18px 42px;
+    font-size: 18px;
+    box-shadow: 0 10px 28px rgba(46, 204, 113, 0.4);
+}
+
+.action-btn.primary svg {
+    width: 24px;
+    height: 24px;
+}
+
+.action-bar {
+    gap: 16px;
+}
+
+/* ============================================================
+   LARGER GAME TILES
+   ============================================================ */
+
+.game-row {
+    gap: 28px;
+    padding: 50px 70px;
+}
+
+.game-tile {
+    width: 340px;
+    height: 430px;
+    border-radius: 22px;
+}
+
+/* Keep the "inactive" tile a bit smaller so the active one stands out */
+.game-tile:not(.active) {
+    transform: scale(0.9);
+}
+
+.game-tile.active {
+    transform: scale(1);
+    box-shadow: 0 40px 90px rgba(0, 0, 0, 0.75),
+                0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.game-tile:hover:not(.active) {
+    transform: scale(0.94);
+}
+
+/* Bigger title text on tiles */
+.tile-label {
+    font-size: 22px;
+    bottom: 26px;
+    left: 26px;
+    right: 26px;
+}
+
+/* ============================================================
+   REPORTS PAGE — allow full height (scrollable)
+   ============================================================ */
+
+.reports-page .dashboard,
+.reports-page main.dashboard {
+    height: auto;
+    min-height: calc(100vh - 90px);
+    overflow: visible;
+    padding: 32px 48px 60px;
+}
+
+/* Ensure report sections don't get clipped */
+.reports-page .report-table-wrap {
+    overflow: visible;
+}
+
+.reports-page .report-table {
+    width: 100%;
+}
+
+/* If needed, allow the page to scroll */
+.reports-page body,
+body.reports-page {
+    overflow-y: auto;
+    overflow-x: hidden;
+}

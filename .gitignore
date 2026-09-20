@@ -1,0 +1,27 @@
+# Sensitive credentials
+config/mail_config.php
+.env
+
+# Debug/testing files
+debug.php
+test_login.php
+hash.php
+phpinfo.php
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Godot cache
+game-source/.godot/
+
+# Node modules (if any)
+node_modules/
