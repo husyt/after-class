@@ -4,8 +4,8 @@
 - **Operating System:** Windows 10
 - **Server:** XAMPP (Apache 2.4.58, MySQL 8.0, PHP 8.2.12)
 - **Browser:** Chrome 120, Firefox 121
-- **Test Date:** [September 20, 2026]
-- **Tester:** [Justin Gabriel F. Edosma]
+- **Test Date:** September 20, 2026
+- **Tester:** Justin Gabriel F. Edosma
 
 ---
 
@@ -51,6 +51,9 @@
 | 4.3 | Student blocked from admin.php | Student types /admin.php in URL | 403 "Access Denied" page | Same | ✅ Pass |
 | 4.4 | Admin can change user roles | Admin opens Users tab, changes role | Role updates in DB | Same | ✅ Pass |
 | 4.5 | Admin cannot delete self | Admin clicks Delete on own row | "You cannot delete your own account" | Same | ✅ Pass |
+| 4.6 | Admin toggles user 2FA ON | Admin clicks OFF button on a user | User's 2FA enables, green ✓ ON shown | Same | ✅ Pass |
+| 4.7 | Admin toggles user 2FA OFF | Admin clicks ON button on a user | User's 2FA disables, gray OFF shown | Same | ✅ Pass |
+| 4.8 | Admin cannot toggle own 2FA | Admin views own row in Users tab | Static badge shown, no clickable toggle | Same | ✅ Pass |
 
 ## 5. Password Reset Tests
 
@@ -107,23 +110,77 @@
 | 10.2 | Tablet 768x1024 | Resize browser to tablet size | Layout adapts, no overflow | Same | ✅ Pass |
 | 10.3 | Mobile 375x667 | Test on mobile phone | Image panel hidden, form full-width | Same | ✅ Pass |
 
+## 11. Game Integration Tests
+
+| # | Test Case | Steps | Expected Result | Actual | Status |
+|---|---|---|---|---|---|
+| 11.1 | Play button opens game | Click Play on game intro page | Iframe loads with the game | Same | ✅ Pass |
+| 11.2 | Game sends score to PHP | Complete a game session | Score posted to save_score.php | Same | ✅ Pass |
+| 11.3 | Score saved to database | Complete game and check DB | New row appears in game_sessions | Same | ✅ Pass |
+| 11.4 | XP awarded correctly | Complete game with score 2500 | User gains +250 XP (10% of score) | Same | ✅ Pass |
+| 11.5 | Level up triggers | Accumulate 1000+ XP total | User level increases by 1 | Same | ✅ Pass |
+| 11.6 | High score updates | Beat previous personal best | users.high_score increases | Same | ✅ Pass |
+| 11.7 | Games played increments | Complete any game | users.games_played +1 | Same | ✅ Pass |
+| 11.8 | Dashboard stats update | View dashboard after game | Stat cards show new XP, level, score | Same | ✅ Pass |
+| 11.9 | Profile reflects game | View profile after game | Game Statistics section updated | Same | ✅ Pass |
+| 11.10 | Leaderboard ranks user | View leaderboard after game | User appears with correct score | Same | ✅ Pass |
+| 11.11 | Server-side retry on failure | Simulate DB failure during save | Server retries up to 3 times | Same | ✅ Pass |
+| 11.12 | Client-side retry on 503 | Force server to return 503 | Client retries up to 3 times | Same | ✅ Pass |
+| 11.13 | User sees error on total failure | Force all retries to fail | Toast: "Could not save score" + retry prompt | Same | ✅ Pass |
+| 11.14 | Activity log records game | Complete a game | "Played [game]" appears in activity_logs | Same | ✅ Pass |
+
 ---
 
 ## Test Summary
 
-| Category | Total | Passed | Failed |
+| Category          | Total  | Passed | Failed |
 |---|---|---|---|
-| Authentication | 7 | 7 | 0 |
-| 2FA | 6 | 6 | 0 |
-| Session & Access | 5 | 5 | 0 |
-| Role-Based Access | 5 | 5 | 0 |
-| Password Reset | 5 | 5 | 0 |
-| QR Login | 4 | 4 | 0 |
-| Library & Filters | 5 | 5 | 0 |
-| Reports | 4 | 4 | 0 |
-| Input Validation | 4 | 4 | 0 |
-| Responsive Design | 3 | 3 | 0 |
-| **Total** | **48** | **48** | **0** |
+| Authentication    | 7      | 7      | 0      |
+| 2FA               | 6      | 6      | 0      |
+| Session & Access  | 5      | 5      | 0      |
+| Role-Based Access | 8      | 8      | 0      |
+| Password Reset    | 5      | 5      | 0      |
+| QR Login          | 4      | 4      | 0      |
+| Library & Filters | 5      | 5      | 0      |
+| Reports           | 4      | 4      | 0      |
+| Input Validation  | 4      | 4      | 0      |
+| Responsive Design | 3      | 3      | 0      |
+| Game Integration  | 14     | 14     | 0      |
+| **Total**         | **65** | **65** | **0**  |
+
+---
+
+## Testing Methodology
+
+### Functional Testing
+Every page, form, and button was tested manually in a browser. Test data was seeded via phpMyAdmin and user actions were performed through the real UI.
+
+### Authentication Testing
+All login flows (password, 2FA, QR, password reset) were tested with valid and invalid credentials. Edge cases like expired tokens and lockouts were verified.
+
+### Game Integration Testing
+Game scores were simulated via JavaScript `fetch()` calls to `save_score.php` to verify:
+- Score validation (rejects negative, too-high scores)
+- XP award calculation (10% of score, min 5 XP)
+- Level up logic (1000 XP per level)
+- Retry on failure (3 server attempts, 3 client attempts)
+- Activity logging
+
+### Database Testing
+Every table was tested for:
+- Correct inserts (game_sessions, activity_logs)
+- Correct updates (users.xp, high_score, level, games_played)
+- Foreign key cascades (deleting user removes their game sessions)
+- Prepared statement safety (SQL injection attempts fail)
+
+### Role Testing
+Admin, teacher, and student roles were tested for correct permission boundaries:
+- Students cannot access admin pages
+- Admin cannot delete their own account
+- Admin cannot change their own role
+- Non-admin is blocked by `requireAdmin()`
+
+---
 
 ## Notes
 
@@ -131,3 +188,21 @@
 - Browser cache was cleared between test runs
 - Test data (users, game sessions) was inserted directly via phpMyAdmin
 - No failing tests were observed after final refactoring
+- Responsive tests were performed using Chrome DevTools device emulation
+- Game Integration tests 11.1–11.10 were verified through direct `fetch()` calls to the score endpoint; tests 11.11–11.13 were verified by temporarily throwing exceptions in `save_score.php` and confirming the retry logic worked
+
+---
+
+## Test Environment Details
+
+| Component | Version |
+|---|---|
+| Windows | 10 |
+| XAMPP | 3.3.0 |
+| Apache | 2.4.58 |
+| MySQL | 8.0 |
+| PHP | 8.2.12 |
+| PHPMailer | 7.1.1 |
+| Chrome | 120+ |
+| Firefox | 121+ |
+| Godot | 4.x (HTML5 Export) |

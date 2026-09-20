@@ -8,14 +8,14 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 
 ## Frontend
 
-| Technology       | Version | Purpose                                             |
-|---               |---      |---                                                  |
-| **HTML5**        | Latest  | Semantic markup for all pages                       |
-| **CSS3**         | Latest  | Custom styling, animations, responsive design       |
-| **JavaScript**   | ES6+    | Client-side validation, dynamic UI, QR code logic   |
-| **Web APIs**     |    —    | Fetch API, postMessage, localStorage, Clipboard API |
-| **QRCode.js**    | 1.0.0   | QR code generation for passwordless login           |
-| **Inter Font**   |    —    | Modern, clean typography via Google Fonts           |
+| Technology     | Version | Purpose                                             |
+|---|---|---|
+| **HTML5**      | Latest  | Semantic markup for all pages                       |
+| **CSS3**       | Latest  | Custom styling, animations, responsive design       |
+| **JavaScript** | ES6+    | Client-side validation, dynamic UI, QR code logic   |
+| **Web APIs**   | —       | Fetch API, postMessage, localStorage, Clipboard API |
+| **QRCode.js**  | 1.0.0   | QR code generation for passwordless login           |
+| **Inter Font** | —       | Modern, clean typography via Google Fonts           |
 
 ### Key Frontend Features
 - **Custom CSS scrollbars** with `::-webkit-scrollbar`
@@ -29,7 +29,7 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 ## Backend
 
 | Technology    | Version | Purpose                                      |
-|---            |---      |---                                           |
+|---|---|---|
 | **PHP**       | 8.2.12  | Server-side logic, routing, session handling |
 | **Apache**    | 2.4.58  | Web server (via XAMPP)                       |
 | **Composer**  | Latest  | Dependency management                        |
@@ -47,7 +47,7 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 ## Database
 
 | Technology     | Version | Purpose                     |
-|---             |---      |---                          |
+|---|---|---|
 | **MySQL**      | 8.0     | Relational database         |
 | **phpMyAdmin** | 5.x     | Database administration GUI |
 
@@ -70,7 +70,7 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 ## Server / Development Environment
 
 | Tool        | Purpose                                        |
-|---          |---                                             |
+|---|---|
 | **XAMPP**   | Local development stack (Apache + MySQL + PHP) |
 | **Apache**  | HTTP server on port 80                         |
 | **MySQL**   | Database server on port 3306                   |
@@ -78,23 +78,34 @@ CoreSync is built on a modern web stack, combining proven server-side technologi
 
 ---
 
-## Game Engine
+## Game Engine (Planned)
 
-| Technology       | Version | Purpose                                       |
-|---               |---      |---                                            |
-| **Godot**        | 4.x     | 2D game engine                                |
-| **GDScript**     |    —    | Godot's native scripting language             |
-| **HTML5 Export** |    —    | Compiles game to WebAssembly for browser play |
+| Technology       | Version | Purpose                                         |
+|---|---|---|
+| **Godot**        | 4.x     | 2D game engine (planned for final sprint)       |
+| **GDScript**     | —       | Godot's native scripting language               |
+| **HTML5 Export** | —       | Compiles game to WebAssembly for browser play   |
 
-### Integration Method
-The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it uses `JavaScriptBridge.eval()` to call `window.parent.postMessage()` — sending the score to the parent PHP page. The parent page then POSTs the score to `save_score.php` for database storage.
+### Integration Method (Architecture Complete)
+
+The integration infrastructure is **fully implemented** — only the exported game files are pending. Once the Godot project is exported to Web, it will run inside an `<iframe>` on `play.php`. When the game ends, it uses `JavaScriptBridge.eval()` to call `window.parent.postMessage()` — sending the score to the parent PHP page. The parent page then POSTs the score to `save_score.php` for database storage.
+
+### Integration Status
+
+| Component | Status |
+|---|---|
+| `play.php` (iframe wrapper) | ✅ Complete |
+| `save_score.php` (with retry logic) | ✅ Complete |
+| `game_sessions` database table | ✅ Complete |
+| Score display on dashboard / profile / leaderboard | ✅ Complete |
+| Godot game export (HTML5) | 🟡 Pending final sprint |
 
 ---
 
 ## Development Tools
 
 | Tool                   | Purpose                                            |
-|---                     |---                                                 |
+|---|---|
 | **Visual Studio Code** | Primary code editor                                |
 | **VS Code Extensions** | PHP Intelephense, PHP Debug, SQLTools, Live Server |
 | **Git**                | Version control                                    |
@@ -131,7 +142,7 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 └─────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────┐
-│  GAME ENGINE (separate)                 │
+│  GAME ENGINE (planned)                  │
 │  Godot 4.x → HTML5 Export               │
 │  Runs in iframe, communicates via       │
 │  JavaScript postMessage()               │
@@ -143,7 +154,7 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 ## Why These Technologies?
 
 | Choice                  | Reason                                                           |
-|---                      |---                                                               |
+|---|---|
 | **PHP**                 | Widely used for education, easy to learn, great MySQL support    |
 | **MySQL**               | Free, reliable, industry-standard relational DB                  |
 | **XAMPP**               | One-click local server setup, ideal for students                 |
@@ -157,29 +168,33 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 
 ## Security Technologies
 
-| Feature                  | Implementation                                              |
-|---                       |---                                                          |
-| Password hashing         | `password_hash()` with PASSWORD_DEFAULT (bcrypt)            |
-| SQL injection prevention | PDO prepared statements with bound parameters               |
-| XSS prevention           | `htmlspecialchars()` on all output                          |
-| CSRF mitigation          | Session-based tokens, SameSite cookies                      |
-| Session security         | `session_regenerate_id()`, httponly cookies, 30-min timeout |
-| Rate limiting            | 5-attempt login lockout for 15 minutes                      |
-| 2FA                      | Email OTP via PHPMailer                                     |
-| Password reset           | 256-bit hex tokens with 1-hour expiration                   |
-| QR login                 | 256-bit hex tokens with 5-minute expiration                 |
+| Feature                    | Implementation                                                    |
+|---|---|
+| Password hashing           | `password_hash()` with PASSWORD_DEFAULT (bcrypt)                  |
+| SQL injection prevention   | PDO prepared statements with bound parameters                     |
+| XSS prevention             | `htmlspecialchars()` on all output                                |
+| CSRF mitigation            | Session-based tokens, SameSite cookies                            |
+| Session security           | `session_regenerate_id()`, httponly cookies, 30-min timeout       |
+| Rate limiting              | 5-attempt login lockout for 15 minutes                            |
+| 2FA                        | Email OTP via PHPMailer (admin-controlled per user)               |
+| Password reset             | 256-bit hex tokens with 1-hour expiration                         |
+| QR login                   | 256-bit hex tokens with 5-minute expiration                       |
+| **Credential protection**  | `config/mail_config.php` excluded from Git via `.gitignore`       |
+| **Debug file cleanup**     | `debug.php`, `hash.php`, `phpinfo.php` deleted before submission  |
+| **Input validation**       | Client-side (JS) + server-side (PHP) validation on every form     |
+| **Error handling**         | User-friendly messages; database errors logged not displayed      |
 
 ---
 
 ## Browser Support
 
 | Browser       | Minimum Version | Tested         |
-|---            |---              |---             |
-| Chrome        | 90+             | ✅            |
-| Firefox       | 88+             | ✅            |
-| Edge          | 90+             | ✅            |
+|---|---|---|
+| Chrome        | 90+             | ✅             |
+| Firefox       | 88+             | ✅             |
+| Edge          | 90+             | ✅             |
 | Safari        | 14+             | ⚠️ (untested) |
-| Mobile Chrome | 90+             | ✅            |
+| Mobile Chrome | 90+             | ✅             |
 | Mobile Safari | 14+             | ⚠️ (untested) |
 
 **Requires:** ES6 JavaScript, CSS Grid, Flexbox, WebAssembly (for Godot game), Fetch API.
@@ -189,7 +204,7 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 ## Hosting / Deployment
 
 | Environment             | Setup                                      |
-|---                      |---                                         |
+|---|---|
 | **Local Development**   | XAMPP on Windows                           |
 | **Production (future)** | Any LAMP/LEMP host with PHP 8+ and MySQL   |
 | **Alternative**         | Docker container with Apache + PHP + MySQL |
@@ -199,3 +214,53 @@ The Godot game runs inside an `<iframe>` on `play.php`. When the game ends, it u
 - Moving `mail_config.php` to environment variables
 - Setting up a real domain and DNS
 - Using a managed MySQL instance (AWS RDS, DigitalOcean Managed DB)
+
+---
+
+## File Structure Overview
+
+```
+after-class/
+├── assets/                    # Static files (videos, audio, game)
+│   ├── audio/                 # Background music
+│   └── games/                 # Game thumbnails, backgrounds, exports
+├── config/                    # Configuration
+│   ├── database.php           # PDO connection
+│   └── mail_config.php        # SMTP credentials (gitignored)
+├── documentation/             # Project documentation
+│   ├── 01-purpose.md
+│   ├── 02-architecture.md
+│   ├── 03-flowchart.md
+│   ├── 04-testing.md
+│   ├── 05-tech-stack.md
+│   ├── 06-challenges.md
+│   ├── 07-client-acceptance.md
+│   ├── architecture-diagram.png
+│   └── erd.md
+├── includes/                  # Shared PHP
+│   ├── PHPMailer/
+│   ├── functions.php
+│   ├── mailer.php
+│   ├── session.php
+│   └── settings_panel.php
+├── public/                    # Web-accessible files
+│   ├── css/
+│   ├── js/
+│   ├── admin.php
+│   ├── authenticate.php
+│   ├── dashboard.php
+│   ├── game.php
+│   ├── index.php
+│   ├── leaderboard.php
+│   ├── library.php
+│   ├── logout.php
+│   ├── play.php
+│   ├── profile.php
+│   ├── register.php
+│   ├── reports.php
+│   ├── save_score.php
+│   └── verify_otp.php
+├── database.sql               # Database schema
+├── README.md
+└── .gitignore                 # Excludes sensitive files
+```

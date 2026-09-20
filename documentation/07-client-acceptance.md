@@ -1,8 +1,8 @@
 # CoreSync — Client Acceptance Document
 
 **Project:** CoreSync — Game-Integrated Learning Platform  
-**Client:** [[UPHSD] / CLIENT 10 – EqualPath Youth Foundation]  
-**Prepared by:** [CoreSync]  
+**Client:** UPHSD / CLIENT 10 — EqualPath Youth Foundation  
+**Prepared by:** CoreSync  
 **Date:** September 20, 2026  
 **Version:** 1.0
 
@@ -16,13 +16,13 @@ The client (a school/organization) reported the following challenges with their 
 > "Students lose interest in traditional learning tools. We have no way to measure their engagement, and teachers lack visibility into which students are actually participating. We've tried multiple platforms but nothing is unified — one system for login, another for quizzes, a third for grades."
 
 ### Key Pain Points
-| # | Problem | Impact |
-|---|---|---|
-| 1 | Low student engagement | Poor learning outcomes |
-| 2 | No progress visibility | Students can't see improvement |
-| 3 | Fragmented tools | Multiple logins, no central data |
-| 4 | No teacher visibility | Teachers can't identify struggling students |
-| 5 | No admin analytics | Management can't measure system usage |
+| # | Problem                | Impact                                      |
+|---|---                     |---                                          |
+| 1 | Low student engagement | Poor learning outcomes                      |
+| 2 | No progress visibility | Students can't see improvement              |
+| 3 | Fragmented tools       | Multiple logins, no central data            |
+| 4 | No teacher visibility  | Teachers can't identify struggling students |
+| 5 | No admin analytics     | Management can't measure system usage       |
 
 ---
 
@@ -31,27 +31,27 @@ The client (a school/organization) reported the following challenges with their 
 Based on the client's feedback, we documented the following requirements:
 
 ### Functional Requirements
-| ID | Requirement | Priority |
-|---|---|---|
-| FR-01 | Secure user authentication | High |
-| FR-02 | Role-based access (Student, Teacher, Admin) | High |
-| FR-03 | Single sign-in for all tools | High |
-| FR-04 | Games that produce measurable scores | High |
-| FR-05 | Track student progress (XP, level, high score) | High |
-| FR-06 | Leaderboard to motivate students | Medium |
-| FR-07 | Reports for teachers and admins | High |
-| FR-08 | Password recovery without admin intervention | Medium |
-| FR-09 | Activity logs for auditing | Medium |
-| FR-10 | Mobile-friendly interface | Medium |
+| ID    | Requirement                                    | Priority |
+|---    |---                                             |---       |
+| FR-01 | Secure user authentication                     | High     |
+| FR-02 | Role-based access (Student, Teacher, Admin)    | High     |
+| FR-03 | Single sign-in for all tools                   | High     |
+| FR-04 | Games that produce measurable scores           | High     |
+| FR-05 | Track student progress (XP, level, high score) | High     |
+| FR-06 | Leaderboard to motivate students               | Medium   |
+| FR-07 | Reports for teachers and admins                | High     |
+| FR-08 | Password recovery without admin intervention   | Medium   |
+| FR-09 | Activity logs for auditing                     | Medium   |
+| FR-10 | Mobile-friendly interface                      | Medium   |
 
 ### Non-Functional Requirements
-| ID | Requirement | Target |
-|---|---|---|
-| NFR-01 | Page load time | < 2 seconds |
-| NFR-02 | Uptime | 99%+ |
+| ID     | Requirement       | Target                  |
+|---     |---                |---                      |
+| NFR-01 | Page load time    | < 2 seconds             |
+| NFR-02 | Uptime            | 99%+                    |
 | NFR-03 | Security standard | OWASP Top 10 compliance |
-| NFR-04 | Browser support | Chrome, Firefox, Edge |
-| NFR-05 | Concurrent users | 100+ |
+| NFR-04 | Browser support   | Chrome, Firefox, Edge   |
+| NFR-05 | Concurrent users  | 100+                    |
 
 ---
 
@@ -85,14 +85,14 @@ Here's how CoreSync addresses each of the client's pain points:
 
 The game isn't just for fun — it serves a specific client purpose:
 
-| Feature | How It Helps the Client |
-|---|---|
-| **Instant scoring** | Every session produces a measurable result |
-| **Progress tracking** | Each game's score is stored in `game_sessions` |
-| **XP and leveling** | Gives students a clear "why" to keep playing |
-| **Per-game statistics** | Reveals which games students prefer |
-| **Time tracking** | Shows how long students engage per session |
-| **Completion tracking** | Shows whether students finish or drop out |
+| Feature                 | How It Helps the Client                        |
+|---                      |---                                             |
+| **Instant scoring**     | Every session produces a measurable result     |
+| **Progress tracking**   | Each game's score is stored in `game_sessions` |
+| **XP and leveling**     | Gives students a clear "why" to keep playing   |
+| **Per-game statistics** | Reveals which games students prefer            |
+| **Time tracking**       | Shows how long students engage per session     |
+| **Completion tracking** | Shows whether students finish or drop out      |
 
 **Every game produces data the client can use.** This is the key requirement from the SIA project.
 
@@ -103,7 +103,9 @@ The game isn't just for fun — it serves a specific client purpose:
 We conducted **3 feedback rounds** with the client during development.
 
 ### Feedback Round 1 — Initial Prototype Review
-**Date:** [Insert date]  
+**Date:** August 28, 2026    (Feedback Round 1)
+**Date:** September 12, 2026   (Feedback Round 2)
+**Date:** September 21, 2026   (Feedback Round 3)
 **Presented:** Login page, Dashboard mockup, ERD  
 **Client Feedback:**
 > "The design looks modern. We like the PlayStation-style dashboard. We'd want to see real data — a leaderboard would motivate students."
@@ -145,23 +147,23 @@ We conducted **3 feedback rounds** with the client during development.
 
 ### Summary of Client-Driven Changes
 
-| # | Client Request | Priority | Implemented | Status |
-|---|---|---|---|---|
-| 1 | Add leaderboard | High | Planned for Sprint 3 | 🟡 Pending |
-| 2 | Password reset | High | ✅ Complete | ✅ Done |
-| 3 | Reports with data | High | ✅ Complete | ✅ Done |
-| 4 | CSV export | Medium | ✅ Complete | ✅ Done |
-| 5 | Admin analytics | Medium | ✅ Complete | ✅ Done |
-| 6 | Mobile responsive | Medium | ✅ Complete | ✅ Done |
-| 7 | 2FA security | Bonus | ✅ Complete | ✅ Done |
-| 8 | QR code login | Bonus | ✅ Complete | ✅ Done |
+| # | Client Request    | Priority | Implemented          | Status      |
+|---|---                |---       |---                   |---          |
+| 1 | Add leaderboard   | High     | Planned for Sprint 3 | 🟡 Pending  |
+| 2 | Password reset    | High     | ✅ Complete         | ✅ Done     |
+| 3 | Reports with data | High     | ✅ Complete         | ✅ Done     |
+| 4 | CSV export        | Medium   | ✅ Complete         | ✅ Done     |
+| 5 | Admin analytics   | Medium   | ✅ Complete         | ✅ Done     |
+| 6 | Mobile responsive | Medium   | ✅ Complete         | ✅ Done     |
+| 7 | 2FA security      | Bonus    | ✅ Complete         | ✅ Done     |
+| 8 | QR code login     | Bonus    | ✅ Complete         | ✅ Done     |
 
 ### Changes Not Yet Implemented
-| # | Client Request | Reason | Timeline |
-|---|---|---|---|
-| 1 | Leaderboard | Waiting on game integration | Next sprint |
-| 2 | Achievement badges | Scope decision | Future version |
-| 3 | Email verification | Scope decision | Future version |
+| # | Client Request     | Reason                      | Timeline       |
+|---|---                 |---                          |---             |
+| 1 | Leaderboard        | Waiting on game integration | Next sprint    |
+| 2 | Achievement badges | Scope decision              | Future version |
+| 3 | Email verification | Scope decision              | Future version |
 
 ---
 
@@ -169,16 +171,16 @@ We conducted **3 feedback rounds** with the client during development.
 
 The client's acceptance criteria and how CoreSync meets them:
 
-| Criteria | Target | Achieved | Status |
-|---|---|---|---|
-| **Login system works** | 100% success rate | ✅ 48/48 tests pass | ✅ Met |
-| **Roles function** | Admin ≠ Student views | ✅ Tested | ✅ Met |
-| **Games produce scores** | Every session saved | ✅ Code complete | ✅ Met |
-| **Reports are usable** | Teacher can export data | ✅ CSV + Print | ✅ Met |
-| **Security features** | No plaintext passwords | ✅ Bcrypt hashing | ✅ Met |
-| **Response time** | < 2s per page | ✅ < 500ms avg | ✅ Exceeded |
-| **Browser support** | Chrome + Firefox + Edge | ✅ All tested | ✅ Met |
-| **Mobile ready** | Works on phones | ✅ Responsive | ✅ Met |
+| Criteria                 | Target                  | Achieved            | Status       |
+|---                       |---                      |---                  |---           |
+| **Login system works**   | 100% success rate       | ✅ 48/48 tests pass | ✅ Met      |
+| **Roles function**       | Admin ≠ Student views   | ✅ Tested           | ✅ Met      |
+| **Games produce scores** | Every session saved     | ✅ Code complete    | ✅ Met      |
+| **Reports are usable**   | Teacher can export data | ✅ CSV + Print      | ✅ Met      |
+| **Security features**    | No plaintext passwords  | ✅ Bcrypt hashing   | ✅ Met      |
+| **Response time**        | < 2s per page           | ✅ < 500ms avg      | ✅ Exceeded |
+| **Browser support**      | Chrome + Firefox + Edge | ✅ All tested       | ✅ Met      |
+| **Mobile ready**         | Works on phones         | ✅ Responsive       | ✅ Met      |
 
 ---
 
@@ -216,14 +218,14 @@ The client identified the following as good ideas for future versions:
 
 ## 10. Client Acceptance Summary
 
-| Item | Status |
-|---|---|
-| Client problem identified | ✅ |
-| Client requirements documented | ✅ |
-| System matches client need | ✅ |
-| Game has purpose related to client | ✅ |
-| Client feedback obtained | ✅ (3 rounds) |
-| Changes based on feedback documented | ✅ |
+| Item                                 | Status         |
+|---                                   |---             |
+| Client problem identified            | ✅             |
+| Client requirements documented       | ✅             |
+| System matches client need           | ✅             |
+| Game has purpose related to client   | ✅             |
+| Client feedback obtained             | ✅ (3 rounds)  |
+| Changes based on feedback documented | ✅             |
 
 **Result:** CoreSync is **accepted** by the client as a viable solution to their engagement and visibility problem.
 
@@ -234,11 +236,11 @@ The client identified the following as good ideas for future versions:
 
 ## Appendix A: Meeting Log
 
-| # | Date | Attendees | Topics | Outcome |
-|---|---|---|---|---|
-| 1 | [Date] | Client + Dev team | Initial requirements | Agreed on core features |
-| 2 | [Date] | Client + Dev team | Prototype review | Approved design direction |
-| 3 | [Date] | Client + Dev team | Final demo | Signed off |
+| # | Date   | Attendees         | Topics                  | Outcome                   |
+|---|---     |---                |---                      |---                        |
+| 1 | [Date] | Client + Dev team | Initial requirements    | Agreed on core features   |
+| 2 | [Date] | Client + Dev team | Prototype review        | Approved design direction |
+| 3 | [Date] | Client + Dev team | Final demo              | Signed off                |
 
 ---
 
