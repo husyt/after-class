@@ -2,7 +2,7 @@
 
 ## Architecture Pattern Used
 
-CoreSync uses a combination of three architectural patterns:
+EqualPath uses a combination of three architectural patterns:
 
 1. **Client-Server** — Browser (client) communicates with Apache/PHP (server) over HTTP
 2. **Layered Architecture** — Three distinct layers: Presentation, Application, Data

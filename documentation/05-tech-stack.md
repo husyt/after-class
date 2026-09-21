@@ -2,7 +2,7 @@
 
 ## Overview
 
-CoreSync is built on a modern web stack, combining proven server-side technologies with modern front-end techniques. Every technology choice was made for **stability**, **security**, and **ease of maintenance**.
+EqualPath is built on a modern web stack, combining proven server-side technologies with modern front-end techniques. Every technology choice was made for **stability**, **security**, and **ease of maintenance**.
 
 ---
 

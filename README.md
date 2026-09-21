@@ -25,15 +25,15 @@ A PHP + MySQL web platform that combines **secure authentication**, **game progr
 
 ## 🎯 Overview
 
-CoreSync is a **game-integrated learning system** that blends:
+EqualPath is a **game-integrated learning system** that blends:
 
 - 🔐 Secure authentication (password, 2FA, QR login)
 - 🎮 Integrated games that produce measurable data
 - 📊 Real-time analytics and reports
 - 🏆 Gamification (XP, levels, achievements)
-- 👥 Role-based access control (Admin / Teacher / Student)
+- 👥 Role-based access control (Admin / Student)
 
-Every game session is tracked, scored, and stored — giving teachers and admins visibility into student engagement and progress.
+Every game session is tracked, scored, and stored — giving admins visibility into student engagement and progress.
 
 ---
 
@@ -167,7 +167,6 @@ http://localhost/after-class/public/
 | Username | Password | Role |
 |---|---|---|
 | `admin` | `Password123!` | Administrator |
-| `teacher` | `Password123!` | Teacher |
 | `student` | `Password123!` | Student |
 
 **Note:** All test accounts have 2FA enabled by default. Check the email inbox for the OTP, or disable 2FA from the admin panel after logging in as `admin`.

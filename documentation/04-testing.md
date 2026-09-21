@@ -174,7 +174,7 @@ Every table was tested for:
 - Prepared statement safety (SQL injection attempts fail)
 
 ### Role Testing
-Admin, teacher, and student roles were tested for correct permission boundaries:
+Admin and student roles were tested for correct permission boundaries:
 - Students cannot access admin pages
 - Admin cannot delete their own account
 - Admin cannot change their own role

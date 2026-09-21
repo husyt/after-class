@@ -9,12 +9,34 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/../config/database.php';
 
+// ============================================
+// FETCH CURRENT USER
+// ============================================
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
-// Same catalog
+// ============================================
+// FETCH USER FAVORITES
+// ============================================
+$stmt = $pdo->prepare("SELECT game_id FROM user_favorites WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$favorites = array_column($stmt->fetchAll(), 'game_id');
+
+// ============================================
+// GAME CATALOG
+// ============================================
 $games = [
+    [
+        'id'          => 'after-class',
+        'title'       => 'AFTER CLASS',
+        'subtitle'    => 'An inclusive education adventure (EqualPath)',
+        'type'        => 'video',
+        'thumbnail'   => '/after-class/assets/games/afterclass-thumb.jpg',
+        'accent'      => '#f97316',
+        'genre'       => 'Educational',
+        'release'     => '2026-02-01',
+    ],
     [
         'id'          => 'lex-obscura',
         'title'       => 'LEX OBSCURA',
@@ -25,16 +47,6 @@ $games = [
         'genre'       => 'Adventure',
         'release'     => '2026-01-15',
     ],
-    [
-        'id'          => 'after-class',
-        'title'       => 'AFTER CLASS',
-        'subtitle'    => 'A pixel art school adventure',
-        'type'        => 'video',
-        'thumbnail'   => '/after-class/assets/games/afterclass-thumb.jpg',
-        'accent'      => '#f97316',
-        'genre'       => 'Casual',
-        'release'     => '2026-02-01',
-    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -44,8 +56,8 @@ $games = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library | CoreSync</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
 </head>
 <body>
 
@@ -71,6 +83,11 @@ $games = [
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
+            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                </svg>
+            </a>
             <a href="profile.php" class="nav-tab" title="Profile">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
@@ -78,12 +95,12 @@ $games = [
                 </svg>
             </a>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-<a href="admin.php" class="nav-tab" title="Admin">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
-    </svg>
-</a>
-<?php endif; ?>
+            <a href="admin.php" class="nav-tab" title="Admin">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
+                </svg>
+            </a>
+            <?php endif; ?>
         </nav>
     </div>
 
@@ -123,6 +140,7 @@ $games = [
             <label>Genre</label>
             <select class="filter-select" id="genreFilter">
                 <option value="all">All Genres</option>
+                <option value="Educational">Educational</option>
                 <option value="Adventure">Adventure</option>
                 <option value="Casual">Casual</option>
             </select>
@@ -134,6 +152,7 @@ $games = [
                 <option value="oldest">Oldest First</option>
                 <option value="az">A → Z</option>
                 <option value="za">Z → A</option>
+                <option value="favorites">Favorites First</option>
             </select>
         </div>
         <div class="filter-group">
@@ -145,16 +164,32 @@ $games = [
     <!-- Game grid -->
     <div class="library-grid" id="libraryGrid">
         <?php foreach ($games as $g): ?>
+            <?php $is_fav = in_array($g['id'], $favorites, true); ?>
             <a href="game.php?id=<?= urlencode($g['id']) ?>"
                class="library-card"
+               data-id="<?= htmlspecialchars($g['id']) ?>"
                data-genre="<?= htmlspecialchars($g['genre']) ?>"
                data-title="<?= htmlspecialchars($g['title']) ?>"
-               data-release="<?= htmlspecialchars($g['release']) ?>">
+               data-release="<?= htmlspecialchars($g['release']) ?>"
+               data-favorited="<?= $is_fav ? '1' : '0' ?>">
                 <div class="library-thumb" style="background-image:url('<?= htmlspecialchars($g['thumbnail']) ?>');">
                     <div class="library-overlay"></div>
+
+                    <!-- Genre badge (top-left) -->
                     <div class="library-badge" style="background: <?= htmlspecialchars($g['accent']) ?>;">
                         <?= htmlspecialchars($g['genre']) ?>
                     </div>
+
+                    <!-- Heart button (top-right) -->
+                    <button class="library-heart <?= $is_fav ? 'active' : '' ?>" 
+                            type="button"
+                            data-game-id="<?= htmlspecialchars($g['id']) ?>"
+                            aria-label="Toggle favorite"
+                            title="<?= $is_fav ? 'Remove from favorites' : 'Add to favorites' ?>">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                        </svg>
+                    </button>
                 </div>
                 <div class="library-info">
                     <h3><?= htmlspecialchars($g['title']) ?></h3>
@@ -171,13 +206,33 @@ $games = [
 
 </main>
 
-<!-- ============ STATIC BACKGROUND ============ -->
-<div class="bg-layer" id="bgLayer"></div>
+<!-- ============ BACKGROUND ============ -->
+<div class="bg-layer" id="bgLayer">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto">
+        <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
+    </video>
+</div>
 
+<!-- Background music -->
+<audio id="bgMusic" loop preload="auto">
+    <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
+</audio>
+
+<?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
+
+<!-- Favorites data for JS -->
 <script>
-    // ========================================
-    // FILTER & SORT LOGIC
-    // ========================================
+    window.FAVORITES = <?= json_encode($favorites, JSON_UNESCAPED_SLASHES) ?>;
+</script>
+
+<script src="js/settings.js"></script>
+<script>
+// ========================================
+// LIBRARY PAGE — FILTER, SORT, FAVORITES
+// ========================================
+document.addEventListener('DOMContentLoaded', () => {
+
+    // -------- Filter & Sort --------
     const cards = document.querySelectorAll('.library-card');
     const genreFilter = document.getElementById('genreFilter');
     const sortSelect = document.getElementById('sortSelect');
@@ -202,12 +257,18 @@ $games = [
             if (show) visible.push(card);
         });
 
-        // Sort visible cards
+        // Sort
         visible.sort((a, b) => {
             if (sort === 'az') return a.dataset.title.localeCompare(b.dataset.title);
             if (sort === 'za') return b.dataset.title.localeCompare(a.dataset.title);
             if (sort === 'newest') return new Date(b.dataset.release) - new Date(a.dataset.release);
             if (sort === 'oldest') return new Date(a.dataset.release) - new Date(b.dataset.release);
+            if (sort === 'favorites') {
+                const aFav = a.dataset.favorited === '1';
+                const bFav = b.dataset.favorited === '1';
+                if (aFav === bFav) return 0;
+                return aFav ? -1 : 1;
+            }
             return 0;
         });
 
@@ -220,17 +281,51 @@ $games = [
     genreFilter.addEventListener('change', applyFilters);
     sortSelect.addEventListener('change', applyFilters);
     searchInput.addEventListener('input', applyFilters);
+
+    // -------- Favorites --------
+    const favorites = new Set(window.FAVORITES || []);
+
+    document.querySelectorAll('.library-heart').forEach(heart => {
+        const gameId = heart.dataset.gameId;
+
+        heart.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+
+            try {
+                const res = await fetch('toggle_favorite.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ game_id: gameId })
+                });
+                const result = await res.json();
+
+                if (!result.success) throw new Error(result.error || 'Failed');
+
+                const card = heart.closest('.library-card');
+
+                if (result.favorited) {
+                    favorites.add(gameId);
+                    heart.classList.add('active');
+                    heart.title = 'Remove from favorites';
+                    if (card) card.dataset.favorited = '1';
+                } else {
+                    favorites.delete(gameId);
+                    heart.classList.remove('active');
+                    heart.title = 'Add to favorites';
+                    if (card) card.dataset.favorited = '0';
+                }
+
+                // Pulse animation
+                heart.classList.add('pulse');
+                setTimeout(() => heart.classList.remove('pulse'), 400);
+
+            } catch (err) {
+                console.error('Toggle favorite failed:', err);
+            }
+        });
+    });
+});
 </script>
-<?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
-<script src="js/settings.js"></script>
-<div class="bg-layer" id="bgLayer">
-    <!-- Background music -->
-<audio id="bgMusic" loop preload="auto">
-    <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
-</audio>
-    <video class="bg-video" autoplay muted loop playsinline preload="auto">
-        <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
-    </video>
-</div>
 </body>
 </html>

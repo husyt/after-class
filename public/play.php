@@ -31,7 +31,7 @@ $game = $allowed_games[$game_id];
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($game['title']) ?> | CoreSync</title>
+    <title><?= htmlspecialchars($game['title']) ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }

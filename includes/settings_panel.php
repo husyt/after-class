@@ -161,7 +161,7 @@
 
                 <div class="settings-field">
                     <label>Version</label>
-                    <div class="settings-value">CoreSync v1.0.0</div>
+                    <div class="settings-value">EqualPath v1.0.0</div>
                 </div>
 
                 <a href="logout.php" class="settings-link danger">

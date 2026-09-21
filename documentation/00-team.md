@@ -1,6 +1,6 @@
 # CoreSync — Team Roles & Responsibilities
 
-**Project:** CoreSync — Game-Integrated Learning Platform  
+**Project:** EqualPath Youth Foundation — Game-Integrated Learning Platform 
 **Course:** System Integration & Architecture (SIA)  
 **Date:** September 2026
 

@@ -10,31 +10,47 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/../config/database.php';
 
+// ============================================
+// FETCH CURRENT USER
+// ============================================
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
+// ============================================
+// LOAD USER FAVORITES
+// ============================================
+$stmt = $pdo->prepare("SELECT game_id FROM user_favorites WHERE user_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$favorites = array_column($stmt->fetchAll(), 'game_id');
+
 // ==================================================
-// GAME CATALOG - Edit this array to add/remove games
+// GAME CATALOG
+// AfterClass (EqualPath) = Client's main game — featured first
+// Lex Obscura = Secondary bonus game
 // ==================================================
 $games = [
     [
-        'id'          => 'lex-obscura',
-        'title'       => 'LEX OBSCURA',
-        'type'        => 'video',
-        'video'       => '/after-class/assets/games/lexobscura-bg.mp4',
-        'reels'       => [],
-        'thumbnail'   => '/after-class/assets/games/lexobscura-thumb.jpg',
-        'accent'      => '#7c3aed',
-    ],
-    [
         'id'          => 'after-class',
         'title'       => 'AFTER CLASS',
+        'subtitle'    => 'An inclusive education adventure',
+        'featured'    => true,
         'type'        => 'video',
         'video'       => '/after-class/assets/games/afterclass-bg.mp4',
         'reels'       => [],
         'thumbnail'   => '/after-class/assets/games/afterclass-thumb.jpg',
         'accent'      => '#f97316',
+    ],
+    [
+        'id'          => 'lex-obscura',
+        'title'       => 'LEX OBSCURA',
+        'subtitle'    => 'A dark fantasy adventure',
+        'featured'    => false,
+        'type'        => 'video',
+        'video'       => '/after-class/assets/games/lexobscura-bg.mp4',
+        'reels'       => [],
+        'thumbnail'   => '/after-class/assets/games/lexobscura-thumb.jpg',
+        'accent'      => '#7c3aed',
     ],
 ];
 ?>
@@ -45,10 +61,17 @@ $games = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home | CoreSync</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-   <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
-<link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
 </head>
 <body>
+
+<!-- ============ BACKGROUND (behind everything) ============ -->
+<div class="bg-layer" id="bgLayer">
+    <video class="bg-video" autoplay muted loop playsinline preload="auto">
+        <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
+    </video>
+</div>
 
 <!-- ============ TOP NAV ============ -->
 <header class="topnav">
@@ -72,6 +95,11 @@ $games = [
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
+            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                </svg>
+            </a>
             <a href="profile.php" class="nav-tab" title="Profile">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
@@ -79,12 +107,12 @@ $games = [
                 </svg>
             </a>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-<a href="admin.php" class="nav-tab" title="Admin">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
-    </svg>
-</a>
-<?php endif; ?>
+            <a href="admin.php" class="nav-tab" title="Admin">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
+                </svg>
+            </a>
+            <?php endif; ?>
         </nav>
     </div>
 
@@ -110,7 +138,7 @@ $games = [
     </div>
 </header>
 
-<!-- ============ MAIN CONTENT ============ -->
+<!-- ============ MAIN ============ -->
 <main class="dashboard">
 
     <!-- Section Title -->
@@ -119,7 +147,7 @@ $games = [
         <span class="user-greeting">Welcome back, <?= htmlspecialchars($user['username']) ?></span>
     </div>
 
-    <!-- Game Row (PlayStation-style horizontal carousel) -->
+    <!-- Game Row -->
     <div class="game-row" id="gameRow">
         <?php foreach ($games as $i => $g): ?>
             <div class="game-tile <?= $i === 0 ? 'active' : '' ?>"
@@ -128,6 +156,7 @@ $games = [
                  data-accent="<?= htmlspecialchars($g['accent']) ?>"
                  data-type="<?= htmlspecialchars($g['type']) ?>"
                  data-title="<?= htmlspecialchars($g['title']) ?>"
+                 data-thumbnail="<?= htmlspecialchars($g['thumbnail']) ?>"
                  <?php if ($g['type'] === 'video'): ?>
                  data-video="<?= htmlspecialchars($g['video']) ?>"
                  <?php else: ?>
@@ -136,13 +165,28 @@ $games = [
                  <?php endif; ?>>
                 <div class="tile-thumb" style="background-image:url('<?= htmlspecialchars($g['thumbnail']) ?>');">
                     <div class="tile-overlay"></div>
+
+                    <?php if (!empty($g['featured'])): ?>
+                        <div class="tile-featured-badge">⭐ FEATURED</div>
+                    <?php endif; ?>
+
+                    <button class="tile-heart <?= in_array($g['id'], $favorites) ? 'active' : '' ?>"
+                            type="button"
+                            data-game-id="<?= htmlspecialchars($g['id']) ?>"
+                            aria-label="Toggle favorite"
+                            title="<?= in_array($g['id'], $favorites) ? 'Remove from favorites' : 'Add to favorites' ?>">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
+                        </svg>
+                    </button>
+
                     <div class="tile-label"><?= htmlspecialchars($g['title']) ?></div>
                 </div>
             </div>
         <?php endforeach; ?>
     </div>
 
-    <!-- Bottom Action Bar (appears when a game is selected) -->
+    <!-- Bottom Action Bar -->
     <div class="action-bar" id="actionBar">
         <a href="#" class="action-btn primary" id="playBtn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -219,7 +263,7 @@ $games = [
 
 </main>
 
-<!-- ============ INFO MODAL (outside main!) ============ -->
+<!-- ============ INFO MODAL ============ -->
 <div class="info-modal" id="infoModal" aria-hidden="true">
     <div class="info-modal-backdrop" id="infoBackdrop"></div>
     <div class="info-modal-panel" role="dialog" aria-labelledby="infoTitle">
@@ -241,10 +285,10 @@ $games = [
 
         <div class="info-body">
             <p class="info-desc">
-                CoreSync is a next-generation game-integrated learning platform built for schools and
-                organizations. It blends secure authentication, real-time game progress tracking, and
-                rich analytics into a single unified system — so every session becomes measurable,
-                meaningful, and fun.
+                CoreSync is a game-integrated learning platform built for schools and organizations.
+                It combines secure authentication, real-time game progress tracking, and detailed
+                analytics into one unified system — so every session becomes measurable, meaningful,
+                and fun.
             </p>
 
             <div class="info-stats">
@@ -268,7 +312,7 @@ $games = [
                     <li>Secure login with two-factor authentication</li>
                     <li>QR code sign-in for mobile devices</li>
                     <li>Integrated game progress and score tracking</li>
-                    <li>Role-based access control for students, teachers, and admins</li>
+                    <li>Role-based access control for students and admins</li>
                     <li>Real-time leaderboards and achievement system</li>
                     <li>Detailed activity logs and analytics dashboard</li>
                 </ul>
@@ -276,7 +320,7 @@ $games = [
 
             <div class="info-footer">
                 <p>
-                    <strong>CoreSync Technologies, Inc.</strong><br>
+                    <strong>CoreSync Technologies</strong><br>
                     Built with PHP, MySQL, and a lot of late nights.<br>
                     © 2026 CoreSync. All rights reserved.
                 </p>
@@ -307,8 +351,8 @@ $games = [
         <form id="reportForm">
             <div class="form-group">
                 <label for="reportSubject">Subject</label>
-                <input type="text" id="reportSubject" 
-                       placeholder="e.g. Game won't load" 
+                <input type="text" id="reportSubject"
+                       placeholder="e.g. Game won't load"
                        required maxlength="150">
                 <span class="field-error" id="reportSubjectError"></span>
             </div>
@@ -325,7 +369,7 @@ $games = [
 
             <div class="form-group">
                 <label for="reportDescription">Description</label>
-                <textarea id="reportDescription" 
+                <textarea id="reportDescription"
                           placeholder="Describe the issue in detail..."
                           required maxlength="2000" rows="5"></textarea>
                 <span class="field-error" id="reportDescriptionError"></span>
@@ -344,24 +388,21 @@ $games = [
     </div>
 </div>
 
-
-<script>
-    window.GAMES = <?= json_encode($games, JSON_UNESCAPED_SLASHES) ?>;
-</script>
+<!-- Background music -->
+<audio id="bgMusic" loop preload="auto">
+    <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
+</audio>
 
 <!-- Settings drawer -->
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
+<!-- Data for JS -->
+<script>
+    window.GAMES = <?= json_encode($games, JSON_UNESCAPED_SLASHES) ?>;
+    window.FAVORITES = <?= json_encode($favorites, JSON_UNESCAPED_SLASHES) ?>;
+</script>
+
 <script src="js/dashboard.js?v=<?= time() ?>"></script>
 <script src="js/settings.js?v=<?= time() ?>"></script>
-<div class="bg-layer" id="bgLayer">
-    <!-- Background music -->
-<audio id="bgMusic" loop preload="auto">
-    <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
-</audio>
-    <video class="bg-video" autoplay muted loop playsinline preload="auto">
-        <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
-    </video>
-</div>
 </body>
 </html>

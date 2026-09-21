@@ -18,11 +18,10 @@ Students today struggle with:
 1. **Low engagement** in traditional learning systems — no motivation to complete exercises
 2. **No visible progress tracking** — students can't see how they're improving over time
 3. **Fragmented tools** — separate systems for login, assignments, quizzes, and grades
-4. **Teacher visibility gap** — teachers don't have a centralized dashboard to monitor student performance
 
 ### Problem Statement
 
-> "Students lose interest in traditional learning tools. We have no way to measure their engagement, and teachers lack visibility into which students are actually participating. We've tried multiple platforms but nothing is unified — one system for login, another for quizzes, a third for grades."
+> "Students lose interest in traditional learning tools. We have no way to measure their engagement, and admin lack visibility into which students are actually participating. We've tried multiple platforms but nothing is unified — one system for login, another for quizzes, a third for grades."
 
 ---
 
@@ -31,30 +30,27 @@ Students today struggle with:
 | User Type | Description | Primary Needs |
 |---|---|---|
 | **Students** | Primary users, ages 12–20 | Fun, gamified learning; visible progress |
-| **Teachers** | Secondary users, educators | Monitor student performance, view reports |
 | **Administrators** | System managers | Manage users, view system-wide analytics |
 
 ---
 
 ## 4. Purpose of the Proposed System
 
-CoreSync is a **game-integrated learning platform** that:
+EqualPath is a **game-integrated learning platform** that:
 
 - Combines authentication, game progression, and analytics into one system
 - Rewards students with XP, levels, and achievements as they play
-- Gives teachers a dashboard to monitor participation and performance
 - Provides administrators with reports and user management tools
 
 ---
 
 ## 5. How the Game Relates to the Client's Needs
 
-| Client Need | How CoreSync Addresses It |
+| Client Need | How EqualPath Addresses It |
 |---|---|
 | Low engagement | Games reward play with XP, levels, and achievements |
 | No progress tracking | Every game session is logged with score, duration, level reached |
 | Fragmented tools | One login handles authentication, game access, and reports |
-| Teacher visibility | Reports page shows per-student and per-game performance |
 
 ---
 
@@ -66,11 +62,6 @@ CoreSync is a **game-integrated learning platform** that:
 - 🏆 Achievement system for motivation
 - 🔐 Secure login with 2FA protection
 
-### For Teachers
-- 📊 Reports on game participation
-- 👥 User management (view, edit roles)
-- 📅 Date-filtered analytics (daily, weekly, monthly)
-- 📥 CSV export for offline analysis
 
 ### For Administrators
 - 🛡️ Role-based access control
@@ -88,10 +79,6 @@ CoreSync is a **game-integrated learning platform** that:
 - View own game history
 - Cannot access admin pages
 
-### 👨‍🏫 Teacher
-- View reports on students
-- Monitor participation
-- Cannot delete users
 
 ### 🛡️ Administrator
 - Full access to all features

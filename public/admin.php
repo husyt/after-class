@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'change_role') {
         $target_id = (int)($_POST['user_id'] ?? 0);
         $new_role = $_POST['new_role'] ?? '';
-        $allowed_roles = ['admin', 'teacher', 'student'];
+        $allowed_roles = ['admin', 'student'];
 
         if (!in_array($new_role, $allowed_roles, true)) {
             $message = 'Invalid role.';
@@ -139,7 +139,7 @@ foreach ($issue_reports as $r) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | CoreSync</title>
+    <title>Admin Panel | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/settings.css">
     <link rel="stylesheet" href="css/dashboard.css">
@@ -620,7 +620,6 @@ foreach ($issue_reports as $r) {
                                 <select name="new_role" class="role-select" onchange="this.form.submit()"
                                     <?= $u['id'] == $_SESSION['user_id'] ? 'disabled' : '' ?>>
                                     <option value="student" <?= $u['role'] === 'student' ? 'selected' : '' ?>>Student</option>
-                                    <option value="teacher" <?= $u['role'] === 'teacher' ? 'selected' : '' ?>>Teacher</option>
                                     <option value="admin"   <?= $u['role'] === 'admin'   ? 'selected' : '' ?>>Admin</option>
                                 </select>
                             </form>

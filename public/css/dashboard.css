@@ -1768,3 +1768,228 @@ body::-webkit-scrollbar-corner {
         width: 100%;
     }
 }
+
+/* ============================================================
+   FAVORITE HEART ON GAME TILES
+   ============================================================ */
+
+.tile-heart {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(10, 10, 15, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 5;
+    opacity: 0.9;
+}
+
+.tile-heart:hover {
+    background: rgba(10, 10, 15, 0.85);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: white;
+    transform: scale(1.1);
+}
+
+.tile-heart.active {
+    background: linear-gradient(135deg, #d13639, #f97316);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 8px 24px rgba(209, 54, 57, 0.5);
+}
+
+.tile-heart.active svg {
+    fill: currentColor;
+}
+
+.tile-heart.active:hover {
+    transform: scale(1.15);
+    box-shadow: 0 10px 28px rgba(209, 54, 57, 0.7);
+}
+
+/* Heart animation when toggled */
+.tile-heart.pulse {
+    animation: heartPulse 0.4s ease;
+}
+
+@keyframes heartPulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.3); }
+    100% { transform: scale(1.1); }
+}
+
+/* Make heart stay visible on mobile */
+@media (max-width: 900px) {
+    .tile-heart {
+        width: 38px;
+        height: 38px;
+        top: 12px;
+        right: 12px;
+    }
+}
+/* Heart on library cards */
+.library-heart {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(10, 10, 15, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+.library-heart:hover {
+    background: rgba(10, 10, 15, 0.85);
+    color: white;
+    transform: scale(1.1);
+}
+
+.library-heart.active {
+    background: linear-gradient(135deg, #d13639, #f97316);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 8px 24px rgba(209, 54, 57, 0.5);
+}
+
+.library-heart.active svg {
+    fill: currentColor;
+}
+
+.library-heart.pulse {
+    animation: heartPulse 0.4s ease;
+}
+
+/* Featured badge on game tiles */
+.tile-featured-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    padding: 6px 12px;
+    background: linear-gradient(135deg, #f97316, #d13639);
+    color: white;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 6px 20px rgba(249, 115, 22, 0.5);
+    z-index: 5;
+}
+
+
+
+/* ============================================================
+   REPORT MODAL — ISOLATED FORM STYLES
+   (Overrides any conflicting .form-group from other stylesheets)
+   ============================================================ */
+
+.report-modal-panel .form-group {
+    margin-bottom: 20px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    display: block;
+    position: static;
+}
+
+.report-modal-panel .form-group label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    position: static;
+}
+
+.report-modal-panel .form-group textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+    transition: all 0.2s;
+    resize: vertical;
+    display: block;
+    position: static;
+}
+
+.report-modal-panel .form-group textarea::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.report-modal-panel .form-group textarea:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.report-modal-panel .form-group textarea.error {
+    border-color: #d13639;
+    background: rgba(209, 54, 57, 0.1);
+}
+
+.report-modal-panel .form-group input[type="text"],
+.report-modal-panel .form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    color: white;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+    display: block;
+    position: static;
+}
+
+.report-modal-panel .form-group input[type="text"]:focus,
+.report-modal-panel .form-group select:focus {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.report-modal-panel .form-group input[type="text"].error {
+    border-color: #d13639;
+    background: rgba(209, 54, 57, 0.1);
+}
+
+.report-modal-panel .form-group .field-error {
+    display: block;
+    font-size: 11px;
+    color: #ff7c7f;
+    margin-top: 6px;
+    min-height: 14px;
+    font-weight: 600;
+}

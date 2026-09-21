@@ -8,10 +8,82 @@ document.addEventListener('DOMContentLoaded', () => {
     const playBtn   = document.getElementById('playBtn');
     const actionBar = document.getElementById('actionBar');
     const games     = window.GAMES || [];
+    const favorites = new Set(window.FAVORITES || []);
 
     let currentIndex = 0;
     let autoRotateTimer = null;
     let currentGameId = null;
+
+        // ========================================
+    // TOGGLE FAVORITE
+    // ========================================
+    async function toggleFavorite(gameId) {
+        if (!gameId) return;
+
+        try {
+            const res = await fetch('toggle_favorite.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ game_id: gameId })
+            });
+
+            const result = await res.json();
+
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to toggle');
+            }
+
+            // Update local Set
+            if (result.favorited) {
+                favorites.add(gameId);
+                showToast('❤️ Added to favorites', 'success');
+            } else {
+                favorites.delete(gameId);
+                showToast('Removed from favorites', 'info');
+            }
+
+            // Update visual heart on the tile
+            updateTileFavorite(gameId);
+
+        } catch (err) {
+            console.error('Favorite toggle failed:', err);
+            showToast('⚠ Could not update favorite', 'error');
+        }
+    }
+
+    // Update heart icon on the current tile
+    function updateTileFavorite(gameId) {
+        tiles.forEach(tile => {
+            if (tile.dataset.id === gameId) {
+                const heart = tile.querySelector('.tile-heart');
+                if (heart) {
+                    if (favorites.has(gameId)) {
+                        heart.classList.add('active');
+                    } else {
+                        heart.classList.remove('active');
+                    }
+                }
+            }
+        });
+    }
+
+    // Initialize hearts on page load
+    tiles.forEach(tile => {
+        const gameId = tile.dataset.id;
+        const heart = tile.querySelector('.tile-heart');
+        if (heart && favorites.has(gameId)) {
+            heart.classList.add('active');
+        }
+
+        // Click on heart toggles favorite
+        if (heart) {
+            heart.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                toggleFavorite(gameId);
+            });
+        }
+    });
 
     // ========================================
     // TOAST SYSTEM
@@ -236,10 +308,23 @@ document.addEventListener('DOMContentLoaded', () => {
             moreBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
         }
 
-        moreBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMoreMenu();
-        });
+       moreBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+
+    // Update favorite menu item label
+    const game = games[currentIndex];
+    const favItem = moreMenu.querySelector('[data-action="favorite"]');
+    if (favItem && game) {
+        const span = favItem.querySelector('span');
+        if (span) {
+            span.textContent = favorites.has(game.id) 
+                ? 'Remove from Favorites' 
+                : 'Add to Favorites';
+        }
+    }
+
+    toggleMoreMenu();
+});
 
         document.addEventListener('click', (e) => {
             if (!moreMenu.contains(e.target) && e.target !== moreBtn) {
@@ -270,8 +355,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (action) {
             case 'favorite':
-                showToast(`Added "${gameName}" to favorites`, 'success');
-                break;
+    toggleFavorite(game.id);
+    break;
 
             case 'details':
                 openInfoModal();

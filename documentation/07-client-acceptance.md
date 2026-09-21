@@ -1,6 +1,6 @@
 # CoreSync — Client Acceptance Document
 
-**Project:** CoreSync — Game-Integrated Learning Platform  
+**Project:** EqualPath Youth Foundation — Game-Integrated Learning Platform  
 **Client:** UPHSD / CLIENT 10 — EqualPath Youth Foundation  
 **Prepared by:** CoreSync Development Team  
 **Date:** September 20, 2026  
@@ -13,7 +13,7 @@
 The client (a school/organization) reported the following challenges with their current learning system:
 
 ### Problem Statement
-> "Students lose interest in traditional learning tools. We have no way to measure their engagement, and teachers lack visibility into which students are actually participating. We've tried multiple platforms but nothing is unified — one system for login, another for quizzes, a third for grades."
+> "Students lose interest in traditional learning tools. We have no way to measure their engagement, and admin lack visibility into which students are actually participating. We've tried multiple platforms but nothing is unified — one system for login, another for quizzes, a third for grades."
 
 ### Key Pain Points
 
@@ -22,8 +22,7 @@ The client (a school/organization) reported the following challenges with their 
 | 1 | Low student engagement | Poor learning outcomes |
 | 2 | No progress visibility | Students can't see improvement |
 | 3 | Fragmented tools | Multiple logins, no central data |
-| 4 | No teacher visibility | Teachers can't identify struggling students |
-| 5 | No admin analytics | Management can't measure system usage |
+| 4 | No admin analytics | Management can't measure system usage |
 
 ---
 
@@ -36,12 +35,12 @@ Based on the client's feedback, we documented the following requirements:
 | ID | Requirement | Priority |
 |---|---|---|
 | FR-01 | Secure user authentication | High |
-| FR-02 | Role-based access (Student, Teacher, Admin) | High |
+| FR-02 | Role-based access (Student, Admin) | High |
 | FR-03 | Single sign-in for all tools | High |
 | FR-04 | Games that produce measurable scores | High |
 | FR-05 | Track student progress (XP, level, high score) | High |
 | FR-06 | Leaderboard to motivate students | Medium |
-| FR-07 | Reports for teachers and admins | High |
+| FR-07 | Reports for the admins | High |
 | FR-08 | Password recovery without admin intervention | Medium |
 | FR-09 | Activity logs for auditing | Medium |
 | FR-10 | Mobile-friendly interface | Medium |
@@ -74,8 +73,8 @@ Here's how CoreSync addresses each of the client's pain points:
 - **Solution:** Single login handles authentication, game access, reports, and admin functions.
 - **Where:** One session across all pages (`session.php`)
 
-### Problem 4: No Teacher Visibility
-- **Solution:** Teachers and admins can view Reports with date filters, per-student performance, and CSV export.
+### Problem 4: No Visibility
+- **Solution:** Admins can view Reports with date filters, per-student performance, and CSV export.
 - **Where:** `reports.php`
 
 ### Problem 5: No Admin Analytics
@@ -143,7 +142,7 @@ We conducted **3 feedback rounds** with the client during development.
 **Changes Made:**
 - Added CSV export for reports
 - Added "Print" button for offline reporting
-- Documented the 2FA process for teacher training materials
+- Documented the 2FA process 
 
 ---
 
@@ -180,7 +179,7 @@ The client's acceptance criteria and how CoreSync meets them:
 | Login system works | 100% success rate | 65/65 tests pass | ✅ Met |
 | Roles function | Admin ≠ Student views | Tested | ✅ Met |
 | Games produce scores | Every session saved | Code complete | ✅ Met |
-| Reports are usable | Teacher can export data | CSV + Print | ✅ Met |
+| Reports are usable | Admin can export data | CSV + Print | ✅ Met |
 | Security features | No plaintext passwords | Bcrypt hashing | ✅ Met |
 | Response time | < 2s per page | < 500ms avg | ✅ Exceeded |
 | Browser support | Chrome + Firefox + Edge | All tested | ✅ Met |
@@ -213,10 +212,9 @@ The client identified the following as good ideas for future versions:
 2. **Multi-language support** — For international students
 3. **More games** — Expand the game library beyond 2 games
 4. **Real-time multiplayer** — Allow students to compete live
-5. **Teacher-created quizzes** — Let teachers build their own game content
-6. **Achievement badges** — Visual rewards for milestones
-7. **Analytics dashboard** — Charts showing trends over time
-8. **Parent portal** — Separate login for parents to monitor progress
+5. **Achievement badges** — Visual rewards for milestones
+6. **Analytics dashboard** — Charts showing trends over time
+7. **Parent portal** — Separate login for parents to monitor progress
 
 ---
 
@@ -235,7 +233,7 @@ The client identified the following as good ideas for future versions:
 
 **Overall Assessment:**
 
-> The client has reviewed the CoreSync system across multiple feedback rounds. All high-priority requirements have been met. The remaining lower-priority items (achievement badges, email verification) are documented as future enhancements. The system is ready for the pilot program.
+> The client has reviewed the EqualPath system across multiple feedback rounds. All high-priority requirements have been met. The remaining lower-priority items (achievement badges, email verification) are documented as future enhancements. The system is ready for the pilot program.
 
 ---
 

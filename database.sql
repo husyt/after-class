@@ -7,7 +7,7 @@ CREATE TABLE users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('admin', 'teacher', 'student') DEFAULT 'student',
+    role ENUM('admin', 'student') DEFAULT 'student',
     profile_image VARCHAR(255) DEFAULT NULL,
     level INT DEFAULT 1,
     xp INT DEFAULT 0,
@@ -52,9 +52,6 @@ INSERT INTO users (username, email, password_hash, role) VALUES
 INSERT INTO users (username, email, password_hash, role) VALUES 
 ('student', 'student@afterclass.com', '$2y$10$YourHashHere', 'student');
 
--- Teacher Account
-INSERT INTO users (username, email, password_hash, role) VALUES 
-('teacher', 'teacher@afterclass.com', '$2y$10$YourHashHere', 'teacher');
 
 -- Add email column if it doesn't exist
 ALTER TABLE users ADD COLUMN email VARCHAR(100) UNIQUE AFTER username;
@@ -62,4 +59,3 @@ ALTER TABLE users ADD COLUMN email VARCHAR(100) UNIQUE AFTER username;
 -- Update existing users with an email (replace with real values)
 UPDATE users SET email = 'admin@afterclass.com' WHERE username = 'admin';
 UPDATE users SET email = 'student@afterclass.com' WHERE username = 'student';
-UPDATE users SET email = 'teacher@afterclass.com' WHERE username = 'teacher';
