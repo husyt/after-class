@@ -1,134 +1,168 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const tabs = document.querySelectorAll('.tab');
-    const signinPanel = document.getElementById('signinPanel');
-    const qrPanel = document.getElementById('qrPanel');
-    const qrCodeContainer = document.getElementById('qrCodeContainer');
-    const qrStatus = document.getElementById('qrStatus');
-    const refreshBtn = document.getElementById('refreshQR');
 
-    let pollInterval = null;
-    let expireTimer = null;
+    const tabs = document.querySelectorAll('.tab');
+
+    const signinPanel =
+        document.getElementById('signinPanel');
+
+    const qrPanel =
+        document.getElementById('qrPanel');
+
+    const qrCodeContainer =
+        document.getElementById('qrCodeContainer');
+
+    const qrStatus =
+        document.getElementById('qrStatus');
+
+    const refreshBtn =
+        document.getElementById('refreshQR');
+
+    const verifyBtn =
+        document.getElementById('verifyQR');
+
+    const codeInput =
+        document.getElementById('qrVerificationCode');
+
+    let expirationTimer = null;
+
+
+    // ==========================================
+    // TAB SWITCHING
+    // ==========================================
 
     tabs.forEach(tab => {
+
         tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
+
+            tabs.forEach(t => {
+                t.classList.remove('active');
+            });
+
             tab.classList.add('active');
 
+
             if (tab.dataset.tab === 'qr') {
+
                 signinPanel.style.display = 'none';
                 qrPanel.style.display = 'block';
 
                 generateQR();
+
             } else {
+
                 signinPanel.style.display = 'block';
                 qrPanel.style.display = 'none';
 
-                stopPolling();
+                stopTimer();
             }
         });
     });
 
 
+    // ==========================================
+    // GENERATE QR
+    // ==========================================
+
     async function generateQR() {
-        stopPolling();
+
+        stopTimer();
 
         qrCodeContainer.innerHTML =
             '<div class="qr-loading">Generating...</div>';
 
         qrStatus.className = 'qr-status';
 
-        qrStatus.innerHTML =
-            '<span class="pulse-dot"></span> Generating secure QR...';
+        qrStatus.textContent =
+            'Generating verification QR...';
+
+        if (codeInput) {
+
+            codeInput.value = '';
+            codeInput.disabled = false;
+        }
+
+        if (verifyBtn) {
+
+            verifyBtn.disabled = false;
+        }
+
 
         try {
 
             const response = await fetch(
                 'qr_generate.php?ts=' + Date.now(),
                 {
-                    method: 'GET',
                     cache: 'no-store'
                 }
             );
 
-            const rawResponse = await response.text();
+            const data = await response.json();
 
-            console.log('QR GENERATE RESPONSE:', rawResponse);
 
-            let data;
+            if (!data.success) {
 
-            try {
-                data = JSON.parse(rawResponse);
-            } catch (error) {
                 throw new Error(
-                    'qr_generate.php did not return valid JSON: ' +
-                    rawResponse
+                    data.error ||
+                    'Unable to generate QR.'
                 );
             }
 
 
-            if (!response.ok || !data.success) {
+            if (!data.qr_text) {
+
                 throw new Error(
-                    data.error || 'QR generation failed.'
+                    'QR verification data is missing.'
                 );
             }
-
-
-            if (!data.token || !data.scan_url) {
-                throw new Error(
-                    'QR response is missing token or scan URL.'
-                );
-            }
-
-
-            console.log('QR TOKEN:', data.token);
-            console.log('QR SCAN URL:', data.scan_url);
 
 
             qrCodeContainer.innerHTML = '';
 
 
-            if (typeof QRCode === 'undefined') {
-                throw new Error(
-                    'QRCode JavaScript library failed to load.'
-                );
-            }
+            new QRCode(
+                qrCodeContainer,
+                {
+                    text: data.qr_text,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#1a1a1a',
+                    colorLight: '#ffffff',
+                    correctLevel:
+                        QRCode.CorrectLevel.H
+                }
+            );
 
 
-            new QRCode(qrCodeContainer, {
-                text: data.scan_url,
-                width: 200,
-                height: 200,
-                colorDark: '#1a1a1a',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            qrStatus.className =
+                'qr-status';
+
+            qrStatus.textContent =
+                'Scan QR with your phone and enter the 6-digit code below.';
 
 
-            qrStatus.className = 'qr-status';
+            expirationTimer =
+                setTimeout(() => {
 
-            qrStatus.innerHTML =
-                '<span class="pulse-dot"></span> Waiting for phone scan...';
+                    qrStatus.className =
+                        'qr-status expired';
 
+                    qrStatus.textContent =
+                        '⚠ QR expired. Generate a new QR.';
 
-            startPolling(data.token);
+                    if (codeInput) {
+                        codeInput.disabled = true;
+                    }
 
+                    if (verifyBtn) {
+                        verifyBtn.disabled = true;
+                    }
 
-            expireTimer = setTimeout(() => {
-
-                stopPolling();
-
-                qrStatus.className =
-                    'qr-status expired';
-
-                qrStatus.innerHTML =
-                    '⚠ QR code expired. Click refresh.';
-
-            }, 300000);
+                }, 300000);
 
 
         } catch (error) {
 
-            console.error('QR ERROR:', error);
+            console.error(error);
 
             qrCodeContainer.innerHTML =
                 '<div class="qr-loading" style="color:#d32f2f;">QR Error</div>';
@@ -142,107 +176,154 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    function startPolling(token) {
+    // ==========================================
+    // VERIFY CODE
+    // ==========================================
 
-        stopPolling(false);
+    async function verifyCode() {
 
-        pollInterval = setInterval(async () => {
+        const code =
+            codeInput.value.trim();
 
-            try {
 
-                const response = await fetch(
-                    'qr_check.php?token=' +
-                    encodeURIComponent(token) +
-                    '&ts=' +
-                    Date.now(),
+        if (!/^\d{6}$/.test(code)) {
+
+            qrStatus.className =
+                'qr-status expired';
+
+            qrStatus.textContent =
+                'Enter the 6-digit code shown on your phone.';
+
+            return;
+        }
+
+
+        qrStatus.className =
+            'qr-status';
+
+        qrStatus.textContent =
+            'Verifying...';
+
+        verifyBtn.disabled =
+            true;
+
+
+        try {
+
+            const response =
+                await fetch(
+                    'qr_verify.php',
                     {
-                        cache: 'no-store'
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body: JSON.stringify({
+                            code: code
+                        })
                     }
                 );
 
 
-                const rawResponse =
-                    await response.text();
-
-                let data;
-
-                try {
-                    data = JSON.parse(rawResponse);
-                } catch (error) {
-
-                    console.error(
-                        'QR CHECK INVALID RESPONSE:',
-                        rawResponse
-                    );
-
-                    return;
-                }
+            const data =
+                await response.json();
 
 
-                console.log(
-                    'QR STATUS:',
-                    data.status
-                );
+            if (data.success) {
+
+                stopTimer();
+
+                qrStatus.className =
+                    'qr-status approved';
+
+                qrStatus.textContent =
+                    '✓ QR verified! Returning to Sign-in...';
+
+                codeInput.disabled =
+                    true;
+
+                verifyBtn.disabled =
+                    true;
 
 
-                if (data.status === 'approved') {
+                setTimeout(() => {
 
-                    stopPolling();
+                    // Switch back to Sign-in tab
+                    tabs.forEach(t => {
+                        t.classList.remove('active');
+                    });
 
-                    qrStatus.className =
-                        'qr-status approved';
+                    const signinTab =
+                        document.querySelector(
+                            '.tab[data-tab="signin"]'
+                        );
 
-                    qrStatus.innerHTML =
-                        '✓ Approved! Signing you in...';
+                    if (signinTab) {
+                        signinTab.classList.add('active');
+                    }
 
+                    qrPanel.style.display =
+                        'none';
 
-                    setTimeout(() => {
+                    signinPanel.style.display =
+                        'block';
 
-                        window.location.href =
-                            'dashboard.php';
+                    const username =
+                        document.getElementById(
+                            'username'
+                        );
 
-                    }, 700);
+                    if (username) {
+                        username.focus();
+                    }
 
-                }
-
-
-                else if (
-                    data.status === 'expired' ||
-                    data.status === 'error'
-                ) {
-
-                    stopPolling();
-
-                    qrStatus.className =
-                        'qr-status expired';
-
-                    qrStatus.innerHTML =
-                        '⚠ QR code expired. Click refresh.';
-                }
+                }, 1000);
 
 
-            } catch (error) {
-
-                console.error(
-                    'QR polling error:',
-                    error
-                );
+                return;
             }
 
-        }, 2000);
+
+            qrStatus.className =
+                'qr-status expired';
+
+            qrStatus.textContent =
+                data.message ||
+                'Incorrect verification code.';
+
+            verifyBtn.disabled =
+                false;
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            qrStatus.className =
+                'qr-status expired';
+
+            qrStatus.textContent =
+                'Verification failed.';
+
+            verifyBtn.disabled =
+                false;
+        }
     }
 
 
-    function stopPolling(clearExpiry = true) {
+    function stopTimer() {
 
-        if (pollInterval) {
-            clearInterval(pollInterval);
-            pollInterval = null;
-        }
+        if (expirationTimer) {
 
-        if (clearExpiry && expireTimer) {
-            clearTimeout(expireTimer);
-            expireTimer = null;
+            clearTimeout(
+                expirationTimer
+            );
+
+            expirationTimer =
+                null;
         }
     }
 
@@ -254,4 +335,43 @@ document.addEventListener('DOMContentLoaded', () => {
             generateQR
         );
     }
+
+
+    if (verifyBtn) {
+
+        verifyBtn.addEventListener(
+            'click',
+            verifyCode
+        );
+    }
+
+
+    if (codeInput) {
+
+        codeInput.addEventListener(
+            'input',
+            () => {
+
+                codeInput.value =
+                    codeInput.value
+                        .replace(/\D/g, '')
+                        .slice(0, 6);
+            }
+        );
+
+
+        codeInput.addEventListener(
+            'keydown',
+            event => {
+
+                if (event.key === 'Enter') {
+
+                    event.preventDefault();
+
+                    verifyCode();
+                }
+            }
+        );
+    }
+
 });
