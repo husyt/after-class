@@ -16,6 +16,16 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
+// ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// LOAD AVATAR HELPER
+// ============================================
+require_once __DIR__ . '/../includes/avatar.php';
+
 $stats = [
     'level'        => (int)($user['level'] ?? 1),
     'xp'           => (int)($user['xp'] ?? 0),
@@ -23,7 +33,6 @@ $stats = [
     'games_played' => (int)($user['games_played'] ?? 0),
 ];
 
-// XP progress to next level
 $stats['xp_current'] = $stats['xp'] % 1000;
 $stats['xp_next']    = 1000;
 $stats['xp_percent'] = ($stats['xp_current'] / $stats['xp_next']) * 100;
@@ -67,13 +76,13 @@ if (!$game) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($game['title'] ?? '') ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <style>
         .bg-video {
             position: fixed;
@@ -290,7 +299,7 @@ if (!$game) {
         }
     </style>
 </head>
-<body>
+<body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
 
 <?php if ($game['type'] === 'video' && !empty($game['video'])): ?>
     <!-- VIDEO BACKGROUND -->
@@ -314,23 +323,23 @@ if (!$game) {
         </div>
     </div>
     <div class="nav-right">
-        <a href="leaderboard.php" class="icon-btn" aria-label="Leaderboard" title="Leaderboard">
+        <a href="leaderboard.php" class="icon-btn" aria-label="<?= __('leaderboard') ?>" title="<?= __('leaderboard') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
             </svg>
         </a>
-        <a href="dashboard.php" class="icon-btn" aria-label="Dashboard" title="Dashboard">
+        <a href="dashboard.php" class="icon-btn" aria-label="<?= __('home') ?>" title="<?= __('home') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
             </svg>
         </a>
+        
+        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out" title="Sign Out">
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>" title="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -341,7 +350,7 @@ if (!$game) {
 
 <main class="game-page">
 
-    <!-- ============ STAT CARDS (top-right corner) ============ -->
+    <!-- Stat Cards -->
     <div class="game-stats">
         <div class="game-stat">
             <div class="game-stat-icon level">
@@ -350,7 +359,7 @@ if (!$game) {
                 </svg>
             </div>
             <div class="game-stat-body">
-                <div class="game-stat-label">Level</div>
+                <div class="game-stat-label"><?= __('level') ?></div>
                 <div class="game-stat-value"><?= $stats['level'] ?></div>
             </div>
         </div>
@@ -362,7 +371,7 @@ if (!$game) {
                 </svg>
             </div>
             <div class="game-stat-body">
-                <div class="game-stat-label">Total XP</div>
+                <div class="game-stat-label"><?= __('total_xp') ?></div>
                 <div class="game-stat-value"><?= number_format($stats['xp']) ?></div>
             </div>
         </div>
@@ -374,7 +383,7 @@ if (!$game) {
                 </svg>
             </div>
             <div class="game-stat-body">
-                <div class="game-stat-label">High Score</div>
+                <div class="game-stat-label"><?= __('high_score') ?></div>
                 <div class="game-stat-value"><?= number_format($stats['high_score']) ?></div>
             </div>
         </div>
@@ -387,7 +396,7 @@ if (!$game) {
                 </svg>
             </div>
             <div class="game-stat-body">
-                <div class="game-stat-label">Played</div>
+                <div class="game-stat-label"><?= __('games_played') ?></div>
                 <div class="game-stat-value"><?= number_format($stats['games_played']) ?></div>
             </div>
         </div>
@@ -397,7 +406,7 @@ if (!$game) {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        Back to Home
+        <?= __('back_to_home') ?>
     </a>
 
     <h1 class="game-title"><?= htmlspecialchars($game['title'] ?? '') ?></h1>
@@ -409,7 +418,7 @@ if (!$game) {
 
     <a href="play.php?id=<?= urlencode($game['id']) ?>" class="play-btn">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-        Play
+        <?= __('play') ?>
     </a>
 </main>
 

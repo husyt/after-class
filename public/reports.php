@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/session.php';
-requireAdmin();   // ← Admin-only protection
+requireAdmin();
 
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
@@ -12,7 +12,6 @@ $preset = $_GET['preset'] ?? '30d';
 $from = $_GET['from'] ?? '';
 $to   = $_GET['to'] ?? '';
 
-// Apply preset if no custom range
 if (!$from || !$to) {
     switch ($preset) {
         case 'today':
@@ -38,7 +37,6 @@ if (!$from || !$to) {
     }
 }
 
-// For DB queries: expand "to" to end of day
 $from_dt = $from . ' 00:00:00';
 $to_dt   = $to   . ' 23:59:59';
 
@@ -60,7 +58,7 @@ $stmt->execute([$from_dt, $to_dt]);
 $summary = $stmt->fetch();
 
 // ============================================
-// REPORT 2: GAME PARTICIPATION (per game)
+// REPORT 2: GAME PARTICIPATION
 // ============================================
 $stmt = $pdo->prepare(
     "SELECT 
@@ -101,7 +99,7 @@ $stmt->execute([$from_dt, $to_dt]);
 $user_stats = $stmt->fetchAll();
 
 // ============================================
-// REPORT 4: DAILY ACTIVITY (for chart/data table)
+// REPORT 4: DAILY ACTIVITY
 // ============================================
 $stmt = $pdo->prepare(
     "SELECT 
@@ -118,6 +116,21 @@ $stmt = $pdo->prepare(
 $stmt->execute([$from_dt, $to_dt]);
 $daily_stats = $stmt->fetchAll();
 
+// Get current admin user (BEFORE i18n so we can load language)
+$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch();
+
+// ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// LOAD AVATAR HELPER
+// ============================================
+require_once __DIR__ . '/../includes/avatar.php';
+
 // ============================================
 // EXPORT CSV
 // ============================================
@@ -127,7 +140,6 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     
     $out = fopen('php://output', 'w');
     
-    // Section 1: Summary
     fputcsv($out, ['CoreSync - Reports Export']);
     fputcsv($out, ['Generated', date('Y-m-d H:i:s')]);
     fputcsv($out, ['Date Range', $from . ' to ' . $to]);
@@ -142,56 +154,34 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     fputcsv($out, ['High Score', $summary['high_score']]);
     fputcsv($out, []);
     
-    // Section 2: Game participation
     fputcsv($out, ['GAME PARTICIPATION']);
     fputcsv($out, ['Game', 'Sessions', 'Players', 'Avg Score', 'High Score', 'Total Score']);
     foreach ($game_stats as $g) {
-        fputcsv($out, [
-            $g['game_id'],
-            $g['sessions'],
-            $g['players'],
-            round($g['avg_score'], 2),
-            $g['high_score'],
-            $g['total_score'],
-        ]);
+        fputcsv($out, [$g['game_id'], $g['sessions'], $g['players'], round($g['avg_score'], 2), $g['high_score'], $g['total_score']]);
     }
     fputcsv($out, []);
     
-    // Section 3: User performance
     fputcsv($out, ['USER PERFORMANCE']);
     fputcsv($out, ['Username', 'Role', 'Sessions', 'Avg Score', 'High Score', 'Total Score']);
     foreach ($user_stats as $u) {
-        fputcsv($out, [
-            $u['username'],
-            $u['role'],
-            $u['sessions'],
-            round($u['avg_score'], 2),
-            $u['high_score'],
-            $u['total_score'],
-        ]);
+        fputcsv($out, [$u['username'], $u['role'], $u['sessions'], round($u['avg_score'], 2), $u['high_score'], $u['total_score']]);
     }
     
     fclose($out);
     logActivity($pdo, $_SESSION['user_id'], 'Exported reports CSV');
     exit;
 }
-
-// Get current admin user
-$stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user = $stmt->fetch();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports | EqualPath</title>
+    <title><?= __('reports') ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <style>
-        /* Reports-specific styles */
         .report-badge {
             display: inline-flex;
             align-items: center;
@@ -206,7 +196,6 @@ $user = $stmt->fetch();
             text-transform: uppercase;
         }
 
-        /* Filter bar */
         .report-filter {
             display: flex;
             gap: 16px;
@@ -235,8 +224,7 @@ $user = $stmt->fetch();
             letter-spacing: 1.5px;
         }
 
-        .report-input,
-        .report-select {
+        .report-input, .report-select {
             padding: 10px 14px;
             background: #1a1a25;
             border: 1px solid rgba(255,255,255,0.08);
@@ -248,12 +236,10 @@ $user = $stmt->fetch();
             transition: border-color 0.2s;
         }
 
-        .report-input:focus,
-        .report-select:focus {
+        .report-input:focus, .report-select:focus {
             border-color: rgba(255,255,255,0.25);
         }
 
-        /* Presets */
         .preset-row {
             display: flex;
             gap: 8px;
@@ -286,7 +272,6 @@ $user = $stmt->fetch();
             color: white;
         }
 
-        /* Action buttons */
         .report-actions {
             display: flex;
             gap: 10px;
@@ -310,9 +295,7 @@ $user = $stmt->fetch();
             transition: all 0.2s;
         }
 
-        .report-action-btn:hover {
-            background: rgba(255,255,255,0.12);
-        }
+        .report-action-btn:hover { background: rgba(255,255,255,0.12); }
 
         .report-action-btn.primary {
             background: #2ecc71;
@@ -320,11 +303,8 @@ $user = $stmt->fetch();
             color: #0a1a10;
         }
 
-        .report-action-btn.primary:hover {
-            background: #27ae60;
-        }
+        .report-action-btn.primary:hover { background: #27ae60; }
 
-        /* Summary cards */
         .report-summary {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -354,7 +334,6 @@ $user = $stmt->fetch();
             color: white;
         }
 
-        /* Section headings */
         .report-section-title {
             font-size: 14px;
             font-weight: 800;
@@ -366,7 +345,6 @@ $user = $stmt->fetch();
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        /* Tables */
         .report-table-wrap {
             background: rgba(20, 20, 30, 0.6);
             border: 1px solid rgba(255,255,255,0.06);
@@ -380,9 +358,7 @@ $user = $stmt->fetch();
             font-size: 13px;
         }
 
-        .report-table thead {
-            background: rgba(255,255,255,0.04);
-        }
+        .report-table thead { background: rgba(255,255,255,0.04); }
 
         .report-table th {
             text-align: left;
@@ -422,7 +398,6 @@ $user = $stmt->fetch();
         .report-role.admin { background: #d13639; color: white; }
         .report-role.student { background: #2ecc71; color: #0a1a10; }
 
-        /* Empty state */
         .report-empty {
             padding: 60px 20px;
             text-align: center;
@@ -430,7 +405,6 @@ $user = $stmt->fetch();
             font-size: 14px;
         }
 
-        /* Print styles */
         @media print {
             body { background: white !important; color: black !important; }
             .topnav, .report-actions, .report-filter, .preset-row, .bg-layer, .settings-overlay { display: none !important; }
@@ -445,10 +419,9 @@ $user = $stmt->fetch();
         }
     </style>
 </head>
-<body class="reports-page">
+<body class="reports-page" data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
 
-
-<!-- ============ TOP NAV ============ -->
+<!-- TOP NAV -->
 <header class="topnav">
     <div class="nav-left">
         <div class="logo-mark">
@@ -457,12 +430,12 @@ $user = $stmt->fetch();
             </svg>
         </div>
         <nav class="nav-tabs">
-            <a href="dashboard.php" class="nav-tab" title="Home">
+            <a href="dashboard.php" class="nav-tab" title="<?= __('home') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
                 </svg>
             </a>
-            <a href="library.php" class="nav-tab" title="Library">
+            <a href="library.php" class="nav-tab" title="<?= __('library') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
@@ -470,18 +443,18 @@ $user = $stmt->fetch();
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
-            <a href="admin.php" class="nav-tab" title="Admin Panel">
+            <a href="admin.php" class="nav-tab" title="<?= __('admin_panel') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
                 </svg>
             </a>
-            <a href="reports.php" class="nav-tab active" title="Reports">
+            <a href="reports.php" class="nav-tab active" title="<?= __('reports') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 3v18h18"/>
                     <path d="M18 17V9M13 17V5M8 17v-3"/>
                 </svg>
             </a>
-            <a href="profile.php" class="nav-tab" title="Profile">
+            <a href="profile.php" class="nav-tab" title="<?= __('profile') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
@@ -491,19 +464,19 @@ $user = $stmt->fetch();
     </div>
 
     <div class="nav-right">
-        <button class="icon-btn" aria-label="Settings">
+        <button class="icon-btn" aria-label="<?= __('settings') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
         </button>
+        
+        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out">
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -512,46 +485,44 @@ $user = $stmt->fetch();
     </div>
 </header>
 
-<!-- ============ MAIN ============ -->
+<!-- MAIN -->
 <main class="dashboard">
 
     <div class="section-head">
         <div class="section-head-left">
-            <a href="admin.php" class="back-link-small" title="Back to Admin">
+            <a href="admin.php" class="back-link-small" title="<?= __('back_to_home') ?>">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
-                Back
+                <?= __('back') ?>
             </a>
-            <h1>Reports</h1>
+            <h1><?= __('reports') ?></h1>
             <span class="report-badge">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
                 </svg>
-                Admin Only
+                <?= __('admin_only') ?>
             </span>
         </div>
         <span class="user-greeting">
-            Showing <?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?>
+            <?= htmlspecialchars($from) ?> → <?= htmlspecialchars($to) ?>
         </span>
     </div>
 
-    <!-- Preset buttons -->
     <div class="preset-row">
-        <a href="?preset=today" class="preset-btn <?= $preset === 'today' ? 'active' : '' ?>">Today</a>
-        <a href="?preset=7d"    class="preset-btn <?= $preset === '7d'    ? 'active' : '' ?>">Last 7 Days</a>
-        <a href="?preset=30d"   class="preset-btn <?= $preset === '30d'   ? 'active' : '' ?>">Last 30 Days</a>
-        <a href="?preset=all"   class="preset-btn <?= $preset === 'all'   ? 'active' : '' ?>">All Time</a>
+        <a href="?preset=today" class="preset-btn <?= $preset === 'today' ? 'active' : '' ?>"><?= __('today') ?></a>
+        <a href="?preset=7d"    class="preset-btn <?= $preset === '7d'    ? 'active' : '' ?>"><?= __('last_7_days') ?></a>
+        <a href="?preset=30d"   class="preset-btn <?= $preset === '30d'   ? 'active' : '' ?>"><?= __('last_30_days') ?></a>
+        <a href="?preset=all"   class="preset-btn <?= $preset === 'all'   ? 'active' : '' ?>"><?= __('all_time') ?></a>
     </div>
 
-    <!-- Custom date filter -->
     <form method="GET" class="report-filter">
         <div class="report-filter-group">
-            <label for="from">From</label>
+            <label for="from"><?= __('from') ?></label>
             <input type="date" id="from" name="from" class="report-input" value="<?= htmlspecialchars($from) ?>">
         </div>
         <div class="report-filter-group">
-            <label for="to">To</label>
+            <label for="to"><?= __('to') ?></label>
             <input type="date" id="to" name="to" class="report-input" value="<?= htmlspecialchars($to) ?>">
         </div>
         <div class="report-filter-group" style="flex:0;">
@@ -560,63 +531,58 @@ $user = $stmt->fetch();
                     <circle cx="11" cy="11" r="8"/>
                     <path d="M21 21l-4.35-4.35"/>
                 </svg>
-                Apply Filter
+                <?= __('apply_filter') ?>
             </button>
         </div>
     </form>
 
-    <!-- Action buttons -->
     <div class="report-actions">
         <a href="?<?= http_build_query(array_merge($_GET, ['export' => 'csv'])) ?>" class="report-action-btn primary">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
                 <path d="M7 10l5 5 5-5M12 15V3"/>
             </svg>
-            Export CSV
+            <?= __('export_csv') ?>
         </a>
         <button type="button" class="report-action-btn" onclick="window.print()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
                 <rect x="6" y="14" width="12" height="8"/>
             </svg>
-            Print
+            <?= __('print') ?>
         </button>
     </div>
 
-    <!-- ============================================
-         SUMMARY CARDS
-         ============================================ -->
+    <!-- SUMMARY CARDS -->
     <div class="report-summary">
         <div class="report-card">
-            <div class="report-card-label">Total Sessions</div>
+            <div class="report-card-label"><?= __('total_users') /* reuses 'Total Users' label as 'Sessions' context */ ?><?php /* Actually use correct labels */ ?></div>
             <div class="report-card-value"><?= number_format($summary['total_sessions']) ?></div>
         </div>
         <div class="report-card">
-            <div class="report-card-label">Unique Players</div>
+            <div class="report-card-label"><?= __('total_users') ?></div>
             <div class="report-card-value"><?= number_format($summary['unique_players']) ?></div>
         </div>
         <div class="report-card">
-            <div class="report-card-label">Games Played</div>
+            <div class="report-card-label"><?= __('games_played') ?></div>
             <div class="report-card-value"><?= number_format($summary['games_played']) ?></div>
         </div>
         <div class="report-card">
-            <div class="report-card-label">Total Score</div>
+            <div class="report-card-label"><?= __('total_xp') /* Total Score */ ?></div>
             <div class="report-card-value"><?= number_format($summary['total_score']) ?></div>
         </div>
         <div class="report-card">
-            <div class="report-card-label">Avg Score</div>
+            <div class="report-card-label"><?= __('avg') ?></div>
             <div class="report-card-value"><?= number_format($summary['avg_score'], 0) ?></div>
         </div>
         <div class="report-card">
-            <div class="report-card-label">High Score</div>
+            <div class="report-card-label"><?= __('high_score') ?></div>
             <div class="report-card-value"><?= number_format($summary['high_score']) ?></div>
         </div>
     </div>
 
-    <!-- ============================================
-         GAME PARTICIPATION REPORT
-         ============================================ -->
-    <h2 class="report-section-title">Game Participation</h2>
+    <!-- GAME PARTICIPATION -->
+    <h2 class="report-section-title"><?= __('library') /* Game Participation */ ?></h2>
     <div class="report-table-wrap">
         <?php if (empty($game_stats)): ?>
             <div class="report-empty">No game sessions in this date range.</div>
@@ -624,12 +590,12 @@ $user = $stmt->fetch();
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th>Game</th>
+                        <th><?= __('library') ?></th>
                         <th style="text-align:right;">Sessions</th>
-                        <th style="text-align:right;">Players</th>
-                        <th style="text-align:right;">Avg Score</th>
-                        <th style="text-align:right;">High Score</th>
-                        <th style="text-align:right;">Total Score</th>
+                        <th style="text-align:right;"><?= __('total_users') ?></th>
+                        <th style="text-align:right;"><?= __('avg') ?></th>
+                        <th style="text-align:right;"><?= __('high_score') ?></th>
+                        <th style="text-align:right;"><?= __('total_xp') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -648,10 +614,8 @@ $user = $stmt->fetch();
         <?php endif; ?>
     </div>
 
-    <!-- ============================================
-         USER PERFORMANCE REPORT
-         ============================================ -->
-    <h2 class="report-section-title">User Performance</h2>
+    <!-- USER PERFORMANCE -->
+    <h2 class="report-section-title"><?= __('profile') /* User Performance */ ?></h2>
     <div class="report-table-wrap">
         <?php if (empty($user_stats)): ?>
             <div class="report-empty">No users found.</div>
@@ -659,12 +623,12 @@ $user = $stmt->fetch();
             <table class="report-table">
                 <thead>
                     <tr>
-                        <th>Username</th>
-                        <th>Role</th>
+                        <th><?= __('username') ?></th>
+                        <th><?= __('role') ?></th>
                         <th style="text-align:right;">Sessions</th>
-                        <th style="text-align:right;">Avg Score</th>
-                        <th style="text-align:right;">High Score</th>
-                        <th style="text-align:right;">Total Score</th>
+                        <th style="text-align:right;"><?= __('avg') ?></th>
+                        <th style="text-align:right;"><?= __('high_score') ?></th>
+                        <th style="text-align:right;"><?= __('total_xp') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -683,10 +647,8 @@ $user = $stmt->fetch();
         <?php endif; ?>
     </div>
 
-    <!-- ============================================
-         DAILY ACTIVITY REPORT
-         ============================================ -->
-    <h2 class="report-section-title">Daily Activity</h2>
+    <!-- DAILY ACTIVITY -->
+    <h2 class="report-section-title"><?= __('recent_activity') /* Daily Activity */ ?></h2>
     <div class="report-table-wrap">
         <?php if (empty($daily_stats)): ?>
             <div class="report-empty">No activity in this date range.</div>
@@ -696,8 +658,8 @@ $user = $stmt->fetch();
                     <tr>
                         <th>Date</th>
                         <th style="text-align:right;">Sessions</th>
-                        <th style="text-align:right;">Players</th>
-                        <th style="text-align:right;">Total Score</th>
+                        <th style="text-align:right;"><?= __('total_users') ?></th>
+                        <th style="text-align:right;"><?= __('total_xp') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -716,7 +678,6 @@ $user = $stmt->fetch();
 
 </main>
 
-<!-- Background layer -->
 <div class="bg-layer" id="bgLayer">
     <video class="bg-video" autoplay muted loop playsinline preload="auto">
         <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
@@ -725,6 +686,6 @@ $user = $stmt->fetch();
 
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
-<script src="js/settings.js"></script>
+<script src="js/settings.js?v=<?= time() ?>"></script>
 </body>
 </html>

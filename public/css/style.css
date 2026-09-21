@@ -247,3 +247,34 @@ body { overflow: hidden; }
     color: #999;
     opacity: 0.8;
 }
+
+/* ============================================================
+   CAPS LOCK WARNING (Login Page)
+   ============================================================ */
+
+.caps-warning {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #fff8e1;
+    border: 1px solid #ffd54f;
+    border-radius: 6px;
+    color: #b45309;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+    animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

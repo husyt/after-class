@@ -18,6 +18,28 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// AVATAR SYSTEM (DiceBear CDN)
+// ============================================
+$avatar_seeds = ['Felix', 'Aneka', 'Leo', 'Mia', 'Kai', 'Zara', 'Ravi', 'Nora'];
+
+function get_avatar_url($profile_picture, $avatar_seeds) {
+    if (empty($profile_picture)) return null;
+    $num = (int) preg_replace('/\D/', '', $profile_picture);
+    if ($num >= 1 && $num <= 8) {
+        $seed = $avatar_seeds[$num - 1];
+        return "https://api.dicebear.com/7.x/adventurer/svg?seed={$seed}&size=200&backgroundColor=7c3aed,d13639,f97316,2ecc71";
+    }
+    return null;
+}
+
+$current_avatar_url = get_avatar_url($user['profile_picture'] ?? '', $avatar_seeds);
+
+// ============================================
 // LOAD USER FAVORITES
 // ============================================
 $stmt = $pdo->prepare("SELECT game_id FROM user_favorites WHERE user_id = ?");
@@ -26,8 +48,6 @@ $favorites = array_column($stmt->fetchAll(), 'game_id');
 
 // ==================================================
 // GAME CATALOG
-// AfterClass (EqualPath) = Client's main game — featured first
-// Lex Obscura = Secondary bonus game
 // ==================================================
 $games = [
     [
@@ -55,25 +75,25 @@ $games = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | EqualPath</title>
+    <title><?= __('home') ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
 </head>
-<body>
+<body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
 
-<!-- ============ BACKGROUND (behind everything) ============ -->
+<!-- BACKGROUND -->
 <div class="bg-layer" id="bgLayer">
     <video class="bg-video" autoplay muted loop playsinline preload="auto">
         <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
     </video>
 </div>
 
-<!-- ============ TOP NAV ============ -->
+<!-- TOP NAV -->
 <header class="topnav">
     <div class="nav-left">
         <div class="logo-mark">
@@ -82,12 +102,12 @@ $games = [
             </svg>
         </div>
         <nav class="nav-tabs">
-            <a href="dashboard.php" class="nav-tab active" title="Home">
+            <a href="dashboard.php" class="nav-tab active" title="<?= __('home') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
                 </svg>
             </a>
-            <a href="library.php" class="nav-tab" title="Library">
+            <a href="library.php" class="nav-tab" title="<?= __('library') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
@@ -95,19 +115,19 @@ $games = [
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
-            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+            <a href="leaderboard.php" class="nav-tab" title="<?= __('leaderboard') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
                 </svg>
             </a>
-            <a href="profile.php" class="nav-tab" title="Profile">
+            <a href="profile.php" class="nav-tab" title="<?= __('profile') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
                 </svg>
             </a>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-            <a href="admin.php" class="nav-tab" title="Admin">
+            <a href="admin.php" class="nav-tab" title="<?= __('admin') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
                 </svg>
@@ -117,19 +137,30 @@ $games = [
     </div>
 
     <div class="nav-right">
-        <button class="icon-btn" aria-label="Settings">
+        <button class="icon-btn" aria-label="<?= __('settings') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
         </button>
+        
+        <!-- UPDATED USER AVATAR SECTION -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <?php if ($current_avatar_url): ?>
+                <img src="<?= htmlspecialchars($current_avatar_url) ?>" 
+                     alt="Profile" 
+                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
+                     onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=\'22\' height=\'22\' viewBox=\'0 0 24 24\' fill=\'currentColor\'><circle cx=\'12\' cy=\'8\' r=\'4\'/><path d=\'M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2\'/></svg>'">
+            <?php else: ?>
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
+                </svg>
+            <?php endif; ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out">
+        <!-- END UPDATED USER AVATAR SECTION -->
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -138,13 +169,12 @@ $games = [
     </div>
 </header>
 
-<!-- ============ MAIN ============ -->
+<!-- MAIN -->
 <main class="dashboard">
 
-    <!-- Section Title -->
     <div class="section-head">
-        <h1>Home</h1>
-        <span class="user-greeting">Welcome back, <?= htmlspecialchars($user['username']) ?></span>
+        <h1><?= __('home') ?></h1>
+        <span class="user-greeting"><?= __('welcome_back') ?>, <?= htmlspecialchars($user['username']) ?></span>
     </div>
 
     <!-- Game Row -->
@@ -167,14 +197,14 @@ $games = [
                     <div class="tile-overlay"></div>
 
                     <?php if (!empty($g['featured'])): ?>
-                        <div class="tile-featured-badge">⭐ FEATURED</div>
+                        <div class="tile-featured-badge">⭐ <?= strtoupper(__('featured')) ?></div>
                     <?php endif; ?>
 
                     <button class="tile-heart <?= in_array($g['id'], $favorites) ? 'active' : '' ?>"
                             type="button"
                             data-game-id="<?= htmlspecialchars($g['id']) ?>"
                             aria-label="Toggle favorite"
-                            title="<?= in_array($g['id'], $favorites) ? 'Remove from favorites' : 'Add to favorites' ?>">
+                            title="<?= in_array($g['id'], $favorites) ? __('remove_favorites') : __('add_favorites') ?>">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                         </svg>
@@ -192,7 +222,7 @@ $games = [
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"/>
             </svg>
-            <span>Play</span>
+            <span><?= __('play') ?></span>
         </a>
 
         <button class="action-btn secondary" id="infoBtn">
@@ -200,7 +230,7 @@ $games = [
                 <circle cx="12" cy="12" r="10"/>
                 <path d="M12 16v-4M12 8h.01"/>
             </svg>
-            <span>Info</span>
+            <span><?= __('info') ?></span>
         </button>
 
         <div class="more-wrapper">
@@ -210,7 +240,7 @@ $games = [
                     <circle cx="19" cy="12" r="1"/>
                     <circle cx="5" cy="12" r="1"/>
                 </svg>
-                <span>More</span>
+                <span><?= __('more') ?></span>
             </button>
 
             <div class="more-menu" id="moreMenu" role="menu">
@@ -218,7 +248,7 @@ $games = [
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                     </svg>
-                    <span>Add to Favorites</span>
+                    <span><?= __('add_favorites') ?></span>
                 </button>
 
                 <button class="more-item" data-action="details" role="menuitem">
@@ -226,7 +256,7 @@ $games = [
                         <circle cx="12" cy="12" r="10"/>
                         <path d="M12 16v-4M12 8h.01"/>
                     </svg>
-                    <span>Game Details</span>
+                    <span><?= __('game_details') ?></span>
                 </button>
 
                 <button class="more-item" data-action="share" role="menuitem">
@@ -236,14 +266,14 @@ $games = [
                         <circle cx="18" cy="19" r="3"/>
                         <path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/>
                     </svg>
-                    <span>Share</span>
+                    <span><?= __('share') ?></span>
                 </button>
 
                 <button class="more-item" data-action="report" role="menuitem">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/>
                     </svg>
-                    <span>Report Issue</span>
+                    <span><?= __('report_issue') ?></span>
                 </button>
 
                 <div class="more-divider"></div>
@@ -252,18 +282,17 @@ $games = [
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
                     </svg>
-                    <span>Remove from Library</span>
+                    <span><?= __('remove_library') ?></span>
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast container -->
     <div class="toast-container" id="toastContainer"></div>
 
 </main>
 
-<!-- ============ INFO MODAL ============ -->
+<!-- INFO MODAL -->
 <div class="info-modal" id="infoModal" aria-hidden="true">
     <div class="info-modal-backdrop" id="infoBackdrop"></div>
     <div class="info-modal-panel" role="dialog" aria-labelledby="infoTitle">
@@ -294,7 +323,7 @@ $games = [
             <div class="info-stats">
                 <div class="info-stat">
                     <div class="info-stat-value">v1.0.0</div>
-                    <div class="info-stat-label">Version</div>
+                    <div class="info-stat-label"><?= __('version') ?></div>
                 </div>
                 <div class="info-stat">
                     <div class="info-stat-value">2</div>
@@ -329,7 +358,7 @@ $games = [
     </div>
 </div>
 
-<!-- ============ REPORT ISSUE MODAL ============ -->
+<!-- REPORT ISSUE MODAL -->
 <div class="report-modal" id="reportModal" aria-hidden="true">
     <div class="report-modal-backdrop" id="reportBackdrop"></div>
     <div class="report-modal-panel" role="dialog">
@@ -345,7 +374,7 @@ $games = [
             </svg>
         </div>
 
-        <h2>Report an Issue</h2>
+        <h2><?= __('report_issue') ?></h2>
         <p class="report-sub">Tell us what went wrong and we'll look into it.</p>
 
         <form id="reportForm">
@@ -400,6 +429,17 @@ $games = [
 <script>
     window.GAMES = <?= json_encode($games, JSON_UNESCAPED_SLASHES) ?>;
     window.FAVORITES = <?= json_encode($favorites, JSON_UNESCAPED_SLASHES) ?>;
+    window.TRANSLATIONS = {
+        add_favorites:    '<?= __('add_favorites') ?>',
+        remove_favorites: '<?= __('remove_favorites') ?>',
+        game_details:     '<?= __('game_details') ?>',
+        share:            '<?= __('share') ?>',
+        report_issue:     '<?= __('report_issue') ?>',
+        remove_library:   '<?= __('remove_library') ?>',
+        added_favorites:  '<?= __('added_favorites') ?>',
+        removed_favorites:'<?= __('removed_favorites') ?>',
+        link_copied:      '<?= __('link_copied') ?>'
+    };
 </script>
 
 <script src="js/dashboard.js?v=<?= time() ?>"></script>

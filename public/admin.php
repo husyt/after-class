@@ -11,6 +11,16 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// LOAD AVATAR HELPER
+// ============================================
+require_once __DIR__ . '/../includes/avatar.php';
+
+// ============================================
 // SYSTEM STATISTICS
 // ============================================
 $stats = [];
@@ -135,14 +145,14 @@ foreach ($issue_reports as $r) {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel | EqualPath</title>
+    <title><?= __('admin_panel') ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <style>
         .admin-badge {
             display: inline-flex;
@@ -167,6 +177,7 @@ foreach ($issue_reports as $r) {
             border: 1px solid rgba(255,255,255,0.06);
             border-radius: 12px;
             width: fit-content;
+            flex-wrap: wrap;
         }
 
         .admin-tab {
@@ -231,9 +242,7 @@ foreach ($issue_reports as $r) {
             border-collapse: collapse;
             font-size: 13px;
         }
-        .admin-table thead {
-            background: rgba(255,255,255,0.04);
-        }
+        .admin-table thead { background: rgba(255,255,255,0.04); }
         .admin-table th {
             text-align: left;
             padding: 14px 20px;
@@ -276,17 +285,9 @@ foreach ($issue_reports as $r) {
             cursor: pointer;
             transition: all 0.2s;
         }
-        .admin-action-btn:hover {
-            background: rgba(255,255,255,0.12);
-            color: white;
-        }
-        .admin-action-btn.danger {
-            color: #ff7c7f;
-            border-color: rgba(209,54,57,0.3);
-        }
-        .admin-action-btn.danger:hover {
-            background: rgba(209,54,57,0.15);
-        }
+        .admin-action-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+        .admin-action-btn.danger { color: #ff7c7f; border-color: rgba(209,54,57,0.3); }
+        .admin-action-btn.danger:hover { background: rgba(209,54,57,0.15); }
 
         .tfa-toggle {
             display: inline-flex;
@@ -314,10 +315,7 @@ foreach ($issue_reports as $r) {
             border-color: rgba(255, 255, 255, 0.1);
             color: rgba(255, 255, 255, 0.5);
         }
-        .tfa-toggle.off:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-        }
+        .tfa-toggle.off:hover { background: rgba(255, 255, 255, 0.1); color: white; }
 
         .tfa-badge {
             display: inline-flex;
@@ -330,20 +328,10 @@ foreach ($issue_reports as $r) {
             letter-spacing: 1px;
             border-radius: 999px;
         }
-        .tfa-badge.on {
-            background: rgba(46, 204, 113, 0.15);
-            color: #2ecc71;
-        }
-        .tfa-badge.off {
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.4);
-        }
+        .tfa-badge.on { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+        .tfa-badge.off { background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.4); }
 
-        .admin-activity {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
+        .admin-activity { display: flex; flex-direction: column; gap: 2px; }
         .admin-activity-row {
             display: flex;
             align-items: center;
@@ -353,24 +341,10 @@ foreach ($issue_reports as $r) {
             border-left: 2px solid transparent;
             transition: all 0.2s;
         }
-        .admin-activity-row:hover {
-            background: rgba(20, 20, 30, 0.7);
-            border-left-color: #d13639;
-        }
-        .admin-activity-user {
-            font-weight: 700;
-            color: #7c3aed;
-            min-width: 120px;
-        }
-        .admin-activity-text {
-            flex: 1;
-            color: rgba(255,255,255,0.85);
-        }
-        .admin-activity-time {
-            font-size: 11px;
-            color: rgba(255,255,255,0.4);
-            font-family: monospace;
-        }
+        .admin-activity-row:hover { background: rgba(20, 20, 30, 0.7); border-left-color: #d13639; }
+        .admin-activity-user { font-weight: 700; color: #7c3aed; min-width: 120px; }
+        .admin-activity-text { flex: 1; color: rgba(255,255,255,0.85); }
+        .admin-activity-time { font-size: 11px; color: rgba(255,255,255,0.4); font-family: monospace; }
 
         .tab-badge {
             display: inline-flex;
@@ -387,12 +361,7 @@ foreach ($issue_reports as $r) {
             font-weight: 800;
         }
 
-        /* Issue Reports */
-        .issue-reports-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .issue-reports-list { display: flex; flex-direction: column; gap: 16px; }
         .issue-report-card {
             padding: 20px 24px;
             background: rgba(20, 20, 30, 0.6);
@@ -414,14 +383,8 @@ foreach ($issue_reports as $r) {
             margin-bottom: 12px;
             flex-wrap: wrap;
         }
-        .issue-report-left {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        .issue-status,
-        .issue-severity,
-        .issue-game {
+        .issue-report-left { display: flex; gap: 8px; flex-wrap: wrap; }
+        .issue-status, .issue-severity, .issue-game {
             padding: 3px 10px;
             border-radius: 999px;
             font-size: 10px;
@@ -438,17 +401,8 @@ foreach ($issue_reports as $r) {
         .issue-severity.severity-high { background: rgba(209,54,57,0.2); color: #ff7c7f; }
         .issue-severity.severity-critical { background: #d13639; color: white; }
         .issue-game { background: rgba(124,58,237,0.2); color: #a78bfa; }
-        .issue-report-meta {
-            font-size: 11px;
-            color: rgba(255,255,255,0.4);
-            font-family: monospace;
-        }
-        .issue-subject {
-            font-size: 16px;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 10px;
-        }
+        .issue-report-meta { font-size: 11px; color: rgba(255,255,255,0.4); font-family: monospace; }
+        .issue-subject { font-size: 16px; font-weight: 800; color: white; margin-bottom: 10px; }
         .issue-description {
             font-size: 13px;
             color: rgba(255,255,255,0.75);
@@ -458,11 +412,7 @@ foreach ($issue_reports as $r) {
             background: rgba(255,255,255,0.03);
             border-radius: 8px;
         }
-        .issue-reporter {
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 12px;
-        }
+        .issue-reporter { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
         .issue-reporter strong { color: rgba(255,255,255,0.85); }
         .issue-admin-notes {
             padding: 12px 16px;
@@ -474,11 +424,7 @@ foreach ($issue_reports as $r) {
             margin-bottom: 12px;
             line-height: 1.6;
         }
-        .issue-admin-notes strong {
-            color: #2ecc71;
-            display: block;
-            margin-bottom: 4px;
-        }
+        .issue-admin-notes strong { color: #2ecc71; display: block; margin-bottom: 4px; }
         .issue-report-actions {
             display: flex;
             gap: 8px;
@@ -488,7 +434,7 @@ foreach ($issue_reports as $r) {
         }
     </style>
 </head>
-<body class="profile-page">
+<body class="profile-page" data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
 
 <header class="topnav">
     <div class="nav-left">
@@ -498,31 +444,34 @@ foreach ($issue_reports as $r) {
             </svg>
         </div>
         <nav class="nav-tabs">
-            <a href="dashboard.php" class="nav-tab" title="Home">
+            <a href="dashboard.php" class="nav-tab" title="<?= __('home') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
             </a>
-            <a href="library.php" class="nav-tab" title="Library">
+            <a href="library.php" class="nav-tab" title="<?= __('library') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             </a>
-            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+            <a href="leaderboard.php" class="nav-tab" title="<?= __('leaderboard') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/></svg>
             </a>
-            <a href="admin.php" class="nav-tab active" title="Admin Panel">
+            <a href="admin.php" class="nav-tab active" title="<?= __('admin_panel') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/></svg>
             </a>
-            <a href="profile.php" class="nav-tab" title="Profile">
+            <a href="profile.php" class="nav-tab" title="<?= __('profile') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
             </a>
         </nav>
     </div>
     <div class="nav-right">
-        <button class="icon-btn" aria-label="Settings">
+        <button class="icon-btn" aria-label="<?= __('settings') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
         </button>
+        
+        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out">
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>
         </a>
     </div>
@@ -532,17 +481,17 @@ foreach ($issue_reports as $r) {
 
     <div class="section-head">
         <div class="section-head-left">
-            <a href="dashboard.php" class="back-link-small" title="Back">
+            <a href="dashboard.php" class="back-link-small" title="<?= __('back_to_home') ?>">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Back
+                <?= __('back') ?>
             </a>
-            <h1>Admin Panel</h1>
+            <h1><?= __('admin_panel') ?></h1>
             <span class="admin-badge">
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/></svg>
-                Admin Only
+                <?= __('admin_only') ?>
             </span>
         </div>
-        <span class="user-greeting">Signed in as <?= htmlspecialchars($user['username']) ?></span>
+        <span class="user-greeting"><?= __('signed_in_as') ?> <?= htmlspecialchars($user['username']) ?></span>
     </div>
 
     <?php if ($message): ?>
@@ -552,18 +501,18 @@ foreach ($issue_reports as $r) {
     <?php endif; ?>
 
     <div class="admin-tabs">
-        <button class="admin-tab active" data-panel="overview">Overview</button>
-        <button class="admin-tab" data-panel="users">Users</button>
-        <button class="admin-tab" data-panel="activity">Activity Logs</button>
+        <button class="admin-tab active" data-panel="overview"><?= __('overview') ?></button>
+        <button class="admin-tab" data-panel="users"><?= __('users') ?></button>
+        <button class="admin-tab" data-panel="activity"><?= __('activity_logs') ?></button>
         <button class="admin-tab" data-panel="issues">
-            Issue Reports
+            <?= __('issue_reports') ?>
             <?php if ($open_reports_count > 0): ?>
                 <span class="tab-badge"><?= $open_reports_count ?></span>
             <?php endif; ?>
         </button>
         <a href="reports.php" class="admin-tab">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>
-            Reports
+            <?= __('reports') ?>
         </a>
     </div>
 
@@ -571,19 +520,19 @@ foreach ($issue_reports as $r) {
     <div class="admin-panel active" data-panel="overview">
         <div class="admin-stats">
             <div class="admin-stat">
-                <div class="admin-stat-label">Total Users</div>
+                <div class="admin-stat-label"><?= __('total_users') ?></div>
                 <div class="admin-stat-value"><?= $stats['total_users'] ?></div>
             </div>
             <div class="admin-stat">
-                <div class="admin-stat-label">Games Played</div>
+                <div class="admin-stat-label"><?= __('games_played') ?></div>
                 <div class="admin-stat-value"><?= $stats['total_games'] ?></div>
             </div>
             <div class="admin-stat">
-                <div class="admin-stat-label">Total Activities</div>
+                <div class="admin-stat-label"><?= __('total_activities') ?></div>
                 <div class="admin-stat-value"><?= number_format($stats['total_sessions']) ?></div>
             </div>
             <div class="admin-stat">
-                <div class="admin-stat-label">Active Today</div>
+                <div class="admin-stat-label"><?= __('active_today') ?></div>
                 <div class="admin-stat-value"><?= $stats['active_today'] ?></div>
             </div>
         </div>
@@ -596,15 +545,15 @@ foreach ($issue_reports as $r) {
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
+                        <th><?= __('username') ?></th>
+                        <th><?= __('email') ?></th>
+                        <th><?= __('role') ?></th>
                         <th>2FA</th>
-                        <th>Level</th>
+                        <th><?= __('level') ?></th>
                         <th>XP</th>
-                        <th>High Score</th>
-                        <th>Last Login</th>
-                        <th>Actions</th>
+                        <th><?= __('high_score') ?></th>
+                        <th><?= __('last_login') ?></th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -635,8 +584,7 @@ foreach ($issue_reports as $r) {
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
                                     <input type="hidden" name="enable" value="<?= $u['two_factor_enabled'] ? 0 : 1 ?>">
                                     <button type="submit"
-                                            class="tfa-toggle <?= $u['two_factor_enabled'] ? 'on' : 'off' ?>"
-                                            title="<?= $u['two_factor_enabled'] ? 'Click to disable' : 'Click to enable' ?>">
+                                            class="tfa-toggle <?= $u['two_factor_enabled'] ? 'on' : 'off' ?>">
                                         <?= $u['two_factor_enabled'] ? '✓ ON' : 'OFF' ?>
                                     </button>
                                 </form>
@@ -645,17 +593,17 @@ foreach ($issue_reports as $r) {
                         <td><?= $u['level'] ?></td>
                         <td><?= number_format($u['xp']) ?></td>
                         <td><?= number_format($u['high_score']) ?></td>
-                        <td><?= $u['last_login'] ? date('M j, Y', strtotime($u['last_login'])) : 'Never' ?></td>
+                        <td><?= $u['last_login'] ? date('M j, Y', strtotime($u['last_login'])) : __('never') ?></td>
                         <td>
                             <?php if ($u['id'] != $_SESSION['user_id']): ?>
                                 <form method="POST" style="display:inline;"
-                                      onsubmit="return confirm('Delete <?= htmlspecialchars($u['username']) ?>? This cannot be undone.');">
+                                      onsubmit="return confirm('Delete <?= htmlspecialchars($u['username']) ?>?');">
                                     <input type="hidden" name="action" value="delete_user">
                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                    <button type="submit" class="admin-action-btn danger">Delete</button>
+                                    <button type="submit" class="admin-action-btn danger"><?= __('delete') ?></button>
                                 </form>
                             <?php else: ?>
-                                <span style="color:rgba(255,255,255,0.3);font-size:12px;">(You)</span>
+                                <span style="color:rgba(255,255,255,0.3);font-size:12px;">(<?= __('you') ?>)</span>
                             <?php endif; ?>
                         </td>
                     </tr>
@@ -669,7 +617,7 @@ foreach ($issue_reports as $r) {
     <div class="admin-panel" data-panel="activity">
         <div class="admin-activity">
             <?php if (empty($activities)): ?>
-                <p style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);">No activity yet.</p>
+                <p style="padding:40px;text-align:center;color:rgba(255,255,255,0.4);"><?= __('no_activity') ?></p>
             <?php else: ?>
                 <?php foreach ($activities as $a): ?>
                     <div class="admin-activity-row">
@@ -712,10 +660,7 @@ foreach ($issue_reports as $r) {
                         </div>
 
                         <h4 class="issue-subject"><?= htmlspecialchars($r['subject']) ?></h4>
-
-                        <p class="issue-description">
-                            <?= nl2br(htmlspecialchars($r['description'])) ?>
-                        </p>
+                        <p class="issue-description"><?= nl2br(htmlspecialchars($r['description'])) ?></p>
 
                         <div class="issue-reporter">
                             <strong><?= htmlspecialchars($r['reporter_name'] ?? 'Unknown') ?></strong>
@@ -737,7 +682,7 @@ foreach ($issue_reports as $r) {
                             <?php endif; ?>
 
                             <?php if ($r['status'] !== 'resolved' && $r['status'] !== 'dismissed'): ?>
-                                <button class="admin-action-btn" style="background:rgba(46,204,113,0.15);color:#2ecc71;border-color:rgba(46,204,113,0.4);"
+                                <button class="admin-action-btn" style="background:rgba(46,204,113,0.15);color:#2ecc71;"
                                         onclick="resolveReportWithNotes(<?= $r['id'] ?>, 'resolved')">
                                     ✓ Resolve
                                 </button>
@@ -747,7 +692,7 @@ foreach ($issue_reports as $r) {
                             <?php endif; ?>
 
                             <button class="admin-action-btn danger" onclick="deleteReport(<?= $r['id'] ?>)">
-                                Delete
+                                <?= __('delete') ?>
                             </button>
                         </div>
                     </div>
@@ -766,7 +711,7 @@ foreach ($issue_reports as $r) {
 
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
-<script src="js/settings.js"></script>
+<script src="js/settings.js?v=<?= time() ?>"></script>
 <script>
 document.querySelectorAll('.admin-tab').forEach(tab => {
     if (!tab.dataset.panel) return;

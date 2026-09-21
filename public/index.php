@@ -3,18 +3,21 @@ require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 
-if (isset($_SESSION['user_id']) && hasPassed2FA()) {
+// If already logged in, redirect
+if (isset($_SESSION['user_id'])) {
     header('Location: dashboard.php');
-    exit;
-}
-if (isset($_SESSION['user_id']) && !hasPassed2FA()) {
-    header('Location: verify_otp.php');
     exit;
 }
 
 $error = $_SESSION['login_error'] ?? '';
 $success = $_SESSION['login_success'] ?? '';
 unset($_SESSION['login_error'], $_SESSION['login_success']);
+
+// ============================================
+// GET REMEMBERED USERNAME
+// ============================================
+$remembered_username = $_SESSION['remember_username'] ?? '';
+unset($_SESSION['remember_username']); // clear after reading
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,7 +74,15 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
             <form action="authenticate.php" method="POST" id="loginForm" novalidate>
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Enter your username" required maxlength="50">
+                    <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    placeholder="Enter your username"
+                    autocomplete="username"
+                    value="<?= htmlspecialchars($remembered_username) ?>"
+                    required
+                    maxlength="50">
                     <span class="field-error" id="username-error"></span>
                 </div>
 
@@ -86,6 +97,11 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
                             </svg>
                         </button>
                     </div>
+
+                    <!-- 👇 ADD THIS LINE 👇 -->
+    <div class="caps-warning" id="capsWarning" style="display:none;">
+        ⚠️ Caps Lock is ON
+    </div>
                     <span class="field-error" id="password-error"></span>
                 </div>
                <div class="email-notice" title="You'll receive a verification code by email.">
@@ -155,6 +171,10 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
     </div>
 </div>
 
+<div class="session-timer" id="sessionTimer" style="display:none;">
+    ⏱️ Session expires in <span id="timerValue">30:00</span>
+</div>
+
 <div class="loading-overlay" id="loadingOverlay">
     <div class="loading-content">
         <div class="loading-spinner"></div>
@@ -163,7 +183,7 @@ unset($_SESSION['login_error'], $_SESSION['login_success']);
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="js/script.js"></script>
+<script src="js/script.js?v=<?= time() ?>"></script>
 <script src="js/qr-login.js"></script>
 </body>
 </html>

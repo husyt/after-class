@@ -309,3 +309,196 @@
     background: #555;
     cursor: not-allowed;
 }
+
+/* ============================================================
+   BACKGROUND & LANGUAGE PICKERS (Settings Drawer)
+   ============================================================ */
+
+.settings-field-block {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.settings-field-block:last-child {
+    border-bottom: none;
+}
+
+.settings-field-block-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+}
+
+.background-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.background-option {
+    width: 46px;
+    height: 46px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    padding: 0;
+}
+
+.background-option:hover {
+    transform: scale(1.08);
+}
+
+.background-option.active {
+    border-color: white;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.background-check {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    opacity: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.background-option.active .background-check {
+    opacity: 1;
+}
+
+.settings-select {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.settings-select:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+.settings-select option {
+    background: #1a1a25;
+    color: white;
+}
+
+/* ============================================================
+   BACKGROUND & LANGUAGE PICKERS (Settings Drawer)
+   ============================================================ */
+
+.settings-field-block {
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    margin-top: 4px;
+}
+
+.settings-field-block:last-child {
+    border-bottom: none;
+}
+
+.settings-field-block-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+    font-family: inherit;
+}
+
+.background-picker {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.background-option {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    padding: 0;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.background-option:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.background-option.active {
+    border-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25), 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.background-check {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    opacity: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+    transition: opacity 0.2s ease;
+}
+
+.background-option.active .background-check {
+    opacity: 1;
+}
+
+.settings-select {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: white;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+.settings-select:focus {
+    border-color: rgba(255, 255, 255, 0.25);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.settings-select option {
+    background: #1a1a25;
+    color: white;
+    padding: 10px;
+}

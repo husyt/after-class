@@ -13,6 +13,16 @@ $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
+// ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// LOAD AVATAR HELPER
+// ============================================
+require_once __DIR__ . '/../includes/avatar.php';
+
 // Flash messages
 $profile_error = $_SESSION['profile_error'] ?? '';
 $profile_success = $_SESSION['profile_success'] ?? '';
@@ -27,7 +37,7 @@ $stmt->execute([$_SESSION['user_id']]);
 $activities = $stmt->fetchAll();
 
 // ============================================
-// GAME STATISTICS (§11)
+// GAME STATISTICS
 // ============================================
 $stmt = $pdo->prepare(
     "SELECT 
@@ -61,7 +71,7 @@ $per_game = $stmt->fetchAll();
 $level   = (int)($user['level'] ?? 1);
 $xp      = (int)($user['xp'] ?? 0);
 $joined  = $user['created_at'] ? date('M Y', strtotime($user['created_at'])) : '—';
-$lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_login'])) : 'Never';
+$lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_login'])) : __('never');
 
 // XP progress
 $xp_current = $xp % 1000;
@@ -72,190 +82,27 @@ $total_seconds = (int)$game_stats['total_seconds'];
 $hours   = floor($total_seconds / 3600);
 $minutes = floor(($total_seconds % 3600) / 60);
 $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
+
+// ============================================
+// AVATAR SYSTEM (DiceBear CDN)
+// ============================================
+// NOTE: $avatar_seeds is needed for the picker grid below.
+// The get_avatar_url() function is now provided by includes/avatar.php
+$avatar_seeds = ['Felix', 'Aneka', 'Leo', 'Mia', 'Kai', 'Zara', 'Ravi', 'Nora'];
+$current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Profile | EqualPath</title>
+    <title><?= __('profile') ?> | CoreSync</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/dashboard.css">
-    <style>
-        /* ============================================
-           GAME STATS SECTION
-           ============================================ */
-        .game-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .game-stat-card {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            transition: all 0.2s;
-        }
-
-        .game-stat-card:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.12);
-        }
-
-        .game-stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-            color: white;
-        }
-
-        .game-stat-icon.purple {
-            background: linear-gradient(135deg, #7c3aed, #a855f7);
-            box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
-        }
-        .game-stat-icon.red {
-            background: linear-gradient(135deg, #d13639, #f97316);
-            box-shadow: 0 4px 14px rgba(209, 54, 57, 0.35);
-        }
-        .game-stat-icon.gold {
-            background: linear-gradient(135deg, #ffd700, #f59e0b);
-            color: #1a0f00;
-            box-shadow: 0 4px 14px rgba(255, 215, 0, 0.35);
-        }
-        .game-stat-icon.green {
-            background: linear-gradient(135deg, #2ecc71, #059669);
-            box-shadow: 0 4px 14px rgba(46, 204, 113, 0.35);
-        }
-
-        .game-stat-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .game-stat-label {
-            font-size: 9px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.45);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 3px;
-        }
-
-        .game-stat-value {
-            font-size: 20px;
-            font-weight: 800;
-            color: white;
-            line-height: 1;
-        }
-
-        /* XP Progress Bar */
-        .xp-progress-wrap {
-            padding: 16px 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        .xp-progress-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
-        }
-
-        .xp-progress-track {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 999px;
-            overflow: hidden;
-        }
-
-        .xp-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #7c3aed, #a855f7);
-            border-radius: 999px;
-            transition: width 0.8s ease;
-        }
-
-        /* Per-game table */
-        .per-game-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .per-game-row {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 14px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        }
-
-        .per-game-row:last-child {
-            border-bottom: none;
-        }
-
-        .per-game-name {
-            flex: 1;
-            font-size: 14px;
-            font-weight: 700;
-            color: white;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .per-game-stats {
-            display: flex;
-            gap: 20px;
-            font-size: 12px;
-        }
-
-        .per-game-stat {
-            text-align: right;
-        }
-
-        .per-game-stat-label {
-            font-size: 9px;
-            color: rgba(255, 255, 255, 0.4);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
-        }
-
-        .per-game-stat-value {
-            font-size: 14px;
-            font-weight: 800;
-            color: #2ecc71;
-            font-family: monospace;
-        }
-
-        .empty-games {
-            text-align: center;
-            padding: 30px 20px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 13px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
 </head>
-<body>
+<body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
+    
 <!-- ============ TOP NAV ============ -->
 <header class="topnav">
     <div class="nav-left">
@@ -265,12 +112,12 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
             </svg>
         </div>
         <nav class="nav-tabs">
-            <a href="dashboard.php" class="nav-tab" title="Home">
+            <a href="dashboard.php" class="nav-tab" title="<?= __('home') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
                 </svg>
             </a>
-            <a href="library.php" class="nav-tab" title="Library">
+            <a href="library.php" class="nav-tab" title="<?= __('library') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
@@ -278,19 +125,19 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
-            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+            <a href="leaderboard.php" class="nav-tab" title="<?= __('leaderboard') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
                 </svg>
             </a>
-            <a href="profile.php" class="nav-tab active" title="Profile">
+            <a href="profile.php" class="nav-tab active" title="<?= __('profile') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
                 </svg>
             </a>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-            <a href="admin.php" class="nav-tab" title="Admin">
+            <a href="admin.php" class="nav-tab" title="<?= __('admin') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
                 </svg>
@@ -300,19 +147,19 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
     </div>
 
     <div class="nav-right">
-        <button class="icon-btn" aria-label="Settings">
+        <button class="icon-btn" aria-label="<?= __('settings') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
         </button>
+        
+        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out">
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -322,19 +169,19 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 </header>
 
 <!-- ============ MAIN ============ -->
-<main class="dashboard">
+<main class="dashboard profile-page">
 
     <div class="section-head">
         <div class="section-head-left">
-            <a href="dashboard.php" class="back-link-small" title="Back to Home">
+            <a href="dashboard.php" class="back-link-small" title="<?= __('back_to_home') ?>">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
-                Back
+                <?= __('back') ?>
             </a>
-            <h1>Profile</h1>
+            <h1><?= __('profile') ?></h1>
         </div>
-        <span class="user-greeting">Member since <?= $joined ?></span>
+        <span class="user-greeting"><?= __('member_since') ?> <?= $joined ?></span>
     </div>
 
     <?php if ($profile_error): ?>
@@ -346,202 +193,282 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 
     <!-- Profile header -->
     <div class="profile-header">
-        <div class="profile-avatar">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+        <div class="profile-avatar" id="profileAvatar" style="cursor: pointer;" title="Click to change avatar">
+            <?php if ($current_avatar_url): ?>
+                <img src="<?= htmlspecialchars($current_avatar_url) ?>" 
+                     alt="Profile picture"
+                     onerror="this.style.display='none';this.parentElement.innerHTML='<svg viewBox=\'0 0 24 24\' fill=\'currentColor\' style=\'width:36px;height:36px;\'><circle cx=\'12\' cy=\'8\' r=\'4\'/><path d=\'M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2\'/></svg>'">
+            <?php else: ?>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="8" r="4"/>
+                    <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
+                </svg>
+            <?php endif; ?>
+            <div class="avatar-edit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+            </div>
         </div>
         <div class="profile-meta">
             <h2><?= htmlspecialchars($user['username']) ?></h2>
             <div class="profile-tags">
                 <span class="tag role"><?= htmlspecialchars($user['role']) ?></span>
-                <span class="tag level">Level <?= $level ?></span>
+                <span class="tag level"><?= __('level') ?> <?= $level ?></span>
             </div>
-            <p class="profile-last-seen">Last login: <?= $lastlog ?></p>
-        </div>
-    </div>
-
-    <!-- Display Name & Pronouns -->
-    <div class="profile-info-cards">
-        <div class="info-card">
-            <div class="info-card-left">
-                <div class="info-card-label">Display Name</div>
-                <div class="info-card-value"><?= htmlspecialchars($user['username'] ?? '—') ?></div>
-            </div>
-            <button class="info-card-edit" type="button" data-field="username">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Edit
-            </button>
-        </div>
-
-        <div class="info-card">
-            <div class="info-card-left">
-                <div class="info-card-label">Pronouns</div>
-                <div class="info-card-value <?= empty($user['pronouns']) ? 'empty-value' : '' ?>">
-                    <?= htmlspecialchars($user['pronouns'] ?? 'Not set') ?>
-                </div>
-            </div>
-            <button class="info-card-edit" type="button" data-field="pronouns">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                </svg>
-                Edit
-            </button>
+            <p class="profile-last-seen"><?= __('last_login') ?>: <?= $lastlog ?></p>
         </div>
     </div>
 
     <!-- ============================================
-         GAME STATISTICS (§11)
+         PROFILE CONTENT — 2-COLUMN GRID
          ============================================ -->
-    <div class="profile-section">
-        <h3>Game Statistics</h3>
+    <div class="profile-content">
 
-        <div class="game-stats-grid">
-            <div class="game-stat-card">
-                <div class="game-stat-icon purple">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
-                    </svg>
-                </div>
-                <div class="game-stat-info">
-                    <div class="game-stat-label">Level</div>
-                    <div class="game-stat-value"><?= $level ?></div>
-                </div>
-            </div>
+        <!-- LEFT COLUMN -->
+        <div class="profile-column">
 
-            <div class="game-stat-card">
-                <div class="game-stat-icon red">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                    </svg>
+            <!-- Display Name & Pronouns -->
+            <div class="profile-info-cards">
+                <div class="info-card">
+                    <div class="info-card-left">
+                        <div class="info-card-label"><?= __('display_name') ?></div>
+                        <div class="info-card-value"><?= htmlspecialchars($user['username'] ?? '—') ?></div>
+                    </div>
+                    <button class="info-card-edit" type="button" data-field="username">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        <?= __('edit') ?>
+                    </button>
                 </div>
-                <div class="game-stat-info">
-                    <div class="game-stat-label">Total XP</div>
-                    <div class="game-stat-value"><?= number_format($xp) ?></div>
-                </div>
-            </div>
 
-            <div class="game-stat-card">
-                <div class="game-stat-icon gold">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
-                    </svg>
-                </div>
-                <div class="game-stat-info">
-                    <div class="game-stat-label">High Score</div>
-                    <div class="game-stat-value"><?= number_format($game_stats['high_score']) ?></div>
-                </div>
-            </div>
-
-            <div class="game-stat-card">
-                <div class="game-stat-icon green">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="2" y="6" width="20" height="12" rx="4"/>
-                        <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
-                    </svg>
-                </div>
-                <div class="game-stat-info">
-                    <div class="game-stat-label">Games Played</div>
-                    <div class="game-stat-value"><?= number_format($game_stats['total_sessions']) ?></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- XP Progress to next level -->
-        <div class="xp-progress-wrap">
-            <div class="xp-progress-header">
-                <span>Level <?= $level ?></span>
-                <span><?= $xp_current ?> / 1000 XP</span>
-            </div>
-            <div class="xp-progress-track">
-                <div class="xp-progress-fill" style="width: <?= $xp_percent ?>%"></div>
-            </div>
-        </div>
-
-        <!-- Per-game stats -->
-        <h3 style="margin-top: 24px;">Per-Game Breakdown</h3>
-        <?php if (empty($per_game)): ?>
-            <p class="empty-games">No games played yet. Start playing to see stats!</p>
-        <?php else: ?>
-            <ul class="per-game-list">
-                <?php foreach ($per_game as $g): ?>
-                    <li class="per-game-row">
-                        <div class="per-game-name">
-                            <?= htmlspecialchars(strtoupper(str_replace('-', ' ', $g['game_id']))) ?>
+                <div class="info-card">
+                    <div class="info-card-left">
+                        <div class="info-card-label"><?= __('pronouns') ?></div>
+                        <div class="info-card-value <?= empty($user['pronouns']) ? 'empty-value' : '' ?>">
+                            <?= htmlspecialchars($user['pronouns'] ?? __('not_set')) ?>
                         </div>
-                        <div class="per-game-stats">
-                            <div class="per-game-stat">
-                                <div class="per-game-stat-label">Plays</div>
-                                <div class="per-game-stat-value"><?= $g['plays'] ?></div>
-                            </div>
-                            <div class="per-game-stat">
-                                <div class="per-game-stat-label">Best</div>
-                                <div class="per-game-stat-value"><?= number_format($g['high_score']) ?></div>
-                            </div>
-                            <div class="per-game-stat">
-                                <div class="per-game-stat-label">Avg</div>
-                                <div class="per-game-stat-value"><?= number_format($g['avg_score'], 0) ?></div>
-                            </div>
-                        </div>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
-    </div>
-
-    <!-- Account Details -->
-    <div class="profile-section">
-        <h3>Account Details</h3>
-        <div class="account-details-grid">
-            <div class="account-detail">
-                <div class="account-detail-label">Username</div>
-                <div class="account-detail-value"><?= htmlspecialchars($user['username'] ?? '—') ?></div>
-            </div>
-            <div class="account-detail">
-                <div class="account-detail-label">Email</div>
-                <div class="account-detail-value"><?= htmlspecialchars($user['email'] ?? '—') ?></div>
-            </div>
-            <div class="account-detail">
-                <div class="account-detail-label">Role</div>
-                <div class="account-detail-value">
-                    <span class="tag role"><?= htmlspecialchars($user['role'] ?? 'user') ?></span>
+                    </div>
+                    <button class="info-card-edit" type="button" data-field="pronouns">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
+                        <?= __('edit') ?>
+                    </button>
                 </div>
             </div>
-            <div class="account-detail">
-                <div class="account-detail-label">Member Since</div>
-                <div class="account-detail-value"><?= $joined ?></div>
-            </div>
-            <div class="account-detail">
-                <div class="account-detail-label">Last Login</div>
-                <div class="account-detail-value"><?= $lastlog ?></div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Recent Activity -->
-    <div class="profile-section">
-        <h3>Recent Activity</h3>
-        <?php if (empty($activities)): ?>
-            <p class="empty-text">No activity yet. Play a game to get started!</p>
-        <?php else: ?>
-            <ul class="activity-list">
-                <?php foreach ($activities as $a): ?>
-                    <li>
-                        <span class="activity-dot"></span>
-                        <span class="activity-text"><?= htmlspecialchars($a['activity']) ?></span>
-                        <span class="activity-time"><?= date('M j, g:i A', strtotime($a['created_at'])) ?></span>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        <?php endif; ?>
+            <!-- Account Details -->
+            <div class="profile-section">
+                <h3><?= __('account_details') ?></h3>
+                <div class="account-details-grid">
+                    <div class="account-detail">
+                        <div class="account-detail-label"><?= __('username') ?></div>
+                        <div class="account-detail-value"><?= htmlspecialchars($user['username'] ?? '—') ?></div>
+                    </div>
+                    <div class="account-detail">
+                        <div class="account-detail-label"><?= __('email') ?></div>
+                        <div class="account-detail-value"><?= htmlspecialchars($user['email'] ?? '—') ?></div>
+                    </div>
+                    <div class="account-detail">
+                        <div class="account-detail-label"><?= __('role') ?></div>
+                        <div class="account-detail-value">
+                            <span class="tag role"><?= htmlspecialchars($user['role'] ?? 'user') ?></span>
+                        </div>
+                    </div>
+                    <div class="account-detail">
+                        <div class="account-detail-label"><?= __('member_since') ?></div>
+                        <div class="account-detail-value"><?= $joined ?></div>
+                    </div>
+                    <div class="account-detail">
+                        <div class="account-detail-label"><?= __('last_login') ?></div>
+                        <div class="account-detail-value"><?= $lastlog ?></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="profile-column">
+
+            <!-- Game Statistics -->
+            <div class="profile-section">
+                <h3><?= __('game_statistics') ?></h3>
+
+                <div class="game-stats-grid">
+                    <div class="game-stat-card">
+                        <div class="game-stat-icon purple">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
+                            </svg>
+                        </div>
+                        <div class="game-stat-info">
+                            <div class="game-stat-label"><?= __('level') ?></div>
+                            <div class="game-stat-value"><?= $level ?></div>
+                        </div>
+                    </div>
+
+                    <div class="game-stat-card">
+                        <div class="game-stat-icon red">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                            </svg>
+                        </div>
+                        <div class="game-stat-info">
+                            <div class="game-stat-label"><?= __('total_xp') ?></div>
+                            <div class="game-stat-value"><?= number_format($xp) ?></div>
+                        </div>
+                    </div>
+
+                    <div class="game-stat-card">
+                        <div class="game-stat-icon gold">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                            </svg>
+                        </div>
+                        <div class="game-stat-info">
+                            <div class="game-stat-label"><?= __('high_score') ?></div>
+                            <div class="game-stat-value"><?= number_format($game_stats['high_score']) ?></div>
+                        </div>
+                    </div>
+
+                    <div class="game-stat-card">
+                        <div class="game-stat-icon green">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="6" width="20" height="12" rx="4"/>
+                                <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
+                            </svg>
+                        </div>
+                        <div class="game-stat-info">
+                            <div class="game-stat-label"><?= __('games_played') ?></div>
+                            <div class="game-stat-value"><?= number_format($game_stats['total_sessions']) ?></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- XP Progress -->
+                <div class="xp-progress-wrap">
+                    <div class="xp-progress-header">
+                        <span><?= __('level') ?> <?= $level ?></span>
+                        <span><?= $xp_current ?> / 1000 XP</span>
+                    </div>
+                    <div class="xp-progress-track">
+                        <div class="xp-progress-fill" style="width: <?= $xp_percent ?>%"></div>
+                    </div>
+                </div>
+
+                <!-- Per-Game Breakdown -->
+                <h3 style="margin-top: 20px;"><?= __('per_game_breakdown') ?></h3>
+                <?php if (empty($per_game)): ?>
+                    <p class="empty-games">No games played yet. Start playing to see stats!</p>
+                <?php else: ?>
+                    <ul class="per-game-list">
+                        <?php foreach ($per_game as $g): ?>
+                            <li class="per-game-row">
+                                <div class="per-game-name">
+                                    <?= htmlspecialchars(strtoupper(str_replace('-', ' ', $g['game_id']))) ?>
+                                </div>
+                                <div class="per-game-stats">
+                                    <div class="per-game-stat">
+                                        <div class="per-game-stat-label"><?= __('plays') ?></div>
+                                        <div class="per-game-stat-value"><?= $g['plays'] ?></div>
+                                    </div>
+                                    <div class="per-game-stat">
+                                        <div class="per-game-stat-label"><?= __('best') ?></div>
+                                        <div class="per-game-stat-value"><?= number_format($g['high_score']) ?></div>
+                                    </div>
+                                    <div class="per-game-stat">
+                                        <div class="per-game-stat-label"><?= __('avg') ?></div>
+                                        <div class="per-game-stat-value"><?= number_format($g['avg_score'], 0) ?></div>
+                                    </div>
+                                </div>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="profile-section">
+                <h3><?= __('recent_activity') ?></h3>
+                <?php if (empty($activities)): ?>
+                    <p class="empty-text"><?= __('no_activity') ?></p>
+                <?php else: ?>
+                    <ul class="activity-list">
+                        <?php foreach ($activities as $a): ?>
+                            <li>
+                                <span class="activity-dot"></span>
+                                <span class="activity-text"><?= htmlspecialchars($a['activity']) ?></span>
+                                <span class="activity-time"><?= date('M j, g:i A', strtotime($a['created_at'])) ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </div>
+
+        </div>
+
     </div>
 
 </main>
+
+<!-- ============ AVATAR PICKER MODAL ============ -->
+<div class="avatar-modal" id="avatarModal" aria-hidden="true">
+    <div class="avatar-modal-backdrop" id="avatarBackdrop"></div>
+    <div class="avatar-modal-panel" role="dialog">
+        <button class="avatar-modal-close" id="avatarClose" aria-label="Close">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <h2>Choose Your Avatar</h2>
+        <p class="avatar-modal-sub">Pick a character that represents you.</p>
+
+        <div class="avatar-grid" id="avatarGrid">
+            <!-- Default / Reset -->
+            <button type="button" class="avatar-option <?= empty($user['profile_picture']) ? 'active' : '' ?>"
+                    data-avatar=""
+                    title="Default">
+                <div class="avatar-preview avatar-default">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="8" r="4"/>
+                        <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
+                    </svg>
+                </div>
+                <span class="avatar-label">Default</span>
+            </button>
+
+            <!-- 8 DiceBear Avatars -->
+            <?php for ($i = 1; $i <= 8; $i++): 
+                $avatar = "avatar-$i.png";
+                $seed = $avatar_seeds[$i - 1];
+                $dicebear_url = "https://api.dicebear.com/7.x/adventurer/svg?seed={$seed}&size=200&backgroundColor=7c3aed,d13639,f97316,2ecc71";
+                $is_active = ($user['profile_picture'] ?? '') === $avatar;
+            ?>
+                <button type="button" class="avatar-option <?= $is_active ? 'active' : '' ?>"
+                        data-avatar="<?= $avatar ?>"
+                        title="Avatar <?= $i ?>">
+                    <div class="avatar-preview">
+                        <img src="<?= $dicebear_url ?>" 
+                             alt="Avatar <?= $i ?>"
+                             loading="lazy">
+                    </div>
+                    <span class="avatar-label">#<?= $i ?></span>
+                </button>
+            <?php endfor; ?>
+        </div>
+
+        <div class="avatar-modal-actions">
+            <button type="button" class="action-btn secondary" id="avatarCancel">Cancel</button>
+        </div>
+    </div>
+</div>
 
 <!-- ============ EDIT PROFILE MODAL ============ -->
 <div class="edit-modal" id="editModal" aria-hidden="true">
@@ -553,7 +480,7 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
             </svg>
         </button>
 
-        <h2 id="editTitle">Edit</h2>
+        <h2 id="editTitle"><?= __('edit') ?></h2>
         <p class="edit-modal-sub" id="editSub"></p>
 
         <form id="editForm" method="POST" action="update_profile.php">
@@ -585,9 +512,15 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
-<script src="js/settings.js"></script>
+<script src="js/settings.js?v=<?= time() ?>"></script>
 <script>
+// ============================================
+// PROFILE PAGE SCRIPTS
+// ============================================
 document.addEventListener('DOMContentLoaded', () => {
+    // ========================================
+    // EDIT PROFILE MODAL
+    // ========================================
     const modal = document.getElementById('editModal');
     const backdrop = document.getElementById('editBackdrop');
     const closeBtn = document.getElementById('editClose');
@@ -680,6 +613,64 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // ========================================
+    // AVATAR PICKER MODAL
+    // ========================================
+    const avatarModal = document.getElementById('avatarModal');
+    const avatarBackdrop = document.getElementById('avatarBackdrop');
+    const avatarClose = document.getElementById('avatarClose');
+    const avatarCancel = document.getElementById('avatarCancel');
+    const profileAvatar = document.getElementById('profileAvatar');
+
+    function openAvatarModal() {
+        avatarModal.classList.add('open');
+        avatarModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeAvatarModal() {
+        avatarModal.classList.remove('open');
+        avatarModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    if (profileAvatar) profileAvatar.addEventListener('click', openAvatarModal);
+    if (avatarClose) avatarClose.addEventListener('click', closeAvatarModal);
+    if (avatarCancel) avatarCancel.addEventListener('click', closeAvatarModal);
+    if (avatarBackdrop) avatarBackdrop.addEventListener('click', closeAvatarModal);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && avatarModal.classList.contains('open')) closeAvatarModal();
+    });
+
+    // Handle avatar selection
+    document.querySelectorAll('.avatar-option').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const avatar = btn.dataset.avatar;
+
+            try {
+                const res = await fetch('update_preference.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        type: 'profile_picture', 
+                        value: avatar 
+                    })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Failed to update avatar: ' + (result.error || 'Unknown error'));
+                }
+            } catch (err) {
+                console.error('Avatar update failed:', err);
+                alert('Network error. Please try again.');
+            }
+        });
+    });
 });
 </script>
 </body>

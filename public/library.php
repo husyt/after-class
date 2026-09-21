@@ -17,6 +17,16 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// LOAD AVATAR HELPER
+// ============================================
+require_once __DIR__ . '/../includes/avatar.php';
+
+// ============================================
 // FETCH USER FAVORITES
 // ============================================
 $stmt = $pdo->prepare("SELECT game_id FROM user_favorites WHERE user_id = ?");
@@ -50,17 +60,17 @@ $games = [
 ];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Library | EqualPath</title>
+    <title><?= __('library') ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
 </head>
-<body>
-
+<body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
+    
 <!-- ============ TOP NAV ============ -->
 <header class="topnav">
     <div class="nav-left">
@@ -70,12 +80,12 @@ $games = [
             </svg>
         </div>
         <nav class="nav-tabs">
-            <a href="dashboard.php" class="nav-tab" title="Home">
+            <a href="dashboard.php" class="nav-tab" title="<?= __('home') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
                 </svg>
             </a>
-            <a href="library.php" class="nav-tab active" title="Library">
+            <a href="library.php" class="nav-tab active" title="<?= __('library') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
@@ -83,19 +93,19 @@ $games = [
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
-            <a href="leaderboard.php" class="nav-tab" title="Leaderboard">
+            <a href="leaderboard.php" class="nav-tab" title="<?= __('leaderboard') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
                 </svg>
             </a>
-            <a href="profile.php" class="nav-tab" title="Profile">
+            <a href="profile.php" class="nav-tab" title="<?= __('profile') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
                 </svg>
             </a>
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-            <a href="admin.php" class="nav-tab" title="Admin">
+            <a href="admin.php" class="nav-tab" title="<?= __('admin') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
                 </svg>
@@ -105,19 +115,19 @@ $games = [
     </div>
 
     <div class="nav-right">
-        <button class="icon-btn" aria-label="Settings">
+        <button class="icon-btn" aria-label="<?= __('settings') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
         </button>
+        
+        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out">
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -130,34 +140,34 @@ $games = [
 <main class="dashboard">
 
     <div class="section-head">
-        <h1>Library</h1>
-        <span class="user-greeting"><?= count($games) ?> games available</span>
+        <h1><?= __('library') ?></h1>
+        <span class="user-greeting"><?= count($games) ?> <?= __('games_available') ?></span>
     </div>
 
     <!-- Filter bar -->
     <div class="filter-bar">
         <div class="filter-group">
-            <label>Genre</label>
+            <label><?= __('filter_genre') ?></label>
             <select class="filter-select" id="genreFilter">
-                <option value="all">All Genres</option>
+                <option value="all"><?= __('all_genres') ?></option>
                 <option value="Educational">Educational</option>
                 <option value="Adventure">Adventure</option>
                 <option value="Casual">Casual</option>
             </select>
         </div>
         <div class="filter-group">
-            <label>Sort</label>
+            <label><?= __('filter_sort') ?></label>
             <select class="filter-select" id="sortSelect">
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="az">A → Z</option>
-                <option value="za">Z → A</option>
-                <option value="favorites">Favorites First</option>
+                <option value="newest"><?= __('newest_first') ?></option>
+                <option value="oldest"><?= __('oldest_first') ?></option>
+                <option value="az"><?= __('sort_az') ?></option>
+                <option value="za"><?= __('sort_za') ?></option>
+                <option value="favorites"><?= __('favorites_first') ?></option>
             </select>
         </div>
         <div class="filter-group">
-            <label>Search</label>
-            <input type="text" class="filter-input" id="searchInput" placeholder="Search games...">
+            <label><?= __('filter_search') ?></label>
+            <input type="text" class="filter-input" id="searchInput" placeholder="<?= __('search_placeholder') ?>">
         </div>
     </div>
 
@@ -185,7 +195,7 @@ $games = [
                             type="button"
                             data-game-id="<?= htmlspecialchars($g['id']) ?>"
                             aria-label="Toggle favorite"
-                            title="<?= $is_fav ? 'Remove from favorites' : 'Add to favorites' ?>">
+                            title="<?= $is_fav ? __('remove_favorites') : __('add_favorites') ?>">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
                         </svg>
@@ -201,7 +211,7 @@ $games = [
 
     <!-- Empty state -->
     <div class="library-empty" id="libraryEmpty" style="display:none;">
-        <p>No games match your filters.</p>
+        <p><?= __('no_match') ?></p>
     </div>
 
 </main>
@@ -223,9 +233,13 @@ $games = [
 <!-- Favorites data for JS -->
 <script>
     window.FAVORITES = <?= json_encode($favorites, JSON_UNESCAPED_SLASHES) ?>;
+    window.TRANSLATIONS = {
+        add_favorites:    '<?= __('add_favorites') ?>',
+        remove_favorites: '<?= __('remove_favorites') ?>'
+    };
 </script>
 
-<script src="js/settings.js"></script>
+<script src="js/settings.js?v=<?= time() ?>"></script>
 <script>
 // ========================================
 // LIBRARY PAGE — FILTER, SORT, FAVORITES
@@ -284,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // -------- Favorites --------
     const favorites = new Set(window.FAVORITES || []);
+    const T = window.TRANSLATIONS || {};
 
     document.querySelectorAll('.library-heart').forEach(heart => {
         const gameId = heart.dataset.gameId;
@@ -307,12 +322,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (result.favorited) {
                     favorites.add(gameId);
                     heart.classList.add('active');
-                    heart.title = 'Remove from favorites';
+                    heart.title = T.remove_favorites || 'Remove from favorites';
                     if (card) card.dataset.favorited = '1';
                 } else {
                     favorites.delete(gameId);
                     heart.classList.remove('active');
-                    heart.title = 'Add to favorites';
+                    heart.title = T.add_favorites || 'Add to favorites';
                     if (card) card.dataset.favorited = '0';
                 }
 

@@ -46,6 +46,11 @@ try {
         $_SESSION['last_activity'] = time();
         $_SESSION['stay_signed_in'] = $stay_signed_in;
         
+        // ============================================
+        // REMEMBER LAST USERNAME (for pre-fill on next visit)
+        // ============================================
+        $_SESSION['remember_username'] = $user['username'];
+        
         if (!$user['two_factor_enabled']) {
             $_SESSION['2fa_verified'] = true;
             logActivity($pdo, $user['id'], 'Login successful (2FA disabled)');

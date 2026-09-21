@@ -169,4 +169,60 @@ document.addEventListener('DOMContentLoaded', () => {
     applyAllPreferences();
     setTimeout(applyAllPreferences, 500);
     setTimeout(applyAllPreferences, 1500);
+
+    // ========================================
+    // BACKGROUND PICKER
+    // ========================================
+    const backgroundPicker = document.getElementById('backgroundPicker');
+    if (backgroundPicker) {
+        backgroundPicker.querySelectorAll('.background-option').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const bg = btn.dataset.bg;
+
+                try {
+                    const res = await fetch('update_preference.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'preferred_background', value: bg })
+                    });
+                    const result = await res.json();
+
+                    if (result.success) {
+                        backgroundPicker.querySelectorAll('.background-option').forEach(b => {
+                            b.classList.remove('active');
+                        });
+                        btn.classList.add('active');
+                    }
+                } catch (err) {
+                    console.error('Background update error:', err);
+                }
+            });
+        });
+    }
+
+    // ========================================
+    // LANGUAGE SELECTOR
+    // ========================================
+    const languageSelect = document.getElementById('languageSelect');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', async () => {
+            const lang = languageSelect.value;
+
+            try {
+                const res = await fetch('update_preference.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'preferred_language', value: lang })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    console.log('Language saved:', lang);
+                }
+            } catch (err) {
+                console.error('Language update error:', err);
+            }
+        });
+    }
+
 });

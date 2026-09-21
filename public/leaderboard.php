@@ -15,10 +15,20 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
+// LOAD TRANSLATION SYSTEM
+// ============================================
+require_once __DIR__ . '/../includes/i18n.php';
+
+// ============================================
+// LOAD AVATAR HELPER
+// ============================================
+require_once __DIR__ . '/../includes/avatar.php';
+
+// ============================================
 // LEADERBOARD: Top 10 users by high score
 // ============================================
 $stmt = $pdo->query(
-    "SELECT id, username, role, level, xp, high_score, games_played
+    "SELECT id, username, role, level, xp, high_score, games_played, profile_picture
      FROM users
      WHERE games_played > 0
      ORDER BY high_score DESC, xp DESC
@@ -60,14 +70,14 @@ $stmt = $pdo->query(
 $game_leaders = $stmt->fetchAll();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= htmlspecialchars($current_lang) ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leaderboard | EqualPath</title>
+    <title><?= __('leaderboard') ?> | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
+    <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <style>
         .leaderboard-tabs {
             display: flex;
@@ -102,7 +112,6 @@ $game_leaders = $stmt->fetchAll();
         .lb-panel { display: none; }
         .lb-panel.active { display: block; }
 
-        /* Ranked list */
         .rank-list {
             display: flex;
             flex-direction: column;
@@ -175,6 +184,13 @@ $game_leaders = $stmt->fetchAll();
             font-weight: 800;
             font-size: 16px;
             flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .rank-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .rank-info {
@@ -218,7 +234,6 @@ $game_leaders = $stmt->fetchAll();
             letter-spacing: 1.5px;
         }
 
-        /* Game leaders */
         .game-leaders-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -261,7 +276,6 @@ $game_leaders = $stmt->fetchAll();
             color: #2ecc71;
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -270,7 +284,7 @@ $game_leaders = $stmt->fetchAll();
         }
     </style>
 </head>
-<body class="profile-page">
+<body class="profile-page" data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
 
 <!-- ============ TOP NAV ============ -->
 <header class="topnav">
@@ -281,12 +295,12 @@ $game_leaders = $stmt->fetchAll();
             </svg>
         </div>
         <nav class="nav-tabs">
-            <a href="dashboard.php" class="nav-tab" title="Home">
+            <a href="dashboard.php" class="nav-tab" title="<?= __('home') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M3 12l9-9 9 9M5 10v10h14V10"/>
                 </svg>
             </a>
-            <a href="library.php" class="nav-tab" title="Library">
+            <a href="library.php" class="nav-tab" title="<?= __('library') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7"/>
                     <rect x="14" y="3" width="7" height="7"/>
@@ -294,12 +308,12 @@ $game_leaders = $stmt->fetchAll();
                     <rect x="3" y="14" width="7" height="7"/>
                 </svg>
             </a>
-            <a href="leaderboard.php" class="nav-tab active" title="Leaderboard">
+            <a href="leaderboard.php" class="nav-tab active" title="<?= __('leaderboard') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
                 </svg>
             </a>
-            <a href="profile.php" class="nav-tab" title="Profile">
+            <a href="profile.php" class="nav-tab" title="<?= __('profile') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <circle cx="12" cy="8" r="4"/>
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
@@ -307,7 +321,7 @@ $game_leaders = $stmt->fetchAll();
             </a>
 
             <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
-            <a href="admin.php" class="nav-tab" title="Admin Panel">
+            <a href="admin.php" class="nav-tab" title="<?= __('admin') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
                 </svg>
@@ -317,19 +331,19 @@ $game_leaders = $stmt->fetchAll();
     </div>
 
     <div class="nav-right">
-        <button class="icon-btn" aria-label="Settings">
+        <button class="icon-btn" aria-label="<?= __('settings') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
         </button>
+        
+        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-            </svg>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <a href="logout.php" class="icon-btn" aria-label="Sign out">
+
+        <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
                 <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -343,34 +357,30 @@ $game_leaders = $stmt->fetchAll();
 
     <div class="section-head">
         <div class="section-head-left">
-            <a href="dashboard.php" class="back-link-small">
+            <a href="dashboard.php" class="back-link-small" title="<?= __('back_to_home') ?>">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
-                Back
+                <?= __('back') ?>
             </a>
-            <h1>Leaderboard</h1>
+            <h1><?= __('leaderboard') ?></h1>
         </div>
         <?php if ($user_rank !== null): ?>
         <span class="user-greeting">
-            Your rank: <strong>#<?= $user_rank ?></strong>
+            <?= __('your_rank') ?>: <strong>#<?= $user_rank ?></strong>
         </span>
         <?php endif; ?>
     </div>
 
     <div class="leaderboard-tabs">
-        <button class="lb-tab active" data-panel="global">Global Rankings</button>
-        <button class="lb-tab" data-panel="games">By Game</button>
+        <button class="lb-tab active" data-panel="global"><?= __('global_rankings') ?></button>
+        <button class="lb-tab" data-panel="games"><?= __('by_game') ?></button>
     </div>
 
-    <!-- ============================================
-         PANEL: GLOBAL
-         ============================================ -->
+    <!-- PANEL: GLOBAL -->
     <div class="lb-panel active" data-panel="global">
         <?php if (empty($leaderboard)): ?>
-            <div class="empty-state">
-                No players yet. Be the first to play a game!
-            </div>
+            <div class="empty-state"><?= __('no_players') ?></div>
         <?php else: ?>
             <div class="rank-list">
                 <?php foreach ($leaderboard as $i => $row): ?>
@@ -381,30 +391,37 @@ $game_leaders = $stmt->fetchAll();
                         elseif ($rank === 2) $row_class = 'top-2';
                         elseif ($rank === 3) $row_class = 'top-3';
                         if ($row['id'] == $_SESSION['user_id']) $row_class .= ' you';
+                        
+                        // Use DiceBear avatar if set, otherwise initials
+                        $row_avatar = get_avatar_url($row['profile_picture'] ?? '');
                     ?>
                     <div class="rank-row <?= $row_class ?>">
                         <div class="rank-number"><?= $rank ?></div>
                         <div class="rank-avatar">
-                            <?= strtoupper(substr($row['username'], 0, 2)) ?>
+                            <?php if ($row_avatar): ?>
+                                <img src="<?= htmlspecialchars($row_avatar) ?>" alt="<?= htmlspecialchars($row['username']) ?>">
+                            <?php else: ?>
+                                <?= strtoupper(substr($row['username'], 0, 2)) ?>
+                            <?php endif; ?>
                         </div>
                         <div class="rank-info">
                             <div class="rank-name">
                                 <?= htmlspecialchars($row['username']) ?>
                                 <?php if ($row['id'] == $_SESSION['user_id']): ?>
-                                    <span style="color:#d13639; font-size:11px;">(You)</span>
+                                    <span style="color:#d13639; font-size:11px;">(<?= __('you') ?>)</span>
                                 <?php endif; ?>
                             </div>
                             <div class="rank-meta">
-                                <span>Level <?= $row['level'] ?></span>
+                                <span><?= __('level') ?> <?= $row['level'] ?></span>
                                 <span>·</span>
                                 <span><?= number_format($row['xp']) ?> XP</span>
                                 <span>·</span>
-                                <span><?= $row['games_played'] ?> games</span>
+                                <span><?= $row['games_played'] ?> <?= __('games_played') ?></span>
                             </div>
                         </div>
                         <div class="rank-score">
                             <div class="rank-score-value"><?= number_format($row['high_score']) ?></div>
-                            <div class="rank-score-label">High Score</div>
+                            <div class="rank-score-label"><?= __('high_score') ?></div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -412,9 +429,7 @@ $game_leaders = $stmt->fetchAll();
         <?php endif; ?>
     </div>
 
-    <!-- ============================================
-         PANEL: BY GAME
-         ============================================ -->
+    <!-- PANEL: BY GAME -->
     <div class="lb-panel" data-panel="games">
         <?php if (empty($game_leaders)): ?>
             <div class="empty-state">
@@ -429,16 +444,16 @@ $game_leaders = $stmt->fetchAll();
                         </div>
                         <div class="game-leader-stats">
                             <div>
-                                <div class="game-leader-stat-label">High Score</div>
+                                <div class="game-leader-stat-label"><?= __('high_score') ?></div>
                                 <div class="game-leader-stat-value"><?= number_format($g['high_score']) ?></div>
                             </div>
                             <div>
-                                <div class="game-leader-stat-label">Total Plays</div>
+                                <div class="game-leader-stat-label"><?= __('plays') ?></div>
                                 <div class="game-leader-stat-value"><?= number_format($g['plays']) ?></div>
                             </div>
                         </div>
                         <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4);">
-                            <?= $g['players'] ?> unique <?= $g['players'] == 1 ? 'player' : 'players' ?>
+                            <?= $g['players'] ?> <?= $g['players'] == 1 ? 'player' : 'players' ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -456,7 +471,7 @@ $game_leaders = $stmt->fetchAll();
 
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
-<script src="js/settings.js"></script>
+<script src="js/settings.js?v=<?= time() ?>"></script>
 <script>
 document.querySelectorAll('.lb-tab').forEach(tab => {
     tab.addEventListener('click', () => {
