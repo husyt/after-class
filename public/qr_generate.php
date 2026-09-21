@@ -1,43 +1,44 @@
 <?php
+
 require_once __DIR__ . '/../includes/session.php';
-require_once __DIR__ . '/../config/database.php';
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
-$pdo->exec("DELETE FROM qr_sessions WHERE expires_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+try {
 
-$token = bin2hex(random_bytes(32));
-$expires = date('Y-m-d H:i:s', time() + 300);
+    // Generate random 6-digit code
+    $code = (string) random_int(100000, 999999);
 
-$stmt = $pdo->prepare("INSERT INTO qr_sessions (token, expires_at) VALUES (?, ?)");
-$stmt->execute([$token, $expires]);
+    // Store hashed version in the session
+    $_SESSION['qr_verification_hash'] =
+        password_hash($code, PASSWORD_DEFAULT);
 
-// Auto-detect IP
-function getLocalIP() {
-    $host = $_SERVER['HTTP_HOST'];
-    if ($host !== 'localhost' && strpos($host, '127.0.0.1') === false) {
-        return 'http://' . $host;
-    }
-    $sock = @socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-    if ($sock) {
-        @socket_connect($sock, '8.8.8.8', 53);
-        @socket_getsockname($sock, $local_ip);
-        @socket_close($sock);
-        if (!empty($local_ip)) {
-            $port = $_SERVER['SERVER_PORT'] == 80 ? '' : ':' . $_SERVER['SERVER_PORT'];
-            return 'http://' . $local_ip . $port;
-        }
-    }
-    return 'http://' . $host;
+    // Code expires after 5 minutes
+    $_SESSION['qr_verification_expires'] =
+        time() + 300;
+
+    // Reset failed attempts
+    $_SESSION['qr_verification_attempts'] = 0;
+
+
+    // Text stored inside the QR
+    // Phone camera will read this
+    $qrText =
+        'EqualPath Verification Code: ' . $code;
+
+
+    echo json_encode([
+        'success' => true,
+        'qr_text' => $qrText,
+        'expires_in' => 300
+    ]);
+
+} catch (Throwable $e) {
+
+    http_response_code(500);
+
+    echo json_encode([
+        'success' => false,
+        'error' => 'Unable to generate QR verification.'
+    ]);
 }
-
-$base_url = getLocalIP() . dirname($_SERVER['PHP_SELF']);
-$scan_url = $base_url . "/qr_scan.php?token=" . $token;
-
-echo json_encode([
-    'success' => true,
-    'token'   => $token,
-    'scan_url' => $scan_url,
-    'expires_in' => 300
-]);
-?>
