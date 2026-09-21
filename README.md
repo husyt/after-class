@@ -1,4 +1,4 @@
-# CoreSync — Game-Integrated Learning Platform
+# EqualPath — Game-Integrated Learning Platform
 
 A PHP + MySQL web platform that combines **secure authentication**, **game progress tracking**, and **analytics** into one unified system for schools and learning organizations.
 
