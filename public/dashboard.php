@@ -59,7 +59,7 @@ $games = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | CoreSync</title>
+    <title>Home | EqualPath</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
@@ -279,13 +279,13 @@ $games = [
                     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
             </div>
-            <h2 id="infoTitle">CoreSync</h2>
+            <h2 id="infoTitle">EqualPath</h2>
             <p class="info-tagline">Play. Learn. Level Up.</p>
         </div>
 
         <div class="info-body">
             <p class="info-desc">
-                CoreSync is a game-integrated learning platform built for schools and organizations.
+                EqualPath is a game-integrated learning platform built for schools and organizations.
                 It combines secure authentication, real-time game progress tracking, and detailed
                 analytics into one unified system — so every session becomes measurable, meaningful,
                 and fun.
@@ -320,9 +320,9 @@ $games = [
 
             <div class="info-footer">
                 <p>
-                    <strong>CoreSync Technologies</strong><br>
+                    <strong>EqualPath Technologies</strong><br>
                     Built with PHP, MySQL, and a lot of late nights.<br>
-                    © 2026 CoreSync. All rights reserved.
+                    © 2026 EqualPath. All rights reserved.
                 </p>
             </div>
         </div>
