@@ -116,13 +116,15 @@ $stmt = $pdo->prepare(
 $stmt->execute([$from_dt, $to_dt]);
 $daily_stats = $stmt->fetchAll();
 
-// Get current admin user (BEFORE i18n so we can load language)
+// ============================================
+// FETCH CURRENT USER FIRST (critical for i18n)
+// ============================================
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
-// LOAD TRANSLATION SYSTEM
+// LOAD TRANSLATION SYSTEM (needs $user)
 // ============================================
 require_once __DIR__ . '/../includes/i18n.php';
 
@@ -556,7 +558,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     <!-- SUMMARY CARDS -->
     <div class="report-summary">
         <div class="report-card">
-            <div class="report-card-label"><?= __('total_users') /* reuses 'Total Users' label as 'Sessions' context */ ?><?php /* Actually use correct labels */ ?></div>
+            <div class="report-card-label"><?= __('total_activities') ?></div>
             <div class="report-card-value"><?= number_format($summary['total_sessions']) ?></div>
         </div>
         <div class="report-card">
@@ -568,7 +570,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
             <div class="report-card-value"><?= number_format($summary['games_played']) ?></div>
         </div>
         <div class="report-card">
-            <div class="report-card-label"><?= __('total_xp') /* Total Score */ ?></div>
+            <div class="report-card-label"><?= __('total_xp') ?></div>
             <div class="report-card-value"><?= number_format($summary['total_score']) ?></div>
         </div>
         <div class="report-card">
@@ -582,7 +584,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     </div>
 
     <!-- GAME PARTICIPATION -->
-    <h2 class="report-section-title"><?= __('library') /* Game Participation */ ?></h2>
+    <h2 class="report-section-title"><?= __('library') ?></h2>
     <div class="report-table-wrap">
         <?php if (empty($game_stats)): ?>
             <div class="report-empty">No game sessions in this date range.</div>
@@ -591,7 +593,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <thead>
                     <tr>
                         <th><?= __('library') ?></th>
-                        <th style="text-align:right;">Sessions</th>
+                        <th style="text-align:right;"><?= __('plays') ?></th>
                         <th style="text-align:right;"><?= __('total_users') ?></th>
                         <th style="text-align:right;"><?= __('avg') ?></th>
                         <th style="text-align:right;"><?= __('high_score') ?></th>
@@ -615,7 +617,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     </div>
 
     <!-- USER PERFORMANCE -->
-    <h2 class="report-section-title"><?= __('profile') /* User Performance */ ?></h2>
+    <h2 class="report-section-title"><?= __('profile') ?></h2>
     <div class="report-table-wrap">
         <?php if (empty($user_stats)): ?>
             <div class="report-empty">No users found.</div>
@@ -625,7 +627,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                     <tr>
                         <th><?= __('username') ?></th>
                         <th><?= __('role') ?></th>
-                        <th style="text-align:right;">Sessions</th>
+                        <th style="text-align:right;"><?= __('plays') ?></th>
                         <th style="text-align:right;"><?= __('avg') ?></th>
                         <th style="text-align:right;"><?= __('high_score') ?></th>
                         <th style="text-align:right;"><?= __('total_xp') ?></th>
@@ -648,7 +650,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     </div>
 
     <!-- DAILY ACTIVITY -->
-    <h2 class="report-section-title"><?= __('recent_activity') /* Daily Activity */ ?></h2>
+    <h2 class="report-section-title"><?= __('recent_activity') ?></h2>
     <div class="report-table-wrap">
         <?php if (empty($daily_stats)): ?>
             <div class="report-empty">No activity in this date range.</div>
@@ -657,7 +659,7 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
                 <thead>
                     <tr>
                         <th>Date</th>
-                        <th style="text-align:right;">Sessions</th>
+                        <th style="text-align:right;"><?= __('plays') ?></th>
                         <th style="text-align:right;"><?= __('total_users') ?></th>
                         <th style="text-align:right;"><?= __('total_xp') ?></th>
                     </tr>

@@ -1,9 +1,19 @@
 <?php
 // includes/i18n.php
-// Global translation system
 
-// Determine current language
-$current_lang = $user['preferred_language'] ?? ($_SESSION['preferred_language'] ?? 'en');
+// DEBUG
+error_log("=== i18n.php loaded ===");
+error_log("user preferred_language: " . var_export($user['preferred_language'] ?? null, true));
+error_log("session preferred_language: " . var_export($_SESSION['preferred_language'] ?? null, true));
+
+global $user;
+$current_lang = 
+    $user['preferred_language'] 
+    ?? $_SESSION['preferred_language'] 
+    ?? 'en';
+
+error_log("FINAL current_lang: " . $current_lang);
+
 $_SESSION['preferred_language'] = $current_lang;
 
 $GLOBAL_TRANSLATIONS = [
@@ -104,9 +114,40 @@ $GLOBAL_TRANSLATIONS = [
         'print'             => 'Print',
         'from'              => 'From',
         'to'                => 'To',
+
+        // ============================================
+        // SETTINGS PANEL (NEW KEYS)
+        // ============================================
+        'account'            => 'Account',
+        'change_password'    => 'Change password',
+        'preferences'        => 'Preferences',
+        'two_fa'             => 'Two-Factor Auth',
+        'two_fa_desc'        => 'Email OTP on login',
+        'dark_mode'          => 'Dark mode',
+        'dark_mode_desc'     => 'Always on by default',
+        'reduce_motion'      => 'Reduce motion',
+        'reduce_motion_desc' => 'Disable animations',
+        'auto_play'          => 'Auto-play videos',
+        'auto_play_desc'     => 'Game backgrounds',
+        'background_theme'   => 'Background Theme',
+        'language'           => 'Language',
+        'audio'              => 'Audio',
+        'master_volume'      => 'Master volume',
+        'mute_all'           => 'Mute all sound',
+        'mute_all_desc'      => 'Silence everything',
+        'bg_music'           => 'Background music',
+        'bg_music_desc'      => 'Play theme music',
+        'notifications'      => 'Notifications',
+        'email_alerts'       => 'Email alerts',
+        'email_alerts_desc'  => 'Login and security alerts',
+        'game_reminders'     => 'Game reminders',
+        'game_reminders_desc'=> 'Daily play reminders',
+        'about'              => 'About',
+        'version'            => 'Version',
     ],
 
     'tl' => [
+        // Nav / Global
         'home'              => 'Tahanan',
         'library'           => 'Aklatan',
         'leaderboard'       => 'Ranggo',
@@ -196,6 +237,36 @@ $GLOBAL_TRANSLATIONS = [
         'print'             => 'I-print',
         'from'              => 'Mula',
         'to'                => 'Hanggang',
+
+        // ============================================
+        // SETTINGS PANEL (NEW KEYS)
+        // ============================================
+        'account'            => 'Account',
+        'change_password'    => 'Palitan ang password',
+        'preferences'        => 'Mga Kagustuhan',
+        'two_fa'             => 'Two-Factor Auth',
+        'two_fa_desc'        => 'Email OTP sa pag-login',
+        'dark_mode'          => 'Dark mode',
+        'dark_mode_desc'     => 'Laging naka-on',
+        'reduce_motion'      => 'Bawasan ang galaw',
+        'reduce_motion_desc' => 'I-disable ang animation',
+        'auto_play'          => 'Auto-play ng video',
+        'auto_play_desc'     => 'Background ng laro',
+        'background_theme'   => 'Tema ng Background',
+        'language'           => 'Wika',
+        'audio'              => 'Audio',
+        'master_volume'      => 'Master volume',
+        'mute_all'           => 'I-mute lahat',
+        'mute_all_desc'      => 'Patahimikin lahat',
+        'bg_music'           => 'Background music',
+        'bg_music_desc'      => 'I-play ang tema',
+        'notifications'      => 'Mga Abiso',
+        'email_alerts'       => 'Mga email alert',
+        'email_alerts_desc'  => 'Alerto sa login at seguridad',
+        'game_reminders'     => 'Paalala ng laro',
+        'game_reminders_desc'=> 'Araw-araw na paalala',
+        'about'              => 'Tungkol',
+        'version'            => 'Bersyon',
     ],
 
     'es' => [
@@ -288,6 +359,36 @@ $GLOBAL_TRANSLATIONS = [
         'print'             => 'Imprimir',
         'from'              => 'Desde',
         'to'                => 'Hasta',
+
+        // ============================================
+        // SETTINGS PANEL (NEW KEYS)
+        // ============================================
+        'account'            => 'Cuenta',
+        'change_password'    => 'Cambiar contraseña',
+        'preferences'        => 'Preferencias',
+        'two_fa'             => 'Autenticación 2FA',
+        'two_fa_desc'        => 'OTP por correo al iniciar sesión',
+        'dark_mode'          => 'Modo oscuro',
+        'dark_mode_desc'     => 'Siempre activado',
+        'reduce_motion'      => 'Reducir movimiento',
+        'reduce_motion_desc' => 'Desactivar animaciones',
+        'auto_play'          => 'Reproducción automática',
+        'auto_play_desc'     => 'Fondos de juegos',
+        'background_theme'   => 'Tema de fondo',
+        'language'           => 'Idioma',
+        'audio'              => 'Audio',
+        'master_volume'      => 'Volumen maestro',
+        'mute_all'           => 'Silenciar todo',
+        'mute_all_desc'      => 'Silenciar todo el sonido',
+        'bg_music'           => 'Música de fondo',
+        'bg_music_desc'      => 'Reproducir música',
+        'notifications'      => 'Notificaciones',
+        'email_alerts'       => 'Alertas por correo',
+        'email_alerts_desc'  => 'Alertas de inicio y seguridad',
+        'game_reminders'     => 'Recordatorios de juego',
+        'game_reminders_desc'=> 'Recordatorios diarios',
+        'about'              => 'Acerca de',
+        'version'            => 'Versión',
     ],
 
     'ja' => [
@@ -380,6 +481,36 @@ $GLOBAL_TRANSLATIONS = [
         'print'             => '印刷',
         'from'              => '開始',
         'to'                => '終了',
+
+        // ============================================
+        // SETTINGS PANEL (NEW KEYS)
+        // ============================================
+        'account'            => 'アカウント',
+        'change_password'    => 'パスワード変更',
+        'preferences'        => '環境設定',
+        'two_fa'             => '二段階認証',
+        'two_fa_desc'        => 'ログイン時のメールOTP',
+        'dark_mode'          => 'ダークモード',
+        'dark_mode_desc'     => '常にオン',
+        'reduce_motion'      => 'モーションを減らす',
+        'reduce_motion_desc' => 'アニメーションを無効化',
+        'auto_play'          => '動画を自動再生',
+        'auto_play_desc'     => 'ゲーム背景',
+        'background_theme'   => '背景テーマ',
+        'language'           => '言語',
+        'audio'              => 'オーディオ',
+        'master_volume'      => 'マスター音量',
+        'mute_all'           => 'すべてミュート',
+        'mute_all_desc'      => 'すべての音を消す',
+        'bg_music'           => 'BGM',
+        'bg_music_desc'      => 'テーマ音楽を再生',
+        'notifications'      => '通知',
+        'email_alerts'       => 'メールアラート',
+        'email_alerts_desc'  => 'ログインとセキュリティ',
+        'game_reminders'     => 'ゲームリマインダー',
+        'game_reminders_desc'=> '毎日のプレイ通知',
+        'about'              => 'について',
+        'version'            => 'バージョン',
     ],
 
     'ko' => [
@@ -472,15 +603,64 @@ $GLOBAL_TRANSLATIONS = [
         'print'             => '인쇄',
         'from'              => '시작',
         'to'                => '종료',
+
+        // ============================================
+        // SETTINGS PANEL (NEW KEYS)
+        // ============================================
+        'account'            => '계정',
+        'change_password'    => '비밀번호 변경',
+        'preferences'        => '환경설정',
+        'two_fa'             => '2단계 인증',
+        'two_fa_desc'        => '로그인 시 이메일 OTP',
+        'dark_mode'          => '다크 모드',
+        'dark_mode_desc'     => '항상 켜짐',
+        'reduce_motion'      => '모션 줄이기',
+        'reduce_motion_desc' => '애니메이션 비활성화',
+        'auto_play'          => '동영상 자동재생',
+        'auto_play_desc'     => '게임 배경',
+        'background_theme'   => '배경 테마',
+        'language'           => '언어',
+        'audio'              => '오디오',
+        'master_volume'      => '마스터 볼륨',
+        'mute_all'           => '모두 음소거',
+        'mute_all_desc'      => '모든 소리 끄기',
+        'bg_music'           => '배경 음악',
+        'bg_music_desc'      => '테마 음악 재생',
+        'notifications'      => '알림',
+        'email_alerts'       => '이메일 알림',
+        'email_alerts_desc'  => '로그인 및 보안 알림',
+        'game_reminders'     => '게임 알림',
+        'game_reminders_desc'=> '일일 플레이 알림',
+        'about'              => '정보',
+        'version'            => '버전',
     ],
 ];
 
 /**
  * Translate a key
+ * Priority: current language → provided fallback → English → key itself
  */
 function __($key, $fallback = null) {
     global $GLOBAL_TRANSLATIONS, $current_lang;
+    
     $lang = $GLOBAL_TRANSLATIONS[$current_lang] ?? $GLOBAL_TRANSLATIONS['en'];
-    return $lang[$key] ?? $fallback ?? $GLOBAL_TRANSLATIONS['en'][$key] ?? $key;
+    
+    // 1. Try current language
+    if (isset($lang[$key])) {
+        return $lang[$key];
+    }
+    
+    // 2. Try explicit fallback passed by caller
+    if ($fallback !== null) {
+        return $fallback;
+    }
+    
+    // 3. Try English
+    if (isset($GLOBAL_TRANSLATIONS['en'][$key])) {
+        return $GLOBAL_TRANSLATIONS['en'][$key];
+    }
+    
+    // 4. Return the key itself
+    return $key;
 }
 ?>

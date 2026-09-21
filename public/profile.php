@@ -9,12 +9,15 @@ if (!isset($_SESSION['user_id'])) {
 
 require_once __DIR__ . '/../config/database.php';
 
+// ============================================
+// FETCH CURRENT USER FIRST (critical for i18n)
+// ============================================
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
-// LOAD TRANSLATION SYSTEM
+// LOAD TRANSLATION SYSTEM (needs $user)
 // ============================================
 require_once __DIR__ . '/../includes/i18n.php';
 
@@ -87,7 +90,7 @@ $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 // AVATAR SYSTEM (DiceBear CDN)
 // ============================================
 // NOTE: $avatar_seeds is needed for the picker grid below.
-// The get_avatar_url() function is now provided by includes/avatar.php
+// The get_avatar_url() function is provided by includes/avatar.php
 $avatar_seeds = ['Felix', 'Aneka', 'Leo', 'Mia', 'Kai', 'Zara', 'Ravi', 'Nora'];
 $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
 ?>

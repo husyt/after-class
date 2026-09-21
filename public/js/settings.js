@@ -204,25 +204,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // LANGUAGE SELECTOR
     // ========================================
     const languageSelect = document.getElementById('languageSelect');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', async () => {
-            const lang = languageSelect.value;
+if (languageSelect) {
+    languageSelect.addEventListener('change', async () => {
+        const selectedLang = languageSelect.value;
+        console.log('🌐 Language changed to:', selectedLang);
 
-            try {
-                const res = await fetch('update_preference.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'preferred_language', value: lang })
-                });
-                const result = await res.json();
+        try {
+            const res = await fetch('update_preference.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    type: 'preferred_language', 
+                    value: selectedLang 
+                })
+            });
 
-                if (result.success) {
-                    console.log('Language saved:', lang);
-                }
-            } catch (err) {
-                console.error('Language update error:', err);
+            console.log('📡 Response status:', res.status);
+
+            const result = await res.json();
+            console.log('📦 Response body:', result);
+
+            if (result.success) {
+                console.log('✅ Reloading...');
+                location.reload();
+            } else {
+                console.error('❌ Server said no:', result.error);
+                alert('Failed to change language: ' + result.error);
             }
-        });
-    }
-
+        } catch (err) {
+            console.error('❌ Network/fetch error:', err);
+            alert('Network error: ' + err.message);
+        }
+    });
+}
 });

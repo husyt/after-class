@@ -10,14 +10,14 @@ if (!isset($_SESSION['user_id'])) {
 require_once __DIR__ . '/../config/database.php';
 
 // ============================================
-// FETCH CURRENT USER
+// FETCH CURRENT USER FIRST (critical for i18n)
 // ============================================
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
-// LOAD TRANSLATION SYSTEM
+// LOAD TRANSLATION SYSTEM (needs $user)
 // ============================================
 require_once __DIR__ . '/../includes/i18n.php';
 

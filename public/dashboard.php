@@ -11,33 +11,21 @@ if (!isset($_SESSION['user_id'])) {
 require_once __DIR__ . '/../config/database.php';
 
 // ============================================
-// FETCH CURRENT USER
+// FETCH CURRENT USER FIRST (Critical for i18n)
 // ============================================
 $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
-// LOAD TRANSLATION SYSTEM
+// LOAD TRANSLATION SYSTEM (needs $user)
 // ============================================
 require_once __DIR__ . '/../includes/i18n.php';
 
 // ============================================
-// AVATAR SYSTEM (DiceBear CDN)
+// LOAD AVATAR HELPER (needs $user)
 // ============================================
-$avatar_seeds = ['Felix', 'Aneka', 'Leo', 'Mia', 'Kai', 'Zara', 'Ravi', 'Nora'];
-
-function get_avatar_url($profile_picture, $avatar_seeds) {
-    if (empty($profile_picture)) return null;
-    $num = (int) preg_replace('/\D/', '', $profile_picture);
-    if ($num >= 1 && $num <= 8) {
-        $seed = $avatar_seeds[$num - 1];
-        return "https://api.dicebear.com/7.x/adventurer/svg?seed={$seed}&size=200&backgroundColor=7c3aed,d13639,f97316,2ecc71";
-    }
-    return null;
-}
-
-$current_avatar_url = get_avatar_url($user['profile_picture'] ?? '', $avatar_seeds);
+require_once __DIR__ . '/../includes/avatar.php';
 
 // ============================================
 // LOAD USER FAVORITES
@@ -143,22 +131,11 @@ $games = [
                 <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
             </svg>
         </button>
-        
-        <!-- UPDATED USER AVATAR SECTION -->
+
+        <!-- USER AVATAR (now uses shared helper) -->
         <div class="user-avatar">
-            <?php if ($current_avatar_url): ?>
-                <img src="<?= htmlspecialchars($current_avatar_url) ?>" 
-                     alt="Profile" 
-                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"
-                     onerror="this.style.display='none';this.parentElement.innerHTML='<svg width=\'22\' height=\'22\' viewBox=\'0 0 24 24\' fill=\'currentColor\'><circle cx=\'12\' cy=\'8\' r=\'4\'/><path d=\'M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2\'/></svg>'">
-            <?php else: ?>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                    <circle cx="12" cy="8" r="4"/>
-                    <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
-                </svg>
-            <?php endif; ?>
+            <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
-        <!-- END UPDATED USER AVATAR SECTION -->
 
         <a href="logout.php" class="icon-btn" aria-label="<?= __('sign_out') ?>">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
