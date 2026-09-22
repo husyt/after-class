@@ -14,6 +14,22 @@ if (ini_get("session.use_cookies")) {
 }
 setcookie('after_class_user', '', time() - 3600, '/');
 session_destroy();
+// Clear remember-me cookie and token
+if (!empty($_COOKIE['remember_token'])) {
+    try {
+        $stmt = $pdo->prepare("DELETE FROM remember_tokens WHERE token = ?");
+        $stmt->execute([$_COOKIE['remember_token']]);
+    } catch (PDOException $e) {
+        error_log("Logout token cleanup error: " . $e->getMessage());
+    }
+
+    setcookie('remember_token', '', [
+        'expires'  => time() - 3600,
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Strict'
+    ]);
+}
 
 session_start();
 $_SESSION['login_success'] = 'You have been logged out successfully.';

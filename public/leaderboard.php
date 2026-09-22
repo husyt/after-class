@@ -80,6 +80,14 @@ $game_leaders = $stmt->fetchAll();
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
+    <link rel="manifest" href="/after-class/public/manifest.json">
+<meta name="theme-color" content="#d13639">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EqualPath">
+<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
     <style>
         .leaderboard-tabs {
             display: flex;
@@ -471,9 +479,15 @@ $game_leaders = $stmt->fetchAll();
     </video>
 </div>
 
+<!-- Background music -->
+<audio id="bgMusic" loop preload="auto">
+    <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
+</audio>
+
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
 <script src="js/settings.js?v=<?= time() ?>"></script>
+<script src="js/music.js?v=<?= time() . rand() ?>"></script>
 <script>
 document.querySelectorAll('.lb-tab').forEach(tab => {
     tab.addEventListener('click', () => {
@@ -484,5 +498,6 @@ document.querySelectorAll('.lb-tab').forEach(tab => {
     });
 });
 </script>
+<script src="js/pwa.js?v=<?= time() . rand() ?>"></script>
 </body>
 </html>

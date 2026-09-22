@@ -1,4 +1,5 @@
 <?php
+define('REQUIRE_LOGIN', false);
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
@@ -40,18 +41,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['code'])) {
                 $stmt = $pdo->prepare("UPDATE otp_codes SET used = 1 WHERE id = ?");
                 $stmt->execute([$otp['id']]);
                 
+                // ============================================
+                // SUCCESS — Mark 2FA verified
+                // ============================================
+                $user_id = $_SESSION['user_id'];  // capture before regenerate
+                
                 $_SESSION['2fa_verified'] = true;
                 $_SESSION['last_activity'] = time();
+                $_SESSION['login_time']    = time();
+                
+                // Regenerate session ID for security, but keep session data
+                session_regenerate_id(true);
+                
+                // Re-assign after regenerate (session data should persist, but be safe)
+                $_SESSION['user_id']       = $user_id;
+                $_SESSION['2fa_verified']  = true;
                 
                 $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
-                $stmt->execute([$_SESSION['user_id']]);
+                $stmt->execute([$user_id]);
                 
-                logActivity($pdo, $_SESSION['user_id'], '2FA verified - full login');
+                logActivity($pdo, $user_id, '2FA verified - full login');
                 
                 if (!empty($_SESSION['stay_signed_in'])) {
-                    setcookie('after_class_user', $_SESSION['user_id'], [
-                        'expires' => time() + (86400 * 30),
-                        'path' => '/',
+                    setcookie('after_class_user', $user_id, [
+                        'expires'  => time() + (86400 * 30),
+                        'path'     => '/',
                         'httponly' => true,
                         'samesite' => 'Strict'
                     ]);

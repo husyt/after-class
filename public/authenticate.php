@@ -67,6 +67,48 @@ try {
             header('Location: dashboard.php');
             exit;
         }
+
+        // ============================================
+// STAY SIGNED IN — generate remember token
+// ============================================
+if (!empty($_POST['stay_signed_in'])) {
+    $token     = bin2hex(random_bytes(32));
+    $expires   = date('Y-m-d H:i:s', time() + (86400 * 30)); // 30 days
+
+    $stmt = $pdo->prepare(
+        "INSERT INTO remember_tokens (user_id, token, expires_at) 
+         VALUES (?, ?, ?)"
+    );
+    $stmt->execute([$user['id'], $token, $expires]);
+
+    // Set cookie for 30 days
+    setcookie('remember_token', $token, [
+        'expires'  => time() + (86400 * 30),
+        'path'     => '/',
+        'httponly' => true,
+        'samesite' => 'Strict',
+        'secure'   => !empty($_SERVER['HTTPS'])
+    ]);
+
+    logActivity($pdo, $user['id'], 'Enabled stay-signed-in (30 days)');
+
+    // Skip 2FA — log them in directly
+    session_regenerate_id(true);
+
+    $_SESSION['user_id']       = $user['id'];
+    $_SESSION['username']      = $user['username'];
+    $_SESSION['email']         = $user['email'];
+    $_SESSION['role']          = $user['role'];
+    $_SESSION['2fa_verified']  = true;
+    $_SESSION['last_activity'] = time();
+    $_SESSION['login_time']    = time();
+
+    $stmt = $pdo->prepare("UPDATE users SET last_login = NOW() WHERE id = ?");
+    $stmt->execute([$user['id']]);
+
+    header('Location: dashboard.php');
+    exit;
+}
         
         // Generate OTP
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);

@@ -1,36 +1,67 @@
 <?php
+define('REQUIRE_LOGIN', false);
 require_once __DIR__ . '/../includes/session.php';
+require_once __DIR__ . '/../config/database.php';
+
 $message = '';
 $message_type = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    require_once __DIR__ . '/../config/database.php';
     require_once __DIR__ . '/../includes/mailer.php';
-    
+
     $email = filter_var(trim($_POST['email'] ?? ''), FILTER_VALIDATE_EMAIL);
-    
+
     if (!$email) {
         $message = 'Please enter a valid email address.';
         $message_type = 'error';
     } else {
         try {
+            // 1. Look up the user
             $stmt = $pdo->prepare("SELECT id, username FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
-            
+
             if ($user) {
-                $token = bin2hex(random_bytes(32));
-                $expires = date('Y-m-d H:i:s', time() + 3600);
-                
+                // 2. Generate token + expiry
+                $token   = bin2hex(random_bytes(32));
+                $expires = date('Y-m-d H:i:s', time() + 3600); // 1 hour
+
+                                // 3. Remove any previous reset requests for this email
                 $stmt = $pdo->prepare("DELETE FROM password_resets WHERE email = ?");
                 $stmt->execute([$email]);
-                
-                $stmt = $pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)");
-                $stmt->execute([$email, $token, $expires]);
-                
-                $reset_link = "http://localhost/after-class/public/reset_password.php?token=" . $token;
+
+                // 4. Build INSERT dynamically based on which columns exist
+                $cols = $pdo->query("DESCRIBE password_resets")->fetchAll(PDO::FETCH_COLUMN);
+                $has_user_id = in_array('user_id', $cols, true);
+                $has_used    = in_array('used', $cols, true);
+
+                $fields = ['email', 'token', 'expires_at'];
+                $values = [$email, $token, $expires];
+
+                if ($has_user_id) {
+                    $fields[] = 'user_id';
+                    $values[] = $user['id'];
+                }
+                if ($has_used) {
+                    $fields[] = 'used';
+                    $values[] = 0;
+                }
+
+                $placeholders = implode(', ', array_fill(0, count($fields), '?'));
+                $sql = "INSERT INTO password_resets (" . implode(', ', $fields) . ") 
+                        VALUES ($placeholders)";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($values);
+
+                // 5. Build reset link — detect protocol + host dynamically
+                $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+                $host     = $_SERVER['HTTP_HOST'];
+                $base     = rtrim(dirname($_SERVER['PHP_SELF']), '/\\');
+                $reset_link = "{$protocol}://{$host}{$base}/reset_password.php?token=" . $token;
+
+                // 6. Send email
                 $sent = sendPasswordResetEmail($email, $user['username'], $reset_link);
-                
+
                 if ($sent) {
                     $message = 'A password reset link has been sent to <strong>' . htmlspecialchars($email) . '</strong>.';
                     $message_type = 'success';
@@ -39,6 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $message_type = 'error';
                 }
             } else {
+                // Security: don't reveal if the email exists
                 $message = 'If that email is registered, a reset link has been sent.';
                 $message_type = 'success';
             }

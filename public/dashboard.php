@@ -18,12 +18,12 @@ $stmt->execute([$_SESSION['user_id']]);
 $user = $stmt->fetch();
 
 // ============================================
-// LOAD TRANSLATION SYSTEM (needs $user)
+// LOAD TRANSLATION SYSTEM
 // ============================================
 require_once __DIR__ . '/../includes/i18n.php';
 
 // ============================================
-// LOAD AVATAR HELPER (needs $user)
+// LOAD AVATAR HELPER
 // ============================================
 require_once __DIR__ . '/../includes/avatar.php';
 
@@ -61,6 +61,8 @@ $games = [
         'accent'      => '#7c3aed',
     ],
 ];
+
+$is_admin = (($_SESSION['role'] ?? '') === 'admin');
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($current_lang) ?>">
@@ -71,17 +73,29 @@ $games = [
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
+    <link rel="manifest" href="/after-class/public/manifest.json">
+<meta name="theme-color" content="#d13639">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EqualPath">
+<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
 </head>
 <body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
 
-<!-- BACKGROUND -->
+<!-- ============================================
+     BACKGROUND VIDEO
+     ============================================ -->
 <div class="bg-layer" id="bgLayer">
     <video class="bg-video" autoplay muted loop playsinline preload="auto">
         <source src="/after-class/assets/games/bg-home.mp4" type="video/mp4">
     </video>
 </div>
 
-<!-- TOP NAV -->
+<!-- ============================================
+     TOP NAV
+     ============================================ -->
 <header class="topnav">
     <div class="nav-left">
         <div class="logo-mark">
@@ -114,7 +128,7 @@ $games = [
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
                 </svg>
             </a>
-            <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+            <?php if ($is_admin): ?>
             <a href="admin.php" class="nav-tab" title="<?= __('admin') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
@@ -132,7 +146,6 @@ $games = [
             </svg>
         </button>
 
-        <!-- USER AVATAR (now uses shared helper) -->
         <div class="user-avatar">
             <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
@@ -146,7 +159,9 @@ $games = [
     </div>
 </header>
 
-<!-- MAIN -->
+<!-- ============================================
+     MAIN
+     ============================================ -->
 <main class="dashboard">
 
     <div class="section-head">
@@ -154,7 +169,7 @@ $games = [
         <span class="user-greeting"><?= __('welcome_back') ?>, <?= htmlspecialchars($user['username']) ?></span>
     </div>
 
-    <!-- Game Row -->
+    <!-- GAME ROW -->
     <div class="game-row" id="gameRow">
         <?php foreach ($games as $i => $g): ?>
             <div class="game-tile <?= $i === 0 ? 'active' : '' ?>"
@@ -193,8 +208,9 @@ $games = [
         <?php endforeach; ?>
     </div>
 
-    <!-- Bottom Action Bar -->
+    <!-- ACTION BAR -->
     <div class="action-bar" id="actionBar">
+
         <a href="#" class="action-btn primary" id="playBtn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"/>
@@ -210,6 +226,7 @@ $games = [
             <span><?= __('info') ?></span>
         </button>
 
+        <?php if (!$is_admin): ?>
         <div class="more-wrapper">
             <button class="action-btn secondary" id="moreBtn" aria-haspopup="true" aria-expanded="false">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -252,24 +269,19 @@ $games = [
                     </svg>
                     <span><?= __('report_issue') ?></span>
                 </button>
-
-                <div class="more-divider"></div>
-
-                <button class="more-item danger" data-action="remove" role="menuitem">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-                    </svg>
-                    <span><?= __('remove_library') ?></span>
-                </button>
             </div>
         </div>
+        <?php endif; ?>
+
     </div>
 
     <div class="toast-container" id="toastContainer"></div>
 
 </main>
 
-<!-- INFO MODAL -->
+<!-- ============================================
+     INFO MODAL
+     ============================================ -->
 <div class="info-modal" id="infoModal" aria-hidden="true">
     <div class="info-modal-backdrop" id="infoBackdrop"></div>
     <div class="info-modal-panel" role="dialog" aria-labelledby="infoTitle">
@@ -335,7 +347,9 @@ $games = [
     </div>
 </div>
 
-<!-- REPORT ISSUE MODAL -->
+<!-- ============================================
+     REPORT ISSUE MODAL
+     ============================================ -->
 <div class="report-modal" id="reportModal" aria-hidden="true">
     <div class="report-modal-backdrop" id="reportBackdrop"></div>
     <div class="report-modal-panel" role="dialog">
@@ -394,15 +408,43 @@ $games = [
     </div>
 </div>
 
-<!-- Background music -->
+<!-- ============================================
+     SHARE POPUP
+     ============================================ -->
+<div class="share-popup" id="sharePopup" aria-hidden="true">
+    <div class="share-popup-backdrop" id="shareBackdrop"></div>
+    <div class="share-popup-panel" role="dialog">
+        <button class="share-popup-close" id="shareClose" aria-label="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+
+        <h3 class="share-popup-title">Share this game</h3>
+        <p class="share-popup-sub" id="shareGameName">Copy the link below to share with your friends.</p>
+
+        <div class="share-link-row">
+            <input type="text" id="shareLinkInput" class="share-link-input" readonly>
+            <button type="button" id="shareCopyBtn" class="share-copy-btn">Copy</button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================
+     BACKGROUND MUSIC
+     ============================================ -->
 <audio id="bgMusic" loop preload="auto">
     <source src="/after-class/assets/audio/theme.mp3" type="audio/mpeg">
 </audio>
 
-<!-- Settings drawer -->
+<!-- ============================================
+     SETTINGS DRAWER
+     ============================================ -->
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
-<!-- Data for JS -->
+<!-- ============================================
+     DATA FOR JS
+     ============================================ -->
 <script>
     window.GAMES = <?= json_encode($games, JSON_UNESCAPED_SLASHES) ?>;
     window.FAVORITES = <?= json_encode($favorites, JSON_UNESCAPED_SLASHES) ?>;
@@ -419,7 +461,118 @@ $games = [
     };
 </script>
 
+<!-- ============================================
+     SHARE POPUP SCRIPT
+     ============================================ -->
+<script>
+(function () {
+    'use strict';
+
+    const popup    = document.getElementById('sharePopup');
+    const backdrop = document.getElementById('shareBackdrop');
+    const closeBtn = document.getElementById('shareClose');
+    const input    = document.getElementById('shareLinkInput');
+    const copyBtn  = document.getElementById('shareCopyBtn');
+    const gameName = document.getElementById('shareGameName');
+
+    function openShare() {
+        if (!popup) return;
+
+        const activeTile = document.querySelector('.game-tile.active');
+        const gameId     = activeTile?.dataset.id || 'game';
+        const gameTitle  = activeTile?.dataset.title || 'this game';
+
+        const shareUrl = window.location.origin +
+                         window.location.pathname.replace(/[^/]*$/, '') +
+                         'game.php?id=' + encodeURIComponent(gameId);
+
+        if (input)    input.value = shareUrl;
+        if (gameName) gameName.textContent = 'Copy the link below to share "' + gameTitle + '".';
+
+        popup.classList.add('open');
+        popup.setAttribute('aria-hidden', 'false');
+
+        if (copyBtn) {
+            copyBtn.textContent = 'Copy';
+            copyBtn.classList.remove('copied');
+        }
+
+        setTimeout(() => {
+            if (input) { input.focus(); input.select(); }
+        }, 100);
+
+        clearTimeout(copyBtn?._resetTimer);
+        if (copyBtn) {
+            copyBtn._resetTimer = setTimeout(() => {
+                copyBtn.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+            }, 2500);
+        }
+    }
+
+    function closeShare() {
+        if (!popup) return;
+        popup.classList.remove('open');
+        popup.setAttribute('aria-hidden', 'true');
+    }
+
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            const url = input?.value || '';
+            if (!url) return;
+            try {
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(url);
+                } else {
+                    input.removeAttribute('readonly');
+                    input.select();
+                    document.execCommand('copy');
+                    input.setAttribute('readonly', 'readonly');
+                }
+                copyBtn.textContent = '✓ Copied';
+                copyBtn.classList.add('copied');
+                clearTimeout(copyBtn._resetTimer);
+                copyBtn._resetTimer = setTimeout(() => {
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            } catch (err) {
+                console.error('Copy failed:', err);
+                copyBtn.textContent = 'Failed';
+                copyBtn.style.background = '#d13639';
+            }
+        });
+    }
+
+    if (closeBtn) closeBtn.addEventListener('click', closeShare);
+    if (backdrop) backdrop.addEventListener('click', closeShare);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && popup?.classList.contains('open')) {
+            closeShare();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        const item = e.target.closest('.more-item[data-action="share"]');
+        if (item) {
+            e.preventDefault();
+            e.stopPropagation();
+            openShare();
+        }
+    });
+
+    window.openShare = openShare;
+})();
+</script>
+
+<!-- ============================================
+     PAGE SCRIPTS
+     ============================================ -->
+<script src="js/music.js?v=<?= time() . rand() ?>"></script>
 <script src="js/dashboard.js?v=<?= time() ?>"></script>
 <script src="js/settings.js?v=<?= time() ?>"></script>
+<script src="js/pwa.js?v=<?= time() . rand() ?>"></script>
+
 </body>
 </html>

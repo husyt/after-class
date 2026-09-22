@@ -87,12 +87,13 @@ $minutes = floor(($total_seconds % 3600) / 60);
 $playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 
 // ============================================
-// AVATAR SYSTEM (DiceBear CDN)
+// AVATAR SYSTEM
 // ============================================
-// NOTE: $avatar_seeds is needed for the picker grid below.
-// The get_avatar_url() function is provided by includes/avatar.php
 $avatar_seeds = ['Felix', 'Aneka', 'Leo', 'Mia', 'Kai', 'Zara', 'Ravi', 'Nora'];
 $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
+
+// Role check
+$is_admin = (($_SESSION['role'] ?? '') === 'admin');
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($current_lang) ?>">
@@ -103,6 +104,14 @@ $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
+    <link rel="manifest" href="/after-class/public/manifest.json">
+<meta name="theme-color" content="#d13639">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EqualPath">
+<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
 </head>
 <body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
     
@@ -139,7 +148,7 @@ $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
                     <path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/>
                 </svg>
             </a>
-            <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+            <?php if ($is_admin): ?>
             <a href="admin.php" class="nav-tab" title="<?= __('admin') ?>">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 2l8 4v6c0 5.5-3.8 10.7-8 12-4.2-1.3-8-6.5-8-12V6l8-4z"/>
@@ -157,7 +166,6 @@ $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
             </svg>
         </button>
         
-        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
             <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
@@ -299,7 +307,8 @@ $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
         <!-- RIGHT COLUMN -->
         <div class="profile-column">
 
-            <!-- Game Statistics -->
+            <?php if (!$is_admin): ?>
+            <!-- Game Statistics (hidden for admins) -->
             <div class="profile-section">
                 <h3><?= __('game_statistics') ?></h3>
 
@@ -395,8 +404,9 @@ $current_avatar_url = get_avatar_url($user['profile_picture'] ?? '');
                     </ul>
                 <?php endif; ?>
             </div>
+            <?php endif; ?>
 
-            <!-- Recent Activity -->
+            <!-- Recent Activity (always visible) -->
             <div class="profile-section">
                 <h3><?= __('recent_activity') ?></h3>
                 <?php if (empty($activities)): ?>
@@ -676,5 +686,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
+<script src="js/music.js?v=<?= time() . rand() ?>"></script>
+<script src="js/pwa.js?v=<?= time() . rand() ?>"></script>
 </body>
 </html>

@@ -1,5 +1,7 @@
 <?php
+define('REQUIRE_LOGIN', false);
 require_once __DIR__ . '/../includes/session.php';
+require_once __DIR__ . '/../config/database.php';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

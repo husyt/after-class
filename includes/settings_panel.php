@@ -4,7 +4,6 @@ require_once __DIR__ . '/i18n.php';
 
 global $user, $current_lang;
 
-// Force-refresh $current_lang from DB user
 if (!empty($user['preferred_language'])) {
     $current_lang = $user['preferred_language'];
 } elseif (!empty($_SESSION['preferred_language'])) {
@@ -15,6 +14,14 @@ if (!empty($user['preferred_language'])) {
 $_SESSION['preferred_language'] = $current_lang;
 
 $user = $user ?? [];
+
+// Saved notification preferences (from DB or defaults)
+$email_alerts_on   = (int)($user['email_alerts']    ?? 1);
+$game_reminders_on = (int)($user['game_reminders']  ?? 1);
+$reduce_motion_on  = (int)($user['reduce_motion']   ?? 0);
+$auto_play_on      = (int)($user['auto_play']       ?? 1);
+$bg_music_on       = (int)($user['bg_music']        ?? 1);
+$master_volume     = (int)($user['master_volume']   ?? 70);
 ?>
 <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
     <div class="settings-backdrop" id="settingsBackdrop"></div>
@@ -30,6 +37,7 @@ $user = $user ?? [];
 
         <div class="settings-body">
 
+            <!-- ACCOUNT -->
             <section class="settings-section">
                 <h3><?= __("account") ?></h3>
                 <div class="settings-field">
@@ -55,30 +63,9 @@ $user = $user ?? [];
                 </a>
             </section>
 
+            <!-- PREFERENCES -->
             <section class="settings-section">
                 <h3><?= __("preferences") ?></h3>
-
-                <div class="settings-toggle-row">
-                    <div>
-                        <div class="settings-toggle-label"><?= __("two_fa") ?></div>
-                        <div class="settings-toggle-desc"><?= __("two_fa_desc") ?></div>
-                    </div>
-                    <label class="toggle">
-                        <input type="checkbox" id="pref2FA" <?= ($user['two_factor_enabled'] ?? 0) ? 'checked' : '' ?>>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-
-                <div class="settings-toggle-row">
-                    <div>
-                        <div class="settings-toggle-label"><?= __("dark_mode") ?></div>
-                        <div class="settings-toggle-desc"><?= __("dark_mode_desc") ?></div>
-                    </div>
-                    <label class="toggle">
-                        <input type="checkbox" id="prefDark" checked disabled>
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
 
                 <div class="settings-toggle-row">
                     <div>
@@ -86,7 +73,10 @@ $user = $user ?? [];
                         <div class="settings-toggle-desc"><?= __("reduce_motion_desc") ?></div>
                     </div>
                     <label class="toggle">
-                        <input type="checkbox" id="prefMotion">
+                        <input type="checkbox"
+                               id="prefMotion"
+                               data-pref="reduce_motion"
+                               <?= $reduce_motion_on ? 'checked' : '' ?>>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
@@ -97,11 +87,15 @@ $user = $user ?? [];
                         <div class="settings-toggle-desc"><?= __("auto_play_desc") ?></div>
                     </div>
                     <label class="toggle">
-                        <input type="checkbox" id="prefAutoplay" checked>
+                        <input type="checkbox"
+                               id="prefAutoplay"
+                               data-pref="auto_play"
+                               <?= $auto_play_on ? 'checked' : '' ?>>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
 
+                <!-- BACKGROUND PICKER -->
                 <div class="settings-field-block">
                     <label class="settings-field-block-label"><?= __("background_theme") ?></label>
                     <div class="background-picker" id="backgroundPicker">
@@ -125,6 +119,7 @@ $user = $user ?? [];
                     </div>
                 </div>
 
+                <!-- LANGUAGE PICKER -->
                 <div class="settings-field-block">
                     <label class="settings-field-block-label"><?= __("language") ?></label>
                     <select class="settings-select" id="languageSelect">
@@ -146,59 +141,75 @@ $user = $user ?? [];
                 </div>
             </section>
 
+            <!-- AUDIO -->
             <section class="settings-section">
                 <h3><?= __("audio") ?></h3>
+
                 <div class="settings-slider-row">
                     <label><?= __("master_volume") ?></label>
-                    <input type="range" min="0" max="100" value="70" class="settings-range" id="prefVolume">
-                    <span class="settings-range-value" id="volumeValue">70%</span>
+                    <input type="range" min="0" max="100"
+                           value="<?= $master_volume ?>"
+                           class="settings-range"
+                           id="prefVolume"
+                           data-pref="master_volume">
+                    <span class="settings-range-value" id="volumeValue"><?= $master_volume ?>%</span>
                 </div>
-                <div class="settings-toggle-row">
-                    <div>
-                        <div class="settings-toggle-label"><?= __("mute_all") ?></div>
-                        <div class="settings-toggle-desc"><?= __("mute_all_desc") ?></div>
-                    </div>
-                    <label class="toggle">
-                        <input type="checkbox" id="prefMute">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
+
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("bg_music") ?></div>
                         <div class="settings-toggle-desc"><?= __("bg_music_desc") ?></div>
                     </div>
                     <label class="toggle">
-                        <input type="checkbox" id="prefMusic" checked>
+                        <input type="checkbox"
+                               id="prefMusic"
+                               data-pref="bg_music"
+                               <?= $bg_music_on ? 'checked' : '' ?>>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
             </section>
 
+            <!-- NOTIFICATIONS -->
             <section class="settings-section">
                 <h3><?= __("notifications") ?></h3>
+
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("email_alerts") ?></div>
                         <div class="settings-toggle-desc"><?= __("email_alerts_desc") ?></div>
                     </div>
                     <label class="toggle">
-                        <input type="checkbox" id="prefEmail" checked>
+                        <input type="checkbox"
+                               id="prefEmail"
+                               data-pref="email_alerts"
+                               <?= $email_alerts_on ? 'checked' : '' ?>>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
+
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("game_reminders") ?></div>
                         <div class="settings-toggle-desc"><?= __("game_reminders_desc") ?></div>
                     </div>
                     <label class="toggle">
-                        <input type="checkbox" id="prefReminders">
+                        <input type="checkbox"
+                               id="prefReminders"
+                               data-pref="game_reminders"
+                               <?= $game_reminders_on ? 'checked' : '' ?>>
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
+
+                <!-- Live indicator: shows when the setting actually takes effect -->
+                <div class="settings-note" id="notifStatus"
+                     style="margin-top:12px;font-size:12px;color:#888;line-height:1.5;">
+                    Changes are saved to your account instantly.
+                </div>
             </section>
 
+            <!-- ABOUT -->
             <section class="settings-section">
                 <h3><?= __("about") ?></h3>
                 <div class="settings-field">
@@ -220,9 +231,10 @@ $user = $user ?? [];
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // ========================================
+
+    // ============================================
     // OPEN / CLOSE DRAWER
-    // ========================================
+    // ============================================
     const overlay  = document.getElementById('settingsOverlay');
     const backdrop = document.getElementById('settingsBackdrop');
     const closeBtn = document.getElementById('settingsClose');
@@ -246,9 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cloned = gearBtn.cloneNode(true);
         gearBtn.parentNode.replaceChild(cloned, gearBtn);
         cloned.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            openSettings();
+            e.preventDefault(); e.stopPropagation(); openSettings();
         });
     }
     if (closeBtn) closeBtn.addEventListener('click', closeSettings);
@@ -257,9 +267,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key === 'Escape' && overlay.classList.contains('open')) closeSettings();
     });
 
-    // ========================================
+    // ============================================
     // BACKGROUND PICKER
-    // ========================================
+    // ============================================
     const backgroundPicker = document.getElementById('backgroundPicker');
     if (!document.body.dataset.bg) document.body.dataset.bg = 'bg-home';
 
@@ -270,111 +280,149 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.dataset.bg = bg;
                 backgroundPicker.querySelectorAll('.background-option').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                try {
-                    await fetch('update_preference.php', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ type: 'preferred_background', value: bg })
-                    });
-                } catch (err) { console.error('Background save error:', err); }
+                await savePreference('preferred_background', bg);
             });
         });
     }
 
-    // ========================================
+    // ============================================
     // VOLUME SLIDER
-    // ========================================
+    // ============================================
     const volumeSlider = document.getElementById('prefVolume');
     const volumeValue  = document.getElementById('volumeValue');
-
-    // Restore saved volume (fallback 70)
-    const savedVolume = localStorage.getItem('prefVolume') || 70;
-    if (volumeSlider) {
-        volumeSlider.value = savedVolume;
-        if (volumeValue) volumeValue.textContent = savedVolume + '%';
-    }
-
     if (volumeSlider) {
         volumeSlider.addEventListener('input', () => {
             const v = volumeSlider.value;
             if (volumeValue) volumeValue.textContent = v + '%';
-            localStorage.setItem('prefVolume', v);
-
-            // Apply to audio elements on the page
             const bgMusic = document.getElementById('bgMusic');
             if (bgMusic) bgMusic.volume = v / 100;
         });
+        volumeSlider.addEventListener('change', () => {
+            savePreference('master_volume', volumeSlider.value);
+        });
+        // Apply initial volume to audio elements
+        const bgMusic = document.getElementById('bgMusic');
+        if (bgMusic) bgMusic.volume = volumeSlider.value / 100;
     }
 
-    // ========================================
-    // TOGGLE PERSISTENCE (all switches)
-    // ========================================
-    document.querySelectorAll('.settings-toggle-row input[type="checkbox"]').forEach(cb => {
-        // Skip disabled ones (like dark mode)
+    // ============================================
+    // TOGGLES (reduce_motion, auto_play, bg_music, email_alerts, game_reminders)
+    // ============================================
+    document.querySelectorAll('.settings-toggle-row input[type="checkbox"][data-pref]').forEach(cb => {
         if (cb.disabled) return;
 
-        const key = 'pref_' + cb.id;
+        cb.addEventListener('change', async () => {
+            const pref = cb.dataset.pref;
+            const val  = cb.checked ? 1 : 0;
 
-        // Restore saved state
-        const saved = localStorage.getItem(key);
-        if (saved !== null) cb.checked = saved === 'true';
+            // Apply live behavior per preference
+            applyLiveBehavior(pref, cb.checked);
 
-        // Save on change
-        cb.addEventListener('change', () => {
-            localStorage.setItem(key, cb.checked);
+            // Save to DB
+            const result = await savePreference(pref, val);
 
-            // Special handling for "Mute all"
-            if (cb.id === 'prefMute') {
-                const bgMusic = document.getElementById('bgMusic');
-                if (bgMusic) bgMusic.muted = cb.checked;
+            if (pref === 'email_alerts' || pref === 'game_reminders') {
+                showNotifFeedback(pref, cb.checked, result);
             }
+        });
+    });
 
-            // Special handling for background music toggle
-            if (cb.id === 'prefMusic') {
-                const bgMusic = document.getElementById('bgMusic');
+    // ============================================
+    // APPLY LIVE BEHAVIOR
+    // ============================================
+    function applyLiveBehavior(pref, on) {
+        const bgMusic = document.getElementById('bgMusic');
+
+        switch (pref) {
+            case 'reduce_motion':
+                // Disable all animations & transitions on the page
+                document.documentElement.style.setProperty('--animation-duration', on ? '0s' : '');
+                document.body.classList.toggle('reduce-motion', on);
+                break;
+
+            case 'auto_play':
+                // Pause / play background videos
+                document.querySelectorAll('video.bg-video, video[autoplay]').forEach(v => {
+                    if (on) {
+                        v.play().catch(() => {});
+                    } else {
+                        v.pause();
+                    }
+                });
+                break;
+
+            case 'bg_music':
                 if (bgMusic) {
-                    if (cb.checked) {
+                    if (on) {
                         bgMusic.play().catch(() => {});
                     } else {
                         bgMusic.pause();
                     }
                 }
-            }
-        });
+                break;
 
-        // Apply initial state for mute on page load
-        if (cb.id === 'prefMute') {
-            const bgMusic = document.getElementById('bgMusic');
-            if (bgMusic) bgMusic.muted = cb.checked;
+            case 'email_alerts':
+            case 'game_reminders':
+                // No immediate visual effect — only affects future emails
+                break;
         }
-    });
+    }
 
-    // ========================================
+    // ============================================
+    // NOTIFICATION FEEDBACK
+    // ============================================
+    function showNotifFeedback(pref, on, result) {
+        const el = document.getElementById('notifStatus');
+        if (!el) return;
+
+        const labels = {
+            email_alerts:   'Email alerts',
+            game_reminders: 'Game reminders'
+        };
+
+        if (result && result.success) {
+            el.style.color = '#2ecc71';
+            el.textContent = `${labels[pref]} ${on ? 'ENABLED' : 'DISABLED'} — saved to your account.`;
+        } else {
+            el.style.color = '#d13639';
+            el.textContent = `Could not save ${labels[pref]}. Please try again.`;
+        }
+
+        // Reset back to neutral after a few seconds
+        setTimeout(() => {
+            el.style.color = '#888';
+            el.textContent = 'Changes are saved to your account instantly.';
+        }, 3000);
+    }
+
+    // ============================================
+    // SAVE PREFERENCE TO DB
+    // ============================================
+    async function savePreference(type, value) {
+        try {
+            const res = await fetch('update_preference.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: type, value: value })
+            });
+            return await res.json();
+        } catch (err) {
+            console.error('Save preference error:', err);
+            return { success: false };
+        }
+    }
+
+    // ============================================
     // LANGUAGE SELECTOR
-    // ========================================
+    // ============================================
     const languageSelect = document.getElementById('languageSelect');
     if (languageSelect) {
         languageSelect.addEventListener('change', async () => {
-            const selected = languageSelect.value;
-            console.log('🌐 Changing language to:', selected);
-            try {
-                const res = await fetch('update_preference.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'preferred_language', value: selected })
-                });
-                const result = await res.json();
-                console.log('📦 Response:', result);
-                if (result.success) {
-                    location.reload();
-                } else {
-                    alert('Failed: ' + (result.error || 'Unknown'));
-                }
-            } catch (err) {
-                console.error('❌', err);
-                alert('Network error: ' + err.message);
-            }
+            const result = await savePreference('preferred_language', languageSelect.value);
+            if (result.success) location.reload();
         });
     }
+
+    console.log('✓ Settings drawer ready');
 });
 </script>

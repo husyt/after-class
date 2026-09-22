@@ -40,11 +40,15 @@ function require2FA() {
  * Require admin role — blocks non-admins with 403
  */
 function requireAdmin() {
-    // Must be logged in
-    if (!isset($_SESSION['user_id'])) {
-        header('Location: index.php');
-        exit;
-    }
+   // Public pages can define REQUIRE_LOGIN = false before including this file
+if (!defined('REQUIRE_LOGIN')) {
+    define('REQUIRE_LOGIN', true);
+}
+
+if (REQUIRE_LOGIN && !isset($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit;
+}
     
     // Must have passed 2FA
     if (!hasPassed2FA()) {

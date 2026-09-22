@@ -9,9 +9,14 @@ $current_lang =
 
 $_SESSION['preferred_language'] = $current_lang;
 
+// ============================================
+// FULL TRANSLATION DICTIONARY
+// Every key exists in EVERY language.
+// ============================================
 $GLOBAL_TRANSLATIONS = [
+
     'en' => [
-        // Nav / Global
+        // NAV
         'home' => 'Home', 'library' => 'Library', 'leaderboard' => 'Leaderboard',
         'profile' => 'Profile', 'admin_panel' => 'Admin Panel', 'admin' => 'Admin',
         'back' => 'Back', 'back_to_home' => 'Back to Home', 'sign_out' => 'Sign Out',
@@ -27,26 +32,29 @@ $GLOBAL_TRANSLATIONS = [
         'search_placeholder' => 'Search games...', 'all_genres' => 'All Genres',
         'newest_first' => 'Newest First', 'oldest_first' => 'Oldest First',
         'sort_az' => 'A → Z', 'sort_za' => 'Z → A', 'favorites_first' => 'Favorites First',
-        'no_match' => 'No games match your filters.', 'display_name' => 'Display Name',
-        'pronouns' => 'Pronouns', 'not_set' => 'Not set', 'edit' => 'Edit',
-        'account_details' => 'Account Details', 'username' => 'Username', 'email' => 'Email',
-        'role' => 'Role', 'last_login' => 'Last Login', 'game_statistics' => 'Game Statistics',
-        'level' => 'Level', 'total_xp' => 'Total XP', 'high_score' => 'High Score',
-        'games_played' => 'Games Played', 'per_game_breakdown' => 'Per-Game Breakdown',
-        'plays' => 'Plays', 'best' => 'Best', 'avg' => 'Avg',
-        'recent_activity' => 'Recent Activity', 'no_activity' => 'No activity yet.',
+        'no_match' => 'No games match your filters.',
+        // PROFILE
+        'display_name' => 'Display Name', 'pronouns' => 'Pronouns', 'not_set' => 'Not set',
+        'edit' => 'Edit', 'account_details' => 'Account Details', 'username' => 'Username',
+        'email' => 'Email', 'role' => 'Role', 'last_login' => 'Last Login',
+        'game_statistics' => 'Game Statistics', 'level' => 'Level', 'total_xp' => 'Total XP',
+        'high_score' => 'High Score', 'games_played' => 'Games Played',
+        'per_game_breakdown' => 'Per-Game Breakdown', 'plays' => 'Plays', 'best' => 'Best',
+        'avg' => 'Avg', 'recent_activity' => 'Recent Activity', 'no_activity' => 'No activity yet.',
+        // LEADERBOARD
         'global_rankings' => 'Global Rankings', 'by_game' => 'By Game',
-        'no_players' => 'No players yet.', 'users' => 'Users',
-        'activity_logs' => 'Activity Logs', 'issue_reports' => 'Issue Reports',
+        'no_players' => 'No players yet.',
+        // ADMIN
+        'users' => 'Users', 'activity_logs' => 'Activity Logs', 'issue_reports' => 'Issue Reports',
         'reports' => 'Reports', 'overview' => 'Overview', 'total_users' => 'Total Users',
         'total_activities' => 'Total Activities', 'active_today' => 'Active Today',
         'admin_only' => 'Admin Only', 'signed_in_as' => 'Signed in as',
         'delete' => 'Delete', 'never' => 'Never', 'you' => 'You',
-        'today' => 'Today', 'last_7_days' => 'Last 7 Days',
-        'last_30_days' => 'Last 30 Days', 'all_time' => 'All Time',
-        'apply_filter' => 'Apply Filter', 'export_csv' => 'Export CSV',
+        // REPORTS
+        'today' => 'Today', 'last_7_days' => 'Last 7 Days', 'last_30_days' => 'Last 30 Days',
+        'all_time' => 'All Time', 'apply_filter' => 'Apply Filter', 'export_csv' => 'Export CSV',
         'print' => 'Print', 'from' => 'From', 'to' => 'To',
-        // Settings panel
+        // SETTINGS PANEL
         'account' => 'Account', 'change_password' => 'Change password',
         'preferences' => 'Preferences', 'two_fa' => 'Two-Factor Auth',
         'two_fa_desc' => 'Email OTP on login', 'dark_mode' => 'Dark mode',
@@ -63,44 +71,47 @@ $GLOBAL_TRANSLATIONS = [
     ],
 
     'tl' => [
-        // Nav / Global
+        // NAV
         'home' => 'Tahanan', 'library' => 'Aklatan', 'leaderboard' => 'Ranggo',
         'profile' => 'Profile', 'admin_panel' => 'Admin Panel', 'admin' => 'Admin',
-        'back' => 'Bumalik', 'back_to_home' => 'Bumalik sa Tahanan',
-        'sign_out' => 'Mag-sign Out', 'settings' => 'Mga Setting',
-        'welcome_back' => 'Maligayang pagbabalik', 'member_since' => 'Miyembro mula',
-        'your_rank' => 'Iyong ranggo', 'featured' => 'Itinatampok', 'play' => 'Maglaro',
-        'info' => 'Impormasyon', 'more' => 'Higit pa',
-        'add_favorites' => 'Idagdag sa Paborito', 'remove_favorites' => 'Alisin sa Paborito',
-        'game_details' => 'Detalye ng Laro', 'share' => 'Ibahagi',
-        'report_issue' => 'I-report ang Isyu', 'remove_library' => 'Alisin sa Aklatan',
-        'added_favorites' => 'Naidagdag sa paborito', 'removed_favorites' => 'Inalis sa paborito',
-        'link_copied' => 'Nakopya ang link', 'games_available' => 'mga laro',
-        'filter_genre' => 'Genre', 'filter_sort' => 'Ayusin', 'filter_search' => 'Maghanap',
-        'search_placeholder' => 'Maghanap ng laro...', 'all_genres' => 'Lahat ng Genre',
-        'newest_first' => 'Pinakabago', 'oldest_first' => 'Pinakaluma',
-        'sort_az' => 'A → Z', 'sort_za' => 'Z → A', 'favorites_first' => 'Paborito Muna',
-        'no_match' => 'Walang tugma na laro.', 'display_name' => 'Pangalan',
-        'pronouns' => 'Panghalip', 'not_set' => 'Hindi nakatakda', 'edit' => 'I-edit',
-        'account_details' => 'Detalye ng Account', 'username' => 'Username',
+        'back' => 'Bumalik', 'back_to_home' => 'Bumalik sa Tahanan', 'sign_out' => 'Mag-sign Out',
+        'settings' => 'Mga Setting', 'welcome_back' => 'Maligayang pagbabalik',
+        'member_since' => 'Miyembro mula', 'your_rank' => 'Iyong ranggo',
+        'featured' => 'Itinatampok', 'play' => 'Maglaro', 'info' => 'Impormasyon',
+        'more' => 'Higit pa', 'add_favorites' => 'Idagdag sa Paborito',
+        'remove_favorites' => 'Alisin sa Paborito', 'game_details' => 'Detalye ng Laro',
+        'share' => 'Ibahagi', 'report_issue' => 'I-report ang Isyu',
+        'remove_library' => 'Alisin sa Aklatan', 'added_favorites' => 'Naidagdag sa paborito',
+        'removed_favorites' => 'Inalis sa paborito', 'link_copied' => 'Nakopya ang link',
+        'games_available' => 'mga laro', 'filter_genre' => 'Genre', 'filter_sort' => 'Ayusin',
+        'filter_search' => 'Maghanap', 'search_placeholder' => 'Maghanap ng laro...',
+        'all_genres' => 'Lahat ng Genre', 'newest_first' => 'Pinakabago',
+        'oldest_first' => 'Pinakaluma', 'sort_az' => 'A → Z', 'sort_za' => 'Z → A',
+        'favorites_first' => 'Paborito Muna', 'no_match' => 'Walang tugma na laro.',
+        // PROFILE
+        'display_name' => 'Pangalan', 'pronouns' => 'Panghalip', 'not_set' => 'Hindi nakatakda',
+        'edit' => 'I-edit', 'account_details' => 'Detalye ng Account', 'username' => 'Username',
         'email' => 'Email', 'role' => 'Tungkulin', 'last_login' => 'Huling Login',
         'game_statistics' => 'Estadistika ng Laro', 'level' => 'Antas',
         'total_xp' => 'Kabuuang XP', 'high_score' => 'Pinakamataas',
         'games_played' => 'Nalarong Laro', 'per_game_breakdown' => 'Bawat Larong Detalye',
         'plays' => 'Bilang', 'best' => 'Pinakamagaling', 'avg' => 'Average',
         'recent_activity' => 'Kamakailang Gawain', 'no_activity' => 'Wala pang gawain.',
+        // LEADERBOARD
         'global_rankings' => 'Pandaigdigang Ranggo', 'by_game' => 'Ayon sa Laro',
-        'no_players' => 'Wala pang manlalaro.', 'users' => 'Mga User',
-        'activity_logs' => 'Talaan ng Gawain', 'issue_reports' => 'Mga Isyu',
-        'reports' => 'Mga Ulat', 'overview' => 'Pangkalahatan',
+        'no_players' => 'Wala pang manlalaro.',
+        // ADMIN
+        'users' => 'Mga User', 'activity_logs' => 'Talaan ng Gawain',
+        'issue_reports' => 'Mga Isyu', 'reports' => 'Mga Ulat', 'overview' => 'Pangkalahatan',
         'total_users' => 'Kabuuang User', 'total_activities' => 'Kabuuang Gawain',
         'active_today' => 'Aktibo Ngayon', 'admin_only' => 'Admin Lamang',
-        'signed_in_as' => 'Naka-login bilang', 'delete' => 'Burahin',
-        'never' => 'Hindi pa', 'you' => 'Ikaw', 'today' => 'Ngayon',
-        'last_7_days' => 'Huling 7 Araw', 'last_30_days' => 'Huling 30 Araw',
+        'signed_in_as' => 'Naka-login bilang', 'delete' => 'Burahin', 'never' => 'Hindi pa',
+        'you' => 'Ikaw',
+        // REPORTS
+        'today' => 'Ngayon', 'last_7_days' => 'Huling 7 Araw', 'last_30_days' => 'Huling 30 Araw',
         'all_time' => 'Lahat ng Panahon', 'apply_filter' => 'Ilapat ang Filter',
         'export_csv' => 'I-export CSV', 'print' => 'I-print', 'from' => 'Mula', 'to' => 'Hanggang',
-        // Settings panel
+        // SETTINGS PANEL
         'account' => 'Account', 'change_password' => 'Palitan ang password',
         'preferences' => 'Mga Kagustuhan', 'two_fa' => 'Two-Factor Auth',
         'two_fa_desc' => 'Email OTP sa pag-login', 'dark_mode' => 'Dark mode',
@@ -111,21 +122,18 @@ $GLOBAL_TRANSLATIONS = [
         'mute_all' => 'I-mute lahat', 'mute_all_desc' => 'Patahimikin lahat',
         'bg_music' => 'Background music', 'bg_music_desc' => 'I-play ang tema',
         'notifications' => 'Mga Abiso', 'email_alerts' => 'Mga email alert',
-        'email_alerts_desc' => 'Alerto sa login at seguridad',
-        'game_reminders' => 'Paalala ng laro',
-        'game_reminders_desc' => 'Araw-araw na paalala', 'about' => 'Tungkol',
-        'version' => 'Bersyon',
+        'email_alerts_desc' => 'Alerto sa login at seguridad', 'game_reminders' => 'Paalala ng laro',
+        'game_reminders_desc' => 'Araw-araw na paalala', 'about' => 'Tungkol', 'version' => 'Bersyon',
     ],
 
     'es' => [
-        // Nav / Global
+        // NAV
         'home' => 'Inicio', 'library' => 'Biblioteca', 'leaderboard' => 'Clasificación',
         'profile' => 'Perfil', 'admin_panel' => 'Panel de Admin', 'admin' => 'Admin',
-        'back' => 'Atrás', 'back_to_home' => 'Volver al Inicio',
-        'sign_out' => 'Cerrar Sesión', 'settings' => 'Ajustes',
-        'welcome_back' => 'Bienvenido de nuevo', 'member_since' => 'Miembro desde',
-        'your_rank' => 'Tu rango', 'featured' => 'Destacado', 'play' => 'Jugar',
-        'info' => 'Info', 'more' => 'Más',
+        'back' => 'Atrás', 'back_to_home' => 'Volver al Inicio', 'sign_out' => 'Cerrar Sesión',
+        'settings' => 'Ajustes', 'welcome_back' => 'Bienvenido de nuevo',
+        'member_since' => 'Miembro desde', 'your_rank' => 'Tu rango',
+        'featured' => 'Destacado', 'play' => 'Jugar', 'info' => 'Info', 'more' => 'Más',
         'add_favorites' => 'Añadir a Favoritos', 'remove_favorites' => 'Quitar de Favoritos',
         'game_details' => 'Detalles del Juego', 'share' => 'Compartir',
         'report_issue' => 'Reportar Problema', 'remove_library' => 'Quitar de la Biblioteca',
@@ -135,35 +143,36 @@ $GLOBAL_TRANSLATIONS = [
         'search_placeholder' => 'Buscar juegos...', 'all_genres' => 'Todos los Géneros',
         'newest_first' => 'Más Recientes', 'oldest_first' => 'Más Antiguos',
         'sort_az' => 'A → Z', 'sort_za' => 'Z → A', 'favorites_first' => 'Favoritos Primero',
-        'no_match' => 'Ningún juego coincide.', 'display_name' => 'Nombre',
-        'pronouns' => 'Pronombres', 'not_set' => 'No establecido', 'edit' => 'Editar',
-        'account_details' => 'Detalles de Cuenta', 'username' => 'Usuario',
+        'no_match' => 'Ningún juego coincide.',
+        // PROFILE
+        'display_name' => 'Nombre', 'pronouns' => 'Pronombres', 'not_set' => 'No establecido',
+        'edit' => 'Editar', 'account_details' => 'Detalles de Cuenta', 'username' => 'Usuario',
         'email' => 'Correo', 'role' => 'Rol', 'last_login' => 'Último Acceso',
-        'game_statistics' => 'Estadísticas', 'level' => 'Nivel',
-        'total_xp' => 'XP Total', 'high_score' => 'Puntuación',
-        'games_played' => 'Juegos Jugados', 'per_game_breakdown' => 'Por Juego',
-        'plays' => 'Partidas', 'best' => 'Mejor', 'avg' => 'Promedio',
-        'recent_activity' => 'Actividad Reciente', 'no_activity' => 'Sin actividad aún.',
+        'game_statistics' => 'Estadísticas', 'level' => 'Nivel', 'total_xp' => 'XP Total',
+        'high_score' => 'Puntuación', 'games_played' => 'Juegos Jugados',
+        'per_game_breakdown' => 'Por Juego', 'plays' => 'Partidas', 'best' => 'Mejor',
+        'avg' => 'Promedio', 'recent_activity' => 'Actividad Reciente',
+        'no_activity' => 'Sin actividad aún.',
+        // LEADERBOARD
         'global_rankings' => 'Clasificación Global', 'by_game' => 'Por Juego',
-        'no_players' => 'Aún no hay jugadores.', 'users' => 'Usuarios',
-        'activity_logs' => 'Registros', 'issue_reports' => 'Reportes',
+        'no_players' => 'Aún no hay jugadores.',
+        // ADMIN
+        'users' => 'Usuarios', 'activity_logs' => 'Registros', 'issue_reports' => 'Reportes',
         'reports' => 'Informes', 'overview' => 'Resumen', 'total_users' => 'Usuarios Totales',
         'total_activities' => 'Actividades Totales', 'active_today' => 'Activos Hoy',
         'admin_only' => 'Solo Admin', 'signed_in_as' => 'Sesión como',
         'delete' => 'Eliminar', 'never' => 'Nunca', 'you' => 'Tú',
-        'today' => 'Hoy', 'last_7_days' => 'Últimos 7 Días',
-        'last_30_days' => 'Últimos 30 Días', 'all_time' => 'Todo el Tiempo',
-        'apply_filter' => 'Aplicar Filtro', 'export_csv' => 'Exportar CSV',
-        'print' => 'Imprimir', 'from' => 'Desde', 'to' => 'Hasta',
-        // Settings panel
+        // REPORTS
+        'today' => 'Hoy', 'last_7_days' => 'Últimos 7 Días', 'last_30_days' => 'Últimos 30 Días',
+        'all_time' => 'Todo el Tiempo', 'apply_filter' => 'Aplicar Filtro',
+        'export_csv' => 'Exportar CSV', 'print' => 'Imprimir', 'from' => 'Desde', 'to' => 'Hasta',
+        // SETTINGS PANEL
         'account' => 'Cuenta', 'change_password' => 'Cambiar contraseña',
         'preferences' => 'Preferencias', 'two_fa' => 'Autenticación 2FA',
         'two_fa_desc' => 'OTP por correo al iniciar sesión',
         'dark_mode' => 'Modo oscuro', 'dark_mode_desc' => 'Siempre activado',
-        'reduce_motion' => 'Reducir movimiento',
-        'reduce_motion_desc' => 'Desactivar animaciones',
-        'auto_play' => 'Reproducción automática',
-        'auto_play_desc' => 'Fondos de juegos',
+        'reduce_motion' => 'Reducir movimiento', 'reduce_motion_desc' => 'Desactivar animaciones',
+        'auto_play' => 'Reproducción automática', 'auto_play_desc' => 'Fondos de juegos',
         'background_theme' => 'Tema de fondo', 'language' => 'Idioma',
         'audio' => 'Audio', 'master_volume' => 'Volumen maestro',
         'mute_all' => 'Silenciar todo', 'mute_all_desc' => 'Silenciar todo el sonido',
@@ -176,7 +185,7 @@ $GLOBAL_TRANSLATIONS = [
     ],
 
     'ja' => [
-        // Nav / Global
+        // NAV
         'home' => 'ホーム', 'library' => 'ライブラリ', 'leaderboard' => 'ランキング',
         'profile' => 'プロフィール', 'admin_panel' => '管理パネル', 'admin' => '管理者',
         'back' => '戻る', 'back_to_home' => 'ホームに戻る', 'sign_out' => 'ログアウト',
@@ -193,34 +202,35 @@ $GLOBAL_TRANSLATIONS = [
         'search_placeholder' => 'ゲームを検索...', 'all_genres' => 'すべてのジャンル',
         'newest_first' => '新しい順', 'oldest_first' => '古い順',
         'sort_az' => 'A → Z', 'sort_za' => 'Z → A', 'favorites_first' => 'お気に入り優先',
-        'no_match' => '一致するゲームはありません', 'display_name' => '表示名',
-        'pronouns' => '代名詞', 'not_set' => '未設定', 'edit' => '編集',
-        'account_details' => 'アカウント詳細', 'username' => 'ユーザー名',
+        'no_match' => '一致するゲームはありません',
+        // PROFILE
+        'display_name' => '表示名', 'pronouns' => '代名詞', 'not_set' => '未設定',
+        'edit' => '編集', 'account_details' => 'アカウント詳細', 'username' => 'ユーザー名',
         'email' => 'メール', 'role' => '役割', 'last_login' => '最終ログイン',
-        'game_statistics' => 'ゲーム統計', 'level' => 'レベル',
-        'total_xp' => '総XP', 'high_score' => 'ハイスコア',
-        'games_played' => 'プレイ回数', 'per_game_breakdown' => 'ゲーム別',
-        'plays' => '回', 'best' => '最高', 'avg' => '平均',
+        'game_statistics' => 'ゲーム統計', 'level' => 'レベル', 'total_xp' => '総XP',
+        'high_score' => 'ハイスコア', 'games_played' => 'プレイ回数',
+        'per_game_breakdown' => 'ゲーム別', 'plays' => '回', 'best' => '最高', 'avg' => '平均',
         'recent_activity' => '最近のアクティビティ',
         'no_activity' => 'まだアクティビティはありません。',
+        // LEADERBOARD
         'global_rankings' => 'グローバルランキング', 'by_game' => 'ゲーム別',
-        'no_players' => 'まだプレイヤーがいません。', 'users' => 'ユーザー',
-        'activity_logs' => 'アクティビティ履歴', 'issue_reports' => '問題レポート',
-        'reports' => 'レポート', 'overview' => '概要',
+        'no_players' => 'まだプレイヤーがいません。',
+        // ADMIN
+        'users' => 'ユーザー', 'activity_logs' => 'アクティビティ履歴',
+        'issue_reports' => '問題レポート', 'reports' => 'レポート', 'overview' => '概要',
         'total_users' => '総ユーザー数', 'total_activities' => '総アクティビティ',
         'active_today' => '本日アクティブ', 'admin_only' => '管理者のみ',
-        'signed_in_as' => 'ログイン中', 'delete' => '削除',
-        'never' => 'なし', 'you' => 'あなた', 'today' => '今日',
-        'last_7_days' => '過去7日間', 'last_30_days' => '過去30日間',
-        'all_time' => '全期間', 'apply_filter' => 'フィルタ適用',
-        'export_csv' => 'CSV出力', 'print' => '印刷', 'from' => '開始', 'to' => '終了',
-        // Settings panel
+        'signed_in_as' => 'ログイン中', 'delete' => '削除', 'never' => 'なし', 'you' => 'あなた',
+        // REPORTS
+        'today' => '今日', 'last_7_days' => '過去7日間', 'last_30_days' => '過去30日間',
+        'all_time' => '全期間', 'apply_filter' => 'フィルタ適用', 'export_csv' => 'CSV出力',
+        'print' => '印刷', 'from' => '開始', 'to' => '終了',
+        // SETTINGS PANEL
         'account' => 'アカウント', 'change_password' => 'パスワード変更',
         'preferences' => '環境設定', 'two_fa' => '二段階認証',
         'two_fa_desc' => 'ログイン時のメールOTP',
         'dark_mode' => 'ダークモード', 'dark_mode_desc' => '常にオン',
-        'reduce_motion' => 'モーションを減らす',
-        'reduce_motion_desc' => 'アニメーションを無効化',
+        'reduce_motion' => 'モーションを減らす', 'reduce_motion_desc' => 'アニメーションを無効化',
         'auto_play' => '動画を自動再生', 'auto_play_desc' => 'ゲーム背景',
         'background_theme' => '背景テーマ', 'language' => '言語',
         'audio' => 'オーディオ', 'master_volume' => 'マスター音量',
@@ -228,13 +238,12 @@ $GLOBAL_TRANSLATIONS = [
         'bg_music' => 'BGM', 'bg_music_desc' => 'テーマ音楽を再生',
         'notifications' => '通知', 'email_alerts' => 'メールアラート',
         'email_alerts_desc' => 'ログインとセキュリティ',
-        'game_reminders' => 'ゲームリマインダー',
-        'game_reminders_desc' => '毎日のプレイ通知',
+        'game_reminders' => 'ゲームリマインダー', 'game_reminders_desc' => '毎日のプレイ通知',
         'about' => 'について', 'version' => 'バージョン',
     ],
 
     'ko' => [
-        // Nav / Global
+        // NAV
         'home' => '홈', 'library' => '라이브러리', 'leaderboard' => '리더보드',
         'profile' => '프로필', 'admin_panel' => '관리자 패널', 'admin' => '관리자',
         'back' => '뒤로', 'back_to_home' => '홈으로', 'sign_out' => '로그아웃',
@@ -251,34 +260,35 @@ $GLOBAL_TRANSLATIONS = [
         'search_placeholder' => '게임 검색...', 'all_genres' => '모든 장르',
         'newest_first' => '최신순', 'oldest_first' => '오래된순',
         'sort_az' => 'A → Z', 'sort_za' => 'Z → A', 'favorites_first' => '즐겨찾기 우선',
-        'no_match' => '일치하는 게임이 없습니다.', 'display_name' => '표시 이름',
-        'pronouns' => '대명사', 'not_set' => '설정되지 않음', 'edit' => '편집',
-        'account_details' => '계정 세부정보', 'username' => '사용자 이름',
+        'no_match' => '일치하는 게임이 없습니다.',
+        // PROFILE
+        'display_name' => '표시 이름', 'pronouns' => '대명사', 'not_set' => '설정되지 않음',
+        'edit' => '편집', 'account_details' => '계정 세부정보', 'username' => '사용자 이름',
         'email' => '이메일', 'role' => '역할', 'last_login' => '마지막 로그인',
-        'game_statistics' => '게임 통계', 'level' => '레벨',
-        'total_xp' => '총 XP', 'high_score' => '최고 점수',
-        'games_played' => '플레이 횟수', 'per_game_breakdown' => '게임별 분포',
-        'plays' => '플레이', 'best' => '최고', 'avg' => '평균',
-        'recent_activity' => '최근 활동',
+        'game_statistics' => '게임 통계', 'level' => '레벨', 'total_xp' => '총 XP',
+        'high_score' => '최고 점수', 'games_played' => '플레이 횟수',
+        'per_game_breakdown' => '게임별 분포', 'plays' => '플레이', 'best' => '최고',
+        'avg' => '평균', 'recent_activity' => '최근 활동',
         'no_activity' => '아직 활동이 없습니다.',
+        // LEADERBOARD
         'global_rankings' => '글로벌 순위', 'by_game' => '게임별',
-        'no_players' => '아직 플레이어가 없습니다.', 'users' => '사용자',
-        'activity_logs' => '활동 로그', 'issue_reports' => '문제 신고',
-        'reports' => '보고서', 'overview' => '개요',
-        'total_users' => '전체 사용자', 'total_activities' => '전체 활동',
-        'active_today' => '오늘 활성', 'admin_only' => '관리자 전용',
-        'signed_in_as' => '로그인 중', 'delete' => '삭제',
-        'never' => '없음', 'you' => '나', 'today' => '오늘',
-        'last_7_days' => '최근 7일', 'last_30_days' => '최근 30일',
-        'all_time' => '전체 기간', 'apply_filter' => '필터 적용',
-        'export_csv' => 'CSV 내보내기', 'print' => '인쇄', 'from' => '시작', 'to' => '종료',
-        // Settings panel
+        'no_players' => '아직 플레이어가 없습니다.',
+        // ADMIN
+        'users' => '사용자', 'activity_logs' => '활동 로그', 'issue_reports' => '문제 신고',
+        'reports' => '보고서', 'overview' => '개요', 'total_users' => '전체 사용자',
+        'total_activities' => '전체 활동', 'active_today' => '오늘 활성',
+        'admin_only' => '관리자 전용', 'signed_in_as' => '로그인 중',
+        'delete' => '삭제', 'never' => '없음', 'you' => '나',
+        // REPORTS
+        'today' => '오늘', 'last_7_days' => '최근 7일', 'last_30_days' => '최근 30일',
+        'all_time' => '전체 기간', 'apply_filter' => '필터 적용', 'export_csv' => 'CSV 내보내기',
+        'print' => '인쇄', 'from' => '시작', 'to' => '종료',
+        // SETTINGS PANEL
         'account' => '계정', 'change_password' => '비밀번호 변경',
         'preferences' => '환경설정', 'two_fa' => '2단계 인증',
         'two_fa_desc' => '로그인 시 이메일 OTP',
         'dark_mode' => '다크 모드', 'dark_mode_desc' => '항상 켜짐',
-        'reduce_motion' => '모션 줄이기',
-        'reduce_motion_desc' => '애니메이션 비활성화',
+        'reduce_motion' => '모션 줄이기', 'reduce_motion_desc' => '애니메이션 비활성화',
         'auto_play' => '동영상 자동재생', 'auto_play_desc' => '게임 배경',
         'background_theme' => '배경 테마', 'language' => '언어',
         'audio' => '오디오', 'master_volume' => '마스터 볼륨',
@@ -286,17 +296,32 @@ $GLOBAL_TRANSLATIONS = [
         'bg_music' => '배경 음악', 'bg_music_desc' => '테마 음악 재생',
         'notifications' => '알림', 'email_alerts' => '이메일 알림',
         'email_alerts_desc' => '로그인 및 보안 알림',
-        'game_reminders' => '게임 알림',
-        'game_reminders_desc' => '일일 플레이 알림',
+        'game_reminders' => '게임 알림', 'game_reminders_desc' => '일일 플레이 알림',
         'about' => '정보', 'version' => '버전',
     ],
 ];
 
+// ============================================
+// Translation function
+// ============================================
 function __($key, $fallback = null) {
     global $GLOBAL_TRANSLATIONS, $current_lang;
-    $lang = $GLOBAL_TRANSLATIONS[$current_lang] ?? $GLOBAL_TRANSLATIONS['en'];
-    if (isset($lang[$key])) return $lang[$key];
-    if ($fallback !== null) return $fallback;
-    if (isset($GLOBAL_TRANSLATIONS['en'][$key])) return $GLOBAL_TRANSLATIONS['en'][$key];
+
+    // 1. Try current language
+    if (isset($GLOBAL_TRANSLATIONS[$current_lang][$key])) {
+        return $GLOBAL_TRANSLATIONS[$current_lang][$key];
+    }
+
+    // 2. Try explicit fallback
+    if ($fallback !== null) {
+        return $fallback;
+    }
+
+    // 3. Fall back to English
+    if (isset($GLOBAL_TRANSLATIONS['en'][$key])) {
+        return $GLOBAL_TRANSLATIONS['en'][$key];
+    }
+
+    // 4. Return key itself
     return $key;
 }

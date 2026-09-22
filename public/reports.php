@@ -183,6 +183,14 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
+    <link rel="manifest" href="/after-class/public/manifest.json">
+<meta name="theme-color" content="#d13639">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EqualPath">
+<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
     <style>
         .report-badge {
             display: inline-flex;
@@ -689,5 +697,6 @@ if (isset($_GET['export']) && $_GET['export'] === 'csv') {
 <?php require_once __DIR__ . '/../includes/settings_panel.php'; ?>
 
 <script src="js/settings.js?v=<?= time() ?>"></script>
+<script src="js/pwa.js?v=<?= time() . rand() ?>"></script>
 </body>
 </html>

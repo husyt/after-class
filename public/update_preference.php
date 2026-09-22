@@ -21,6 +21,12 @@ $allowed = [
                                'avatar-5.png','avatar-6.png','avatar-7.png','avatar-8.png', null],
     'preferred_background' => ['bg-home','bg-city','bg-forest','bg-space','bg-ocean'],
     'preferred_language'   => ['en','tl','es','ja','ko'],
+    'reduce_motion'         => [0, 1, '0', '1'],
+    'auto_play'             => [0, 1, '0', '1'],
+    'bg_music'              => [0, 1, '0', '1'],
+    'email_alerts'          => [0, 1, '0', '1'],
+    'game_reminders'        => [0, 1, '0', '1'],
+    'master_volume'         => range(0, 100),
 ];
 
 if (!isset($allowed[$type])) {

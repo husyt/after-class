@@ -363,11 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case 'share':
-                const shareUrl = `${window.location.origin}${window.location.pathname.replace('dashboard.php', 'game.php')}?id=${encodeURIComponent(game.id)}`;
-                navigator.clipboard.writeText(shareUrl)
-                    .then(() => showToast('Link copied to clipboard', 'success'))
-                    .catch(() => showToast('Could not copy link', 'error'));
-                break;
+    // Handled by dedicated share popup in dashboard.php — just open it
+    if (typeof window.openShare === 'function') {
+        window.openShare();
+    }
+    break;
 
             case 'report':
                 openReportModal(gameName);
