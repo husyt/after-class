@@ -1,14 +1,10 @@
 <?php
 // includes/settings_panel.php
-// Self-contained — does NOT rely on $lang being computed at the top
+require_once __DIR__ . '/i18n.php';
 
-// Ensure i18n is loaded
-if (!function_exists('__')) {
-    require_once __DIR__ . '/i18n.php';
-}
-
-// Ensure $current_lang is fresh
 global $user, $current_lang;
+
+// Force-refresh $current_lang from DB user
 if (!empty($user['preferred_language'])) {
     $current_lang = $user['preferred_language'];
 } elseif (!empty($_SESSION['preferred_language'])) {
@@ -22,8 +18,7 @@ $user = $user ?? [];
 ?>
 <div class="settings-overlay" id="settingsOverlay" aria-hidden="true">
     <div class="settings-backdrop" id="settingsBackdrop"></div>
-
-    <aside class="settings-drawer" role="dialog" aria-label="Settings">
+    <aside class="settings-drawer" role="dialog">
         <header class="settings-header">
             <h2><?= __("settings") ?></h2>
             <button class="settings-close" id="settingsClose" aria-label="Close">
@@ -35,27 +30,22 @@ $user = $user ?? [];
 
         <div class="settings-body">
 
-            <!-- ACCOUNT -->
             <section class="settings-section">
                 <h3><?= __("account") ?></h3>
-
                 <div class="settings-field">
                     <label><?= __("username") ?></label>
                     <div class="settings-value"><?= htmlspecialchars($user['username'] ?? '—') ?></div>
                 </div>
-
                 <div class="settings-field">
                     <label><?= __("email") ?></label>
                     <div class="settings-value"><?= htmlspecialchars($user['email'] ?? '—') ?></div>
                 </div>
-
                 <div class="settings-field">
                     <label><?= __("role") ?></label>
                     <div class="settings-value">
                         <span class="settings-badge"><?= htmlspecialchars($user['role'] ?? 'student') ?></span>
                     </div>
                 </div>
-
                 <a href="forgot_password.php" class="settings-link">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="11" width="18" height="11" rx="2"/>
@@ -65,7 +55,6 @@ $user = $user ?? [];
                 </a>
             </section>
 
-            <!-- PREFERENCES -->
             <section class="settings-section">
                 <h3><?= __("preferences") ?></h3>
 
@@ -113,32 +102,29 @@ $user = $user ?? [];
                     </label>
                 </div>
 
-                <!-- BACKGROUND PICKER -->
                 <div class="settings-field-block">
                     <label class="settings-field-block-label"><?= __("background_theme") ?></label>
                     <div class="background-picker" id="backgroundPicker">
                         <?php
                         $backgrounds = [
-                            'bg-home'   => ['name' => 'Home',   'gradient' => 'linear-gradient(135deg, #d13639, #f97316)'],
-                            'bg-city'   => ['name' => 'City',   'gradient' => 'linear-gradient(135deg, #7c3aed, #ec4899)'],
-                            'bg-forest' => ['name' => 'Forest', 'gradient' => 'linear-gradient(135deg, #059669, #84cc16)'],
-                            'bg-space'  => ['name' => 'Space',  'gradient' => 'linear-gradient(135deg, #1e3a8a, #312e81)'],
-                            'bg-ocean'  => ['name' => 'Ocean',  'gradient' => 'linear-gradient(135deg, #0ea5e9, #06b6d4)'],
+                            'bg-home'   => 'linear-gradient(135deg, #d13639, #f97316)',
+                            'bg-city'   => 'linear-gradient(135deg, #7c3aed, #ec4899)',
+                            'bg-forest' => 'linear-gradient(135deg, #059669, #84cc16)',
+                            'bg-space'  => 'linear-gradient(135deg, #1e3a8a, #312e81)',
+                            'bg-ocean'  => 'linear-gradient(135deg, #0ea5e9, #06b6d4)',
                         ];
                         $current_bg = $user['preferred_background'] ?? 'bg-home';
-                        foreach ($backgrounds as $key => $bg): ?>
+                        foreach ($backgrounds as $key => $gradient): ?>
                             <button type="button"
                                     class="background-option <?= $key === $current_bg ? 'active' : '' ?>"
                                     data-bg="<?= $key ?>"
-                                    title="<?= $bg['name'] ?>"
-                                    style="background: <?= $bg['gradient'] ?>;">
+                                    style="background: <?= $gradient ?>;">
                                 <span class="background-check">✓</span>
                             </button>
                         <?php endforeach; ?>
                     </div>
                 </div>
 
-                <!-- LANGUAGE PICKER -->
                 <div class="settings-field-block">
                     <label class="settings-field-block-label"><?= __("language") ?></label>
                     <select class="settings-select" id="languageSelect">
@@ -160,16 +146,13 @@ $user = $user ?? [];
                 </div>
             </section>
 
-            <!-- AUDIO -->
             <section class="settings-section">
                 <h3><?= __("audio") ?></h3>
-
                 <div class="settings-slider-row">
                     <label><?= __("master_volume") ?></label>
                     <input type="range" min="0" max="100" value="70" class="settings-range" id="prefVolume">
                     <span class="settings-range-value" id="volumeValue">70%</span>
                 </div>
-
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("mute_all") ?></div>
@@ -180,7 +163,6 @@ $user = $user ?? [];
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("bg_music") ?></div>
@@ -193,10 +175,8 @@ $user = $user ?? [];
                 </div>
             </section>
 
-            <!-- NOTIFICATIONS -->
             <section class="settings-section">
                 <h3><?= __("notifications") ?></h3>
-
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("email_alerts") ?></div>
@@ -207,7 +187,6 @@ $user = $user ?? [];
                         <span class="toggle-slider"></span>
                     </label>
                 </div>
-
                 <div class="settings-toggle-row">
                     <div>
                         <div class="settings-toggle-label"><?= __("game_reminders") ?></div>
@@ -220,15 +199,12 @@ $user = $user ?? [];
                 </div>
             </section>
 
-            <!-- ABOUT -->
             <section class="settings-section">
                 <h3><?= __("about") ?></h3>
-
                 <div class="settings-field">
                     <label><?= __("version") ?></label>
                     <div class="settings-value">CoreSync v1.0.0</div>
                 </div>
-
                 <a href="logout.php" class="settings-link danger">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
@@ -256,14 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
                  || document.querySelector('.nav-right .icon-btn:first-child');
 
     function openSettings() {
-        if (!overlay) return;
         overlay.classList.add('open');
         overlay.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
     }
-
     function closeSettings() {
-        if (!overlay) return;
         overlay.classList.remove('open');
         overlay.setAttribute('aria-hidden', 'true');
         document.body.style.overflow = '';
@@ -278,14 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
             openSettings();
         });
     }
-
     if (closeBtn) closeBtn.addEventListener('click', closeSettings);
     if (backdrop) backdrop.addEventListener('click', closeSettings);
-
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && overlay && overlay.classList.contains('open')) {
-            closeSettings();
-        }
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeSettings();
     });
 
     // ========================================
@@ -307,12 +276,78 @@ document.addEventListener('DOMContentLoaded', () => {
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ type: 'preferred_background', value: bg })
                     });
-                } catch (err) {
-                    console.error('Background save error:', err);
-                }
+                } catch (err) { console.error('Background save error:', err); }
             });
         });
     }
+
+    // ========================================
+    // VOLUME SLIDER
+    // ========================================
+    const volumeSlider = document.getElementById('prefVolume');
+    const volumeValue  = document.getElementById('volumeValue');
+
+    // Restore saved volume (fallback 70)
+    const savedVolume = localStorage.getItem('prefVolume') || 70;
+    if (volumeSlider) {
+        volumeSlider.value = savedVolume;
+        if (volumeValue) volumeValue.textContent = savedVolume + '%';
+    }
+
+    if (volumeSlider) {
+        volumeSlider.addEventListener('input', () => {
+            const v = volumeSlider.value;
+            if (volumeValue) volumeValue.textContent = v + '%';
+            localStorage.setItem('prefVolume', v);
+
+            // Apply to audio elements on the page
+            const bgMusic = document.getElementById('bgMusic');
+            if (bgMusic) bgMusic.volume = v / 100;
+        });
+    }
+
+    // ========================================
+    // TOGGLE PERSISTENCE (all switches)
+    // ========================================
+    document.querySelectorAll('.settings-toggle-row input[type="checkbox"]').forEach(cb => {
+        // Skip disabled ones (like dark mode)
+        if (cb.disabled) return;
+
+        const key = 'pref_' + cb.id;
+
+        // Restore saved state
+        const saved = localStorage.getItem(key);
+        if (saved !== null) cb.checked = saved === 'true';
+
+        // Save on change
+        cb.addEventListener('change', () => {
+            localStorage.setItem(key, cb.checked);
+
+            // Special handling for "Mute all"
+            if (cb.id === 'prefMute') {
+                const bgMusic = document.getElementById('bgMusic');
+                if (bgMusic) bgMusic.muted = cb.checked;
+            }
+
+            // Special handling for background music toggle
+            if (cb.id === 'prefMusic') {
+                const bgMusic = document.getElementById('bgMusic');
+                if (bgMusic) {
+                    if (cb.checked) {
+                        bgMusic.play().catch(() => {});
+                    } else {
+                        bgMusic.pause();
+                    }
+                }
+            }
+        });
+
+        // Apply initial state for mute on page load
+        if (cb.id === 'prefMute') {
+            const bgMusic = document.getElementById('bgMusic');
+            if (bgMusic) bgMusic.muted = cb.checked;
+        }
+    });
 
     // ========================================
     // LANGUAGE SELECTOR
@@ -329,15 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ type: 'preferred_language', value: selected })
                 });
                 const result = await res.json();
-                console.log('📦 Server response:', result);
+                console.log('📦 Response:', result);
                 if (result.success) {
-                    console.log('✅ Reloading page...');
                     location.reload();
                 } else {
-                    alert('Language change failed: ' + (result.error || 'Unknown'));
+                    alert('Failed: ' + (result.error || 'Unknown'));
                 }
             } catch (err) {
-                console.error('❌ Error:', err);
+                console.error('❌', err);
                 alert('Network error: ' + err.message);
             }
         });
