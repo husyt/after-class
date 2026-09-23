@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://b4d52fm08886f"]
+
+[ext_resource type="Texture2D" uid="uid://dcolrindapxyr" path="res://Background/Convenience Store.png" id="1_necos"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_necos"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="ConvenieceStore" type="Node3D" unique_id=427723958]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=360980865]
+texture = ExtResource("1_necos")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=704893799]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=921544662]
+sprite_frames = SubResource("SpriteFrames_necos")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=124372887]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=980746841]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=421899457]

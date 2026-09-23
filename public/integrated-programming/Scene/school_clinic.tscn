@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://4vbmid5cx7lc"]
+
+[ext_resource type="Texture2D" uid="uid://bi03oeywdveh" path="res://Background/School Clinic.png" id="1_l6rtq"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_l6rtq"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="SchoolClinic" type="Node3D" unique_id=1158715146]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1636217988]
+texture = ExtResource("1_l6rtq")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1067913291]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=414430819]
+sprite_frames = SubResource("SpriteFrames_l6rtq")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1491510563]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1328951721]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=268394582]

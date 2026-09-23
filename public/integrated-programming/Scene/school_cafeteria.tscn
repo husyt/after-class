@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cwe2x2vfxih4k"]
+
+[ext_resource type="Texture2D" uid="uid://cge7wgjghwisj" path="res://Background/Cafeteria.png" id="1_0qobw"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0qobw"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="SchoolCafeteria" type="Node3D" unique_id=445969684]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1341150194]
+texture = ExtResource("1_0qobw")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=177917985]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=642408019]
+sprite_frames = SubResource("SpriteFrames_0qobw")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=2046708997]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=92447245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1929482839]

@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://bpxbngalwjlj0"]
+
+[ext_resource type="Texture2D" uid="uid://bspatewmrelyh" path="res://Background/Street  Neighborhood.png" id="1_kbg5c"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_kbg5c"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="NeighborhoodStreet" type="Node3D" unique_id=1611219637]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1775863258]
+texture = ExtResource("1_kbg5c")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=628297118]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1768048066]
+sprite_frames = SubResource("SpriteFrames_kbg5c")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=449040513]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1918292279]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1329535407]

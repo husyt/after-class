@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cajbjtpk5g6ow"]
+
+[ext_resource type="Texture2D" uid="uid://gnhkcv4vsg2i" path="res://Background/Hospital.png" id="1_u80dc"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_u80dc"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="Hospital" type="Node3D" unique_id=1694447811]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=536862320]
+texture = ExtResource("1_u80dc")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=634938399]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=640534466]
+sprite_frames = SubResource("SpriteFrames_u80dc")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1195969928]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=231374559]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=647504303]

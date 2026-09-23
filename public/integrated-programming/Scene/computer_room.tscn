@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://tkxmncvirnsx"]
+
+[ext_resource type="Texture2D" uid="uid://ckem7mch8hjcb" path="res://Background/Computer Room.png" id="1_70d7g"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_70d7g"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="ComputerRoom" type="Node3D" unique_id=450939779]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1184715592]
+texture = ExtResource("1_70d7g")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1174086259]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=139271445]
+sprite_frames = SubResource("SpriteFrames_70d7g")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=772361372]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1626913814]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1676834619]

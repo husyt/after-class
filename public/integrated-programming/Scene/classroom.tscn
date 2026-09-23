@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://uqje3bjjr0lx"]
+
+[ext_resource type="Texture2D" uid="uid://cklwfr4bmxmfx" path="res://Background/Classroom.png" id="1_ym234"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ym234"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="Classroom" type="Node3D" unique_id=870387172]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1195142580]
+texture = ExtResource("1_ym234")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1685906630]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1452953185]
+sprite_frames = SubResource("SpriteFrames_ym234")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=774132406]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=1106506334]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1943074013]

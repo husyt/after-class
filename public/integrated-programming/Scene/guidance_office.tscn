@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cw5ma6ye5jwp6"]
+
+[ext_resource type="Texture2D" uid="uid://d3qmokq7mgpad" path="res://Background/Guidance Office.png" id="1_70ruv"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_70ruv"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="GuidanceOffice" type="Node3D" unique_id=136903756]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1581193805]
+texture = ExtResource("1_70ruv")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=935095937]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1672171603]
+sprite_frames = SubResource("SpriteFrames_70ruv")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1052138037]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=901311564]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1552847795]

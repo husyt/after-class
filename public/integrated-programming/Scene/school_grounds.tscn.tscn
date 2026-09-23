@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://cptyvs417p8x5"]
+
+[ext_resource type="Texture2D" uid="uid://datbdj43v0ey3" path="res://Background/Playground  School Grounds.png" id="1_xonmp"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_xonmp"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="SchoolGrounds" type="Node3D" unique_id=1636648068]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1885620587]
+texture = ExtResource("1_xonmp")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=347571084]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1763525076]
+sprite_frames = SubResource("SpriteFrames_xonmp")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1333081692]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=680326114]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=226265052]

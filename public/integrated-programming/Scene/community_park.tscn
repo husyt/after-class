@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://3g0kbxgsli0y"]
+
+[ext_resource type="Texture2D" uid="uid://dc6qidua243fc" path="res://Background/Park.png" id="1_8yt7s"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_8yt7s"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="CommunityParl" type="Node3D" unique_id=2138797343]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1600876219]
+texture = ExtResource("1_8yt7s")
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1137685817]
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1751045178]
+sprite_frames = SubResource("SpriteFrames_8yt7s")
+animation = &"Walk"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1689815481]
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=851701292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+projection = 1
+current = true
+size = 9.0
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=440488531]
