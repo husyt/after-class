@@ -38,10 +38,23 @@ EqualPath uses a combination of three architectural patterns:
 ## Integration Flow
 ## Cross-Layer Communication
 
-| From       | To         | Method                                      |
-|---         |---         |---                                          |
-| Browser    | PHP        | HTTP/HTTPS (form POST, fetch API)           |
-| PHP        | MySQL      | PDO prepared statements                     |
-| PHP        | Gmail SMTP | PHPMailer over TLS (port 587)               |
-| Godot Game | PHP        | JavaScript `postMessage` → `save_score.php` |
-| Browser    | PHP (QR)   | Polling every 2s to `qr_check.php`          |
+| From | To | Method |
+|---|---|---|
+| Browser | PHP | HTTP/HTTPS (form POST, fetch API) |
+| PHP | MySQL | PDO prepared statements |
+| PHP | Gmail SMTP | PHPMailer over TLS (port 587) |
+| Godot Game | PHP | JavaScript `postMessage` → `save_score.php` |
+| Browser | PHP (QR) | Polling every 2s to `qr_check.php` |
+| Browser (PWA) | Service Worker | Cache API + Fetch interception |
+| Phone Browser | QR Approval Page | HTTP GET with signed token |
+| Email Link | Approval Endpoint | HTTP GET → `qr_approve.php` |
+
+## PWA Layer (New)
+
+The Progressive Web App layer sits between the Presentation Layer and the browser:
+
+- **Service Worker (`sw.js`)** — intercepts network requests, serves cached assets when offline
+- **Web App Manifest (`manifest.json`)** — defines app metadata for install
+- **Install Script (`pwa.js`)** — registers the service worker and shows the install prompt
+
+This enables the platform to be installed on any device (phone, tablet, desktop) and used like a native app.

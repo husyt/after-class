@@ -1,6 +1,6 @@
 # CoreSync — Team Roles & Responsibilities
 
-**Project:** EqualPath Youth Foundation — Game-Integrated Learning Platform 
+**Project:** EqualPath Youth Foundation — Game-Integrated Learning Platform  
 **Course:** System Integration & Architecture (SIA)  
 **Date:** September 2026
 
@@ -29,12 +29,14 @@
 - Managed the **GitHub repository** — commits, pull requests, and version control
 - Coordinated team meetings and final submission timeline
 - Ensured deliverables matched the SIA checklist
+- Led deployment planning and hosting setup
 
 **Key Deliverables:**
 - Trello board with labeled and assigned cards
 - GitHub repository with meaningful commit history
 - Team documentation
 - Final submission assembly
+- Deployment and hosting configuration
 
 ---
 
@@ -46,11 +48,13 @@
 - Created the **client acceptance document** with 3 feedback rounds
 - Authored the **testing documentation** with 65 test cases across 11 categories
 - Verified that all requirements were met before submission
+- Aligned client requirements with **SDG 4 (Quality Education)** and **SDG 10 (Reduced Inequalities)**
 
 **Key Deliverables:**
 - `documentation/07-client-acceptance.md`
 - `documentation/04-testing.md`
 - Client feedback summary and acceptance criteria
+- SDG alignment mapping
 
 ---
 
@@ -76,18 +80,20 @@
 ### 4. Fernandez — Game Designer
 
 **Primary Responsibilities:**
-- Designed **two playable games** (Lex Obscura, After Class)
-- Built them in **Godot 4.x** and exported to HTML5
-- Integrated game → PHP via **JavaScript `postMessage` API**
-- Implemented the **score save flow** through `play.php` → `save_score.php`
-- Added **retry logic** (§24 Game Failure Handling) — 3 server + 3 client attempts
-- Tested game performance across Chrome, Firefox, and Edge
+- Designed the **educational adventure/simulation game** for EqualPath
+- Building the game in **Godot 4.x** and exporting to HTML5
+- Integrating game → PHP via **JavaScript `postMessage` API**
+- Implementing the **score save flow** through `play.php` → `save_score.php`
+- Adding **retry logic** (§24 Game Failure Handling) — 3 server + 3 client attempts
+- Building missions around **SDG 4 & SDG 10** themes
+- Designing accessibility challenges, decision-making systems, and the inclusion score
 
 **Key Deliverables:**
 - `assets/game/` — Godot HTML5 export
 - `public/play.php` — iframe wrapper
 - `public/save_score.php` — with retry logic
-- Game testing results
+- Game design document
+- SDG-aligned mission content
 
 ---
 
@@ -96,11 +102,12 @@
 **Primary Responsibilities:**
 - Designed the **Riot Games-inspired login page** with split layout (form + video background)
 - Built the **PS5-style dashboard** with game carousel and stat cards
-- Created all **modal designs** (Info, Report Issue, Edit Profile)
-- Built the **settings drawer** with toggle switches
+- Created all **modal designs** (Info, Report Issue, Edit Profile, Share)
+- Built the **settings drawer** with toggle switches and background picker
 - Made everything **responsive** for desktop, tablet, and mobile
 - Implemented custom **CSS scrollbars**, animations, and hover states
 - Designed the **leaderboard**, **library**, **profile**, and **admin panel** UIs
+- Added the **PWA install button** and share popup UI
 
 **Key Deliverables:**
 - `public/css/style.css` — Login page
@@ -125,19 +132,21 @@
 | Documentation | All | Edosma (coordinator) |
 | Version control | Edosma | All |
 | Final submission | Edosma | All |
+| Deployment & hosting | Edosma | Colminas |
 
 ---
 
 ## 📅 Project Timeline
 
-| Week | Focus | Lead |
-|---|---|---|
-| Week 1 | Requirements gathering, initial architecture | Kaur, Colminas |
-| Week 2 | Authentication, login UI, database setup | Carpio, Colminas |
-| Week 3 | Dashboard, library, profile pages | Carpio, Edosma |
-| Week 4 | Admin panel, reports, 2FA, QR login | Edosma, Kaur |
-| Week 5 | Game integration, score saving | Fernandez, Colminas |
-| Week 6 | Testing, documentation, final polish | Kaur, All |
+| Week | Focus | Lead | Status |
+|---|---|---|---|
+| Week 1 | Requirements gathering, initial architecture | Kaur, Colminas | ✅ Done |
+| Week 2 | Authentication, login UI, database setup | Carpio, Colminas | ✅ Done |
+| Week 3 | Dashboard, library, profile pages | Carpio, Edosma | ✅ Done |
+| Week 4 | Admin panel, reports, 2FA, QR login | Edosma, Kaur | ✅ Done |
+| Week 5 | Game integration, score saving, SDG mission design | Fernandez, Colminas | 🟡 In Progress |
+| Week 6 | Testing, documentation, final polish | Kaur, All | 🟡 Pending |
+| Week 7 | PWA, deployment, final submission | Edosma, All | 🟡 Pending |
 
 ---
 
@@ -146,11 +155,16 @@
 - ✅ **Complete SIA checklist coverage** — all 36 items addressed
 - ✅ **65 test cases** — 100% pass rate
 - ✅ **7 normalized database tables** with full referential integrity
-- ✅ **2 games** fully integrated with the score system
 - ✅ **Admin-controlled 2FA** with per-user toggles
+- ✅ **QR code login** (WhatsApp Web-style approval flow)
+- ✅ **Admin Game Analytics dashboard** with heatmaps and top players
+- ✅ **Multi-language support** (5 languages: EN, TL, ES, JA, KO)
+- ✅ **PWA (Progressive Web App)** — installable on phone and desktop
+- ✅ **Persistent background music** across page navigation
 - ✅ **Full documentation** — 8 markdown files + 3 diagrams
 - ✅ **GitHub repository** with meaningful commit history
 - ✅ **Trello board** with sprint tracking
+- 🟡 **Godot game** in development with SDG 4 & SDG 10 focus
 
 ---
 

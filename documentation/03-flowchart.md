@@ -103,3 +103,38 @@ User can choose between:
 
 ### 7. Session Termination
 Logout destroys session + cookie + regenerates ID.
+
+## PWA Install Flow
+
+```mermaid
+flowchart TD
+    VISIT([Visit EqualPath URL]) --> DETECT{Browser supports PWA?}
+    
+    DETECT -->|Yes| MANIFEST{Manifest valid?}
+    MANIFEST -->|Yes| SW{Service Worker active?}
+    SW -->|Yes| SHOW_INSTALL[Show Install prompt]
+    SW -->|No| INSTALL_FAIL[Install unavailable]
+    
+    SHOW_INSTALL --> USER_CHOICE{User clicks Install?}
+    USER_CHOICE -->|Yes| INSTALLED([App installed on device])
+    USER_CHOICE -->|No| CONTINUE([Continue in browser])
+    
+    INSTALLED --> HOME_SCREEN[Icon on home screen]
+    HOME_SCREEN --> LAUNCH[Launch fullscreen]
+    LAUNCH --> DASHBOARD([Dashboard])
+
+    flowchart TD
+    PLAY_START([User clicks Play]) --> IFRAME[Load game in iframe]
+    IFRAME --> GODOT[Godot game loads]
+    GODOT --> MISSION[Play educational mission]
+    MISSION --> DECISION[Make decisions]
+    DECISION --> INCLUSION[Update Inclusion Score]
+    INCLUSION --> GAME_END{Game ended?}
+    
+    GAME_END -->|No| MISSION
+    GAME_END -->|Yes| POST_MESSAGE[Send postMessage to parent]
+    
+    POST_MESSAGE --> SAVE[POST to save_score.php]
+    SAVE --> UPDATE_DB[Update XP, level, high score]
+    UPDATE_DB --> LOG[Log activity]
+    LOG --> DASHBOARD([Return to dashboard])
