@@ -5,7 +5,7 @@
 - **Server:** XAMPP (Apache 2.4.58, MySQL 8.0, PHP 8.2.12)
 - **Browser:** Chrome 120+, Firefox 121+, Edge 120+, Android Chrome
 - **Test Date:** September 20–23, 2026
-- **Tester:** Justin Gabriel F. Edosma
+- **Tester:** Varunpreet Kaur
 
 ---
 
