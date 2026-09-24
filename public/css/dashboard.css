@@ -21,6 +21,9 @@
    16. Custom Scrollbars
    17. Accessibility (Reduce Motion)
    18. Responsive Breakpoints
+   19. Share Popup
+   20. PWA Install Button
+   21. Per-Game Breakdown Cards
    ============================================================ */
 
 
@@ -32,6 +35,24 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    scrollbar-color: #7c3aed #0a0a0f;
+}
+
+body {
+    width: 100%;
+    max-width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 :root {
@@ -59,13 +80,6 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
-    overflow-x: hidden;
-}
-
-html {
-    overflow-y: scroll;
-    scrollbar-width: thin;
-    scrollbar-color: #7c3aed #0a0a0f;
 }
 
 
@@ -76,6 +90,8 @@ html {
 .bg-layer {
     position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
     z-index: 0;
     overflow: hidden;
     background: #0a0a0f;
@@ -112,32 +128,42 @@ html {
 
 
 /* ============================================================
-   4. TOP NAVIGATION
+   4. TOP NAVIGATION — FIXED WIDTH VERSION
    ============================================================ */
 
 .topnav {
-    position: relative;
-    z-index: 10;
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
     padding: 20px 36px;
-    background: rgba(10, 10, 15, 0.5);
+    background: rgba(10, 10, 15, 0.85);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    box-sizing: border-box;
 }
 
 .nav-left {
     display: flex;
     align-items: center;
     gap: 40px;
+    flex-shrink: 0;
 }
 
 .nav-right {
     display: flex;
     align-items: center;
     gap: 14px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .logo-mark {
@@ -149,6 +175,7 @@ html {
     align-items: center;
     justify-content: center;
     color: white;
+    flex-shrink: 0;
 }
 
 .logo-mark svg {
@@ -174,6 +201,7 @@ html {
     justify-content: center;
     transition: all 0.2s;
     text-decoration: none;
+    flex-shrink: 0;
 }
 
 .nav-tab svg {
@@ -204,6 +232,7 @@ html {
     justify-content: center;
     transition: all 0.2s;
     text-decoration: none;
+    flex-shrink: 0;
 }
 
 .icon-btn svg {
@@ -226,11 +255,19 @@ html {
     justify-content: center;
     color: white;
     border: 2px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+    overflow: hidden;
 }
 
 .user-avatar svg {
     width: 28px;
     height: 28px;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 
@@ -245,6 +282,9 @@ html {
     min-height: calc(100vh - 90px);
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .section-head {
@@ -377,7 +417,6 @@ html {
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
 }
 
-/* Heart on game tiles */
 .tile-heart {
     position: absolute;
     top: 16px;
@@ -428,7 +467,6 @@ html {
     100% { transform: scale(1.1); }
 }
 
-/* Featured badge */
 .tile-featured-badge {
     position: absolute;
     top: 16px;
@@ -1151,7 +1189,6 @@ html {
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* 2-Column Grid */
 .profile-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -1165,7 +1202,6 @@ html {
     gap: 16px;
 }
 
-/* Info cards — stacked */
 .profile-info-cards {
     display: flex;
     flex-direction: column;
@@ -1236,7 +1272,6 @@ html {
     color: white;
 }
 
-/* Profile sections */
 .profile-section {
     padding: 20px 24px;
     background: var(--surface);
@@ -1255,7 +1290,6 @@ html {
     margin-bottom: 14px;
 }
 
-/* Account details — single column in left column */
 .account-details-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -1285,7 +1319,6 @@ html {
     word-break: break-word;
 }
 
-/* Game stats grid */
 .game-stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1356,7 +1389,6 @@ html {
     line-height: 1;
 }
 
-/* XP Progress */
 .xp-progress-wrap {
     padding: 14px 18px;
     background: rgba(255, 255, 255, 0.04);
@@ -1391,7 +1423,6 @@ html {
     transition: width 0.8s ease;
 }
 
-/* Per-game breakdown */
 .per-game-list { list-style: none; padding: 0; margin: 0; }
 
 .per-game-row {
@@ -1438,7 +1469,6 @@ html {
     font-size: 13px;
 }
 
-/* Activity list */
 .activity-list { list-style: none; padding: 0; margin: 0; }
 
 .activity-list li {
@@ -1982,7 +2012,6 @@ body::-webkit-scrollbar-corner {
    18. RESPONSIVE BREAKPOINTS
    ============================================================ */
 
-/* Tablet */
 @media (max-width: 900px) {
     .dashboard { padding: 24px; }
     .topnav { padding: 16px 20px; }
@@ -1998,13 +2027,11 @@ body::-webkit-scrollbar-corner {
     .action-btn.primary { padding: 14px 30px; font-size: 16px; }
     .tile-heart { width: 38px; height: 38px; top: 12px; right: 12px; }
 
-    /* Profile collapses to 1 column */
     .profile-content { grid-template-columns: 1fr; }
     .profile-page .dashboard,
     .profile-page main.dashboard { padding: 20px 24px 32px; }
 }
 
-/* Small Tablet / Large Phone */
 @media (max-width: 700px) {
     .filter-bar { flex-direction: column; }
     .profile-header { flex-direction: column; text-align: center; }
@@ -2014,7 +2041,6 @@ body::-webkit-scrollbar-corner {
     .game-row { gap: 16px; padding: 30px 40px; }
 }
 
-/* Mobile */
 @media (max-width: 600px) {
     .info-modal-panel { padding: 32px 24px; }
     .info-header h2 { font-size: 24px; }
@@ -2026,7 +2052,6 @@ body::-webkit-scrollbar-corner {
     .report-modal-panel { padding: 28px 22px; }
 }
 
-/* Extra Small Mobile */
 @media (max-width: 500px) {
     .more-menu {
         left: auto;
@@ -2042,53 +2067,11 @@ body::-webkit-scrollbar-corner {
     .game-stats-grid { grid-template-columns: 1fr; }
 }
 
+
 /* ============================================================
-   DYNAMIC BACKGROUND TINT (Settings)
+   19. SHARE POPUP
    ============================================================ */
 
-.bg-layer::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    transition: background 0.6s ease;
-    background: transparent;
-}
-
-/* Tint variants applied via data attribute on body */
-body[data-bg="bg-home"] .bg-layer::before {
-    background: linear-gradient(135deg, rgba(209, 54, 57, 0.15), rgba(249, 115, 22, 0.15));
-}
-body[data-bg="bg-city"] .bg-layer::before {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2));
-}
-body[data-bg="bg-forest"] .bg-layer::before {
-    background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(132, 204, 22, 0.2));
-}
-body[data-bg="bg-space"] .bg-layer::before {
-    background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(49, 46, 129, 0.35));
-}
-body[data-bg="bg-ocean"] .bg-layer::before {
-    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.2));
-}
-
-.user-avatar {
-    overflow: hidden; /* Ensures the image doesn't spill out */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.user-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* ============================================
-   SHARE POPUP
-   ============================================ */
 .share-popup {
     position: fixed;
     inset: 0;
@@ -2206,9 +2189,11 @@ body[data-bg="bg-ocean"] .bg-layer::before {
     color: #fff;
 }
 
-/* ============================================
-   PWA INSTALL BUTTON
-   ============================================ */
+
+/* ============================================================
+   20. PWA INSTALL BUTTON
+   ============================================================ */
+
 .pwa-install-btn {
     display: inline-flex;
     align-items: center;
@@ -2247,4 +2232,127 @@ body[data-bg="bg-ocean"] .bg-layer::before {
     .pwa-install-btn {
         padding: 8px 10px;
     }
+}
+
+
+/* ============================================================
+   21. PER-GAME BREAKDOWN CARDS
+   ============================================================ */
+
+.game-breakdown-card {
+    padding: 20px;
+    background: rgba(20, 20, 30, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    margin-bottom: 16px;
+    transition: all 0.2s;
+}
+
+.game-breakdown-card:last-child {
+    margin-bottom: 0;
+}
+
+.game-breakdown-card:hover {
+    background: rgba(20, 20, 30, 0.75);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.game-breakdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-wrap: wrap;
+}
+
+.game-breakdown-title {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: white;
+    margin: 0;
+}
+
+.game-breakdown-playtime {
+    font-size: 11px;
+    font-weight: 700;
+    color: #a78bfa;
+    background: rgba(124, 58, 237, 0.15);
+    padding: 4px 10px;
+    border-radius: 999px;
+    letter-spacing: 0.5px;
+}
+
+.game-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.game-breakdown-stat {
+    text-align: center;
+}
+
+.game-breakdown-label {
+    font-size: 9px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 6px;
+}
+
+.game-breakdown-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+}
+
+.game-breakdown-value.green  { color: #2ecc71; }
+.game-breakdown-value.purple { color: #a78bfa; }
+
+@media (max-width: 700px) {
+    .game-breakdown-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .game-breakdown-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+/* ============================================================
+   DYNAMIC BACKGROUND TINT (Settings)
+   ============================================================ */
+
+.bg-layer::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    transition: background 0.6s ease;
+    background: transparent;
+}
+
+body[data-bg="bg-home"] .bg-layer::before {
+    background: linear-gradient(135deg, rgba(209, 54, 57, 0.15), rgba(249, 115, 22, 0.15));
+}
+body[data-bg="bg-city"] .bg-layer::before {
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2));
+}
+body[data-bg="bg-forest"] .bg-layer::before {
+    background: linear-gradient(135deg, rgba(5, 150, 105, 0.2), rgba(132, 204, 22, 0.2));
+}
+body[data-bg="bg-space"] .bg-layer::before {
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.35), rgba(49, 46, 129, 0.35));
+}
+body[data-bg="bg-ocean"] .bg-layer::before {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.2));
 }

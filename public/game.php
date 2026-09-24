@@ -74,6 +74,43 @@ if (!$game) {
     header('Location: dashboard.php');
     exit;
 }
+
+// ============================================
+// FETCH LEX OBSCURA SPECIFIC STATS (Word Guess + Kills)
+// ============================================
+$word_guess_high = 0;
+$kills_high = 0;
+
+if ($game['id'] === 'lex-obscura') {
+    // Try to fetch game-specific stats from game_sessions
+    // Adjust column names if your schema differs
+    try {
+        $stmt = $pdo->prepare(
+            "SELECT 
+                COALESCE(MAX(score), 0) AS high_score,
+                COUNT(*) AS plays
+             FROM game_sessions
+             WHERE user_id = ? AND game_id = ?"
+        );
+        $stmt->execute([$_SESSION['user_id'], 'lex-obscura']);
+        $lex_stats = $stmt->fetch();
+
+        // Word Guess = highest score achieved in Lex Obscura
+        $word_guess_high = (int)($lex_stats['high_score'] ?? 0);
+
+        // Kills = placeholder, replace with actual column if you have one
+        // e.g. if you have a 'kills' column in game_sessions:
+       $stmt = $pdo->prepare(
+    "SELECT COALESCE(MAX(kills), 0) AS kills
+     FROM game_sessions
+     WHERE user_id = ? AND game_id = ?"
+);
+        $stmt->execute([$_SESSION['user_id'], 'lex-obscura']);
+        $kills_high = (int)$stmt->fetchColumn();
+    } catch (PDOException $e) {
+        error_log("Lex Obscura stats error: " . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= htmlspecialchars($current_lang) ?>">
@@ -84,13 +121,13 @@ if (!$game) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="manifest" href="/after-class/public/manifest.json">
-<meta name="theme-color" content="#d13639">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="EqualPath">
-<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
-<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
+    <meta name="theme-color" content="#d13639">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EqualPath">
+    <link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
     <style>
         .bg-video {
             position: fixed;
@@ -278,6 +315,16 @@ if (!$game) {
             box-shadow: 0 6px 18px rgba(46, 204, 113, 0.4);
         }
 
+        .game-stat-icon.word {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 6px 18px rgba(52, 152, 219, 0.4);
+        }
+
+        .game-stat-icon.kills {
+            background: linear-gradient(135deg, #d13639, #7c3aed);
+            box-shadow: 0 6px 18px rgba(209, 54, 57, 0.4);
+        }
+
         .game-stat-body {
             flex: 1;
             min-width: 0;
@@ -360,54 +407,118 @@ if (!$game) {
 
     <!-- Stat Cards -->
     <div class="game-stats">
-        <div class="game-stat">
-            <div class="game-stat-icon level">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
-                </svg>
-            </div>
-            <div class="game-stat-body">
-                <div class="game-stat-label"><?= __('level') ?></div>
-                <div class="game-stat-value"><?= $stats['level'] ?></div>
-            </div>
-        </div>
 
-        <div class="game-stat">
-            <div class="game-stat-icon xp">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                </svg>
-            </div>
-            <div class="game-stat-body">
-                <div class="game-stat-label"><?= __('total_xp') ?></div>
-                <div class="game-stat-value"><?= number_format($stats['xp']) ?></div>
-            </div>
-        </div>
+        <?php if ($game['id'] === 'lex-obscura'): ?>
 
-        <div class="game-stat">
-            <div class="game-stat-icon score">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
-                </svg>
+            <!-- ============================================
+                 LEX OBSCURA STATS: Word Guess, Kills, Level, Games Played
+                 ============================================ -->
+            <div class="game-stat">
+                <div class="game-stat-icon word">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 7V4h16v3M9 20h6M12 4v16"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label">Word Guess</div>
+                    <div class="game-stat-value"><?= number_format($word_guess_high) ?></div>
+                </div>
             </div>
-            <div class="game-stat-body">
-                <div class="game-stat-label"><?= __('high_score') ?></div>
-                <div class="game-stat-value"><?= number_format($stats['high_score']) ?></div>
-            </div>
-        </div>
 
-        <div class="game-stat">
-            <div class="game-stat-icon games">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="6" width="20" height="12" rx="4"/>
-                    <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
-                </svg>
+            <div class="game-stat">
+                <div class="game-stat-icon kills">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14.5 17.5L3 6V3h3l11.5 11.5"/>
+                        <path d="M13 19l6-6M16 16l4 4M19 21l2-2"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label">Kills</div>
+                    <div class="game-stat-value"><?= number_format($kills_high) ?></div>
+                </div>
             </div>
-            <div class="game-stat-body">
-                <div class="game-stat-label"><?= __('games_played') ?></div>
-                <div class="game-stat-value"><?= number_format($stats['games_played']) ?></div>
+
+            <div class="game-stat">
+                <div class="game-stat-icon level">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label"><?= __('level') ?></div>
+                    <div class="game-stat-value"><?= $stats['level'] ?></div>
+                </div>
             </div>
-        </div>
+
+            <div class="game-stat">
+                <div class="game-stat-icon games">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="6" width="20" height="12" rx="4"/>
+                        <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label"><?= __('games_played') ?></div>
+                    <div class="game-stat-value"><?= number_format($stats['games_played']) ?></div>
+                </div>
+            </div>
+
+        <?php else: ?>
+
+            <!-- ============================================
+                 AFTER CLASS STATS: Level, XP, High Score, Games Played
+                 ============================================ -->
+            <div class="game-stat">
+                <div class="game-stat-icon level">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label"><?= __('level') ?></div>
+                    <div class="game-stat-value"><?= $stats['level'] ?></div>
+                </div>
+            </div>
+
+            <div class="game-stat">
+                <div class="game-stat-icon xp">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label"><?= __('total_xp') ?></div>
+                    <div class="game-stat-value"><?= number_format($stats['xp']) ?></div>
+                </div>
+            </div>
+
+            <div class="game-stat">
+                <div class="game-stat-icon score">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label"><?= __('high_score') ?></div>
+                    <div class="game-stat-value"><?= number_format($stats['high_score']) ?></div>
+                </div>
+            </div>
+
+            <div class="game-stat">
+                <div class="game-stat-icon games">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="6" width="20" height="12" rx="4"/>
+                        <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
+                    </svg>
+                </div>
+                <div class="game-stat-body">
+                    <div class="game-stat-label"><?= __('games_played') ?></div>
+                    <div class="game-stat-value"><?= number_format($stats['games_played']) ?></div>
+                </div>
+            </div>
+
+        <?php endif; ?>
+
     </div>
 
     <a href="dashboard.php" class="back-btn">

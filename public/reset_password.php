@@ -74,17 +74,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $valid_token && $reset_row) {
         try {
             $hash = password_hash($password, PASSWORD_DEFAULT);
 
+            // Check if password_changed_at column exists
+            $user_cols = $pdo->query("DESCRIBE users")->fetchAll(PDO::FETCH_COLUMN);
+            $has_pw_changed = in_array('password_changed_at', $user_cols, true);
+
+            // Build UPDATE dynamically
+            if ($has_pw_changed) {
+                $update_sql = "UPDATE users SET password_hash = ?, password_changed_at = NOW() WHERE ";
+            } else {
+                $update_sql = "UPDATE users SET password_hash = ? WHERE ";
+            }
+
             // Update password — prefer user_id, fall back to email
             if (!empty($reset_row['user_id'])) {
-                $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE id = ?");
+                $stmt = $pdo->prepare($update_sql . "id = ?");
                 $stmt->execute([$hash, $reset_row['user_id']]);
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET password_hash = ? WHERE email = ?");
+                $stmt = $pdo->prepare($update_sql . "email = ?");
                 $stmt->execute([$hash, $reset_row['email']]);
             }
 
             // Mark token as used (only if column exists)
-            if (in_array('used', $cols, true)) {
+            if ($has_used) {
                 $stmt = $pdo->prepare("UPDATE password_resets SET used = 1 WHERE id = ?");
                 $stmt->execute([$reset_row['id']]);
             } else {
@@ -160,7 +171,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $valid_token && $reset_row) {
     </div>
     <div class="visual-panel">
         <video class="bg-video" autoplay muted loop playsinline preload="auto">
-            <source src="../assets/cyberpunk.mp4" type="video/mp4">
+            <source src="../assets/equal_paths.mp4" type="video/mp4">
         </video>
         <div class="visual-overlay"></div>
     </div>

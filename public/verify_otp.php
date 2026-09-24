@@ -188,7 +188,7 @@ if (isset($_POST['resend'])) {
 
     <div class="visual-panel">
         <video class="bg-video" autoplay muted loop playsinline preload="auto">
-            <source src="../assets/cyberpunk.mp4" type="video/mp4">
+            <source src="../assets/equal_paths.mp4" type="video/mp4">
         </video>
         <div class="visual-overlay"></div>
     </div>

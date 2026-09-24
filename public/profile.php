@@ -40,51 +40,92 @@ $stmt->execute([$_SESSION['user_id']]);
 $activities = $stmt->fetchAll();
 
 // ============================================
-// GAME STATISTICS
+// FAVORITE GAMES
+// ============================================
+$stmt = $pdo->prepare(
+    "SELECT game_id FROM user_favorites 
+     WHERE user_id = ? ORDER BY created_at DESC"
+);
+$stmt->execute([$_SESSION['user_id']]);
+$favorite_ids = array_column($stmt->fetchAll(), 'game_id');
+
+$game_catalog = [
+    'after-class' => [
+        'title'     => 'AFTER CLASS',
+        'subtitle'  => 'A pixel art school adventure',
+        'thumbnail' => '/after-class/assets/games/afterclass-thumb.jpg',
+        'accent'    => '#f97316',
+    ],
+    'lex-obscura' => [
+        'title'     => 'LEX OBSCURA',
+        'subtitle'  => 'A dark fantasy adventure',
+        'thumbnail' => '/after-class/assets/games/lexobscura-thumb.jpg',
+        'accent'    => '#7c3aed',
+    ],
+];
+
+$favorite_games = [];
+foreach ($favorite_ids as $gid) {
+    if (isset($game_catalog[$gid])) {
+        $favorite_games[$gid] = $game_catalog[$gid];
+    }
+}
+
+// ============================================
+// PLAY TIME SUMMARY
 // ============================================
 $stmt = $pdo->prepare(
     "SELECT 
-        COUNT(*) as total_sessions,
-        COALESCE(SUM(score), 0) as total_score,
-        COALESCE(AVG(score), 0) as avg_score,
-        COALESCE(MAX(score), 0) as high_score,
-        COALESCE(SUM(duration_seconds), 0) as total_seconds
+        COALESCE(SUM(duration_seconds), 0) AS total_seconds,
+        COUNT(*) AS total_sessions,
+        COALESCE(AVG(duration_seconds), 0) AS avg_seconds
      FROM game_sessions
      WHERE user_id = ?"
 );
 $stmt->execute([$_SESSION['user_id']]);
-$game_stats = $stmt->fetch();
+$playtime_stats = $stmt->fetch();
 
-// Per-game breakdown
+$total_seconds = (int)$playtime_stats['total_seconds'];
+$total_sessions = (int)$playtime_stats['total_sessions'];
+$avg_seconds = (int)round($playtime_stats['avg_seconds']);
+
+$hours   = floor($total_seconds / 3600);
+$minutes = floor(($total_seconds % 3600) / 60);
+$playtime_total = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
+
+$avg_min = floor($avg_seconds / 60);
+$avg_sec = $avg_seconds % 60;
+$avg_playtime = $avg_seconds > 0 ? "{$avg_min}m {$avg_sec}s" : "0m";
+
+// ============================================
+// ACCOUNT SECURITY STATUS
+// ============================================
+// 2FA status from user record
+$twofa_enabled = (bool)($user['two_factor_enabled'] ?? 0);
+
+// Last password change — use last_login as proxy if no dedicated column
+// If you have a `password_changed_at` column, swap this line
+$password_changed_at = $user['password_changed_at'] ?? $user['created_at'] ?? null;
+$password_days_ago = null;
+if ($password_changed_at) {
+    $password_days_ago = floor((time() - strtotime($password_changed_at)) / 86400);
+}
+
+// Count active remember-me devices
 $stmt = $pdo->prepare(
-    "SELECT 
-        game_id,
-        COUNT(*) as plays,
-        COALESCE(MAX(score), 0) as high_score,
-        COALESCE(AVG(score), 0) as avg_score
-     FROM game_sessions
-     WHERE user_id = ?
-     GROUP BY game_id
-     ORDER BY plays DESC"
+    "SELECT COUNT(*) FROM remember_tokens 
+     WHERE user_id = ? AND expires_at > NOW()"
 );
 $stmt->execute([$_SESSION['user_id']]);
-$per_game = $stmt->fetchAll();
+$remember_devices = (int)$stmt->fetchColumn();
 
-// Stats
+// ============================================
+// STATS
+// ============================================
 $level   = (int)($user['level'] ?? 1);
 $xp      = (int)($user['xp'] ?? 0);
 $joined  = $user['created_at'] ? date('M Y', strtotime($user['created_at'])) : '—';
 $lastlog = $user['last_login'] ? date('M j, Y · g:i A', strtotime($user['last_login'])) : __('never');
-
-// XP progress
-$xp_current = $xp % 1000;
-$xp_percent = ($xp_current / 1000) * 100;
-
-// Format playtime
-$total_seconds = (int)$game_stats['total_seconds'];
-$hours   = floor($total_seconds / 3600);
-$minutes = floor(($total_seconds % 3600) / 60);
-$playtime = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
 
 // ============================================
 // AVATAR SYSTEM
@@ -105,13 +146,217 @@ $is_admin = (($_SESSION['role'] ?? '') === 'admin');
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="manifest" href="/after-class/public/manifest.json">
-<meta name="theme-color" content="#d13639">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="EqualPath">
-<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
-<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
+    <meta name="theme-color" content="#d13639">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EqualPath">
+    <link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
+    <style>
+        /* ============================================
+           FAVORITE GAMES SHOWCASE
+           ============================================ */
+        .favorites-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .favorite-card {
+            position: relative;
+            aspect-ratio: 4 / 5;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #1a1a25;
+            border: 1px solid rgba(255,255,255,0.06);
+            text-decoration: none;
+            transition: all 0.25s ease;
+            display: block;
+        }
+
+        .favorite-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .favorite-card-thumb {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .favorite-card-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                rgba(0,0,0,0.1) 0%,
+                rgba(0,0,0,0.6) 60%,
+                rgba(0,0,0,0.9) 100%);
+        }
+
+        .favorite-card-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 12px;
+            z-index: 2;
+        }
+
+        .favorite-card-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .favorite-card-sub {
+            font-size: 10px;
+            color: rgba(255,255,255,0.6);
+            margin-top: 3px;
+            line-height: 1.3;
+        }
+
+        .favorite-heart-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: rgba(209,54,57,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            z-index: 3;
+        }
+
+        .favorites-empty {
+            padding: 24px;
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            font-size: 13px;
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.08);
+            border-radius: 12px;
+        }
+
+        /* ============================================
+           ACCOUNT SECURITY STATUS
+           ============================================ */
+        .security-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .security-item:hover {
+            background: rgba(255,255,255,0.06);
+        }
+
+        .security-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .security-icon.ok {
+            background: rgba(46,204,113,0.15);
+            color: #2ecc71;
+        }
+
+        .security-icon.warn {
+            background: rgba(243,156,18,0.15);
+            color: #f39c12;
+        }
+
+        .security-icon.neutral {
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6);
+        }
+
+        .security-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .security-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            line-height: 1.3;
+        }
+
+        .security-detail {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+
+        /* ============================================
+           PLAY TIME SUMMARY
+           ============================================ */
+        .playtime-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .playtime-stat {
+            padding: 16px 12px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .playtime-stat:hover {
+            background: rgba(255,255,255,0.06);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .playtime-value {
+            font-size: 20px;
+            font-weight: 800;
+            color: #a78bfa;
+            line-height: 1;
+        }
+
+        .playtime-label {
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 8px;
+        }
+    </style>
 </head>
 <body data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
     
@@ -302,111 +547,148 @@ $is_admin = (($_SESSION['role'] ?? '') === 'admin');
                 </div>
             </div>
 
+            <!-- ============================================
+                 ACCOUNT SECURITY STATUS
+                 ============================================ -->
+            <div class="profile-section">
+                <h3>🔐 Account Security</h3>
+
+                <div class="security-list">
+
+                    <!-- 2FA Status -->
+                    <div class="security-item">
+                        <div class="security-icon <?= $twofa_enabled ? 'ok' : 'warn' ?>">
+                            <?php if ($twofa_enabled): ?>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M20 6L9 17l-5-5"/>
+                                </svg>
+                            <?php else: ?>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <path d="M12 9v4M12 17h.01"/>
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                                </svg>
+                            <?php endif; ?>
+                        </div>
+                        <div class="security-info">
+                            <div class="security-label">
+                                Two-Factor Authentication
+                                <?= $twofa_enabled ? 'Enabled' : 'Disabled' ?>
+                            </div>
+                            <div class="security-detail">
+                                <?= $twofa_enabled
+                                    ? 'Your account is protected with email OTP on every login.'
+                                    : 'Enable 2FA in settings for extra security.' ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Age -->
+                    <div class="security-item">
+                        <div class="security-icon <?= ($password_days_ago !== null && $password_days_ago < 90) ? 'ok' : 'warn' ?>">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2"/>
+                                <path d="M7 11V7a5 5 0 0110 0v4"/>
+                            </svg>
+                        </div>
+                        <div class="security-info">
+                            <div class="security-label">Password Last Changed</div>
+                            <div class="security-detail">
+                                <?php if ($password_days_ago === null): ?>
+                                    Unknown — consider updating
+                                <?php elseif ($password_days_ago === 0): ?>
+                                    Today
+                                <?php elseif ($password_days_ago === 1): ?>
+                                    1 day ago
+                                <?php elseif ($password_days_ago < 90): ?>
+                                    <?= $password_days_ago ?> days ago
+                                <?php else: ?>
+                                    <?= $password_days_ago ?> days ago — consider refreshing
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Remember-me Devices -->
+                    <div class="security-item">
+                        <div class="security-icon <?= $remember_devices === 0 ? 'ok' : 'neutral' ?>">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                                <path d="M8 21h8M12 17v4"/>
+                            </svg>
+                        </div>
+                        <div class="security-info">
+                            <div class="security-label">Trusted Devices</div>
+                            <div class="security-detail">
+                                <?php if ($remember_devices === 0): ?>
+                                    No devices with "stay signed in"
+                                <?php elseif ($remember_devices === 1): ?>
+                                    1 device has an active remember-me token
+                                <?php else: ?>
+                                    <?= $remember_devices ?> devices have active remember-me tokens
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
 
         <!-- RIGHT COLUMN -->
         <div class="profile-column">
 
-            <?php if (!$is_admin): ?>
-            <!-- Game Statistics (hidden for admins) -->
+            <!-- ============================================
+                 FAVORITE GAMES SHOWCASE
+                 ============================================ -->
             <div class="profile-section">
-                <h3><?= __('game_statistics') ?></h3>
+                <h3>⭐ Favorite Games</h3>
 
-                <div class="game-stats-grid">
-                    <div class="game-stat-card">
-                        <div class="game-stat-icon purple">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2l3 7h7l-5.5 4 2 7-6.5-4.5L5.5 20l2-7L2 9h7z"/>
-                            </svg>
-                        </div>
-                        <div class="game-stat-info">
-                            <div class="game-stat-label"><?= __('level') ?></div>
-                            <div class="game-stat-value"><?= $level ?></div>
-                        </div>
+                <?php if (empty($favorite_games)): ?>
+                    <div class="favorites-empty">
+                        No favorite games yet.<br>
+                        <span style="font-size:11px;">Tap the heart on any game to save it here.</span>
                     </div>
-
-                    <div class="game-stat-card">
-                        <div class="game-stat-icon red">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-                            </svg>
-                        </div>
-                        <div class="game-stat-info">
-                            <div class="game-stat-label"><?= __('total_xp') ?></div>
-                            <div class="game-stat-value"><?= number_format($xp) ?></div>
-                        </div>
-                    </div>
-
-                    <div class="game-stat-card">
-                        <div class="game-stat-icon gold">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M6 9V2h12v7M6 9H2v3a4 4 0 004 4h1M18 9h4v3a4 4 0 01-4 4h-1M9 21h6M12 17v4"/>
-                            </svg>
-                        </div>
-                        <div class="game-stat-info">
-                            <div class="game-stat-label"><?= __('high_score') ?></div>
-                            <div class="game-stat-value"><?= number_format($game_stats['high_score']) ?></div>
-                        </div>
-                    </div>
-
-                    <div class="game-stat-card">
-                        <div class="game-stat-icon green">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="2" y="6" width="20" height="12" rx="4"/>
-                                <path d="M6 12h4M8 10v4M15 11h.01M17 13h.01"/>
-                            </svg>
-                        </div>
-                        <div class="game-stat-info">
-                            <div class="game-stat-label"><?= __('games_played') ?></div>
-                            <div class="game-stat-value"><?= number_format($game_stats['total_sessions']) ?></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- XP Progress -->
-                <div class="xp-progress-wrap">
-                    <div class="xp-progress-header">
-                        <span><?= __('level') ?> <?= $level ?></span>
-                        <span><?= $xp_current ?> / 1000 XP</span>
-                    </div>
-                    <div class="xp-progress-track">
-                        <div class="xp-progress-fill" style="width: <?= $xp_percent ?>%"></div>
-                    </div>
-                </div>
-
-                <!-- Per-Game Breakdown -->
-                <h3 style="margin-top: 20px;"><?= __('per_game_breakdown') ?></h3>
-                <?php if (empty($per_game)): ?>
-                    <p class="empty-games">No games played yet. Start playing to see stats!</p>
                 <?php else: ?>
-                    <ul class="per-game-list">
-                        <?php foreach ($per_game as $g): ?>
-                            <li class="per-game-row">
-                                <div class="per-game-name">
-                                    <?= htmlspecialchars(strtoupper(str_replace('-', ' ', $g['game_id']))) ?>
+                    <div class="favorites-grid">
+                        <?php foreach ($favorite_games as $gid => $g): ?>
+                            <a href="game.php?id=<?= urlencode($gid) ?>" class="favorite-card">
+                                <div class="favorite-card-thumb" style="background-image: url('<?= htmlspecialchars($g['thumbnail']) ?>');"></div>
+                                <div class="favorite-card-overlay"></div>
+                                <div class="favorite-heart-badge">♥</div>
+                                <div class="favorite-card-content">
+                                    <div class="favorite-card-title"><?= htmlspecialchars($g['title']) ?></div>
+                                    <div class="favorite-card-sub"><?= htmlspecialchars($g['subtitle']) ?></div>
                                 </div>
-                                <div class="per-game-stats">
-                                    <div class="per-game-stat">
-                                        <div class="per-game-stat-label"><?= __('plays') ?></div>
-                                        <div class="per-game-stat-value"><?= $g['plays'] ?></div>
-                                    </div>
-                                    <div class="per-game-stat">
-                                        <div class="per-game-stat-label"><?= __('best') ?></div>
-                                        <div class="per-game-stat-value"><?= number_format($g['high_score']) ?></div>
-                                    </div>
-                                    <div class="per-game-stat">
-                                        <div class="per-game-stat-label"><?= __('avg') ?></div>
-                                        <div class="per-game-stat-value"><?= number_format($g['avg_score'], 0) ?></div>
-                                    </div>
-                                </div>
-                            </li>
+                            </a>
                         <?php endforeach; ?>
-                    </ul>
+                    </div>
                 <?php endif; ?>
             </div>
-            <?php endif; ?>
 
-            <!-- Recent Activity (always visible) -->
+            <!-- ============================================
+                 PLAY TIME SUMMARY
+                 ============================================ -->
+            <div class="profile-section">
+                <h3>⏱ Play Time Summary</h3>
+
+                <div class="playtime-grid">
+                    <div class="playtime-stat">
+                        <div class="playtime-value"><?= htmlspecialchars($playtime_total) ?></div>
+                        <div class="playtime-label">Total Played</div>
+                    </div>
+                    <div class="playtime-stat">
+                        <div class="playtime-value"><?= number_format($total_sessions) ?></div>
+                        <div class="playtime-label">Sessions</div>
+                    </div>
+                    <div class="playtime-stat">
+                        <div class="playtime-value"><?= htmlspecialchars($avg_playtime) ?></div>
+                        <div class="playtime-label">Avg Session</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
             <div class="profile-section">
                 <h3><?= __('recent_activity') ?></h3>
                 <?php if (empty($activities)): ?>

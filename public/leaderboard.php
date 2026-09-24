@@ -81,13 +81,13 @@ $game_leaders = $stmt->fetchAll();
     <link rel="stylesheet" href="css/settings.css?v=<?= time() ?>">
     <link rel="stylesheet" href="css/dashboard.css?v=<?= time() ?>">
     <link rel="manifest" href="/after-class/public/manifest.json">
-<meta name="theme-color" content="#d13639">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="EqualPath">
-<link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
-<link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
+    <meta name="theme-color" content="#d13639">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="EqualPath">
+    <link rel="apple-touch-icon" href="/after-class/assets/icons/icon-192.png">
+    <link rel="icon" type="image/png" href="/after-class/assets/icons/icon-192.png">
     <style>
         .leaderboard-tabs {
             display: flex;
@@ -292,6 +292,72 @@ $game_leaders = $stmt->fetchAll();
             color: rgba(255,255,255,0.4);
             font-size: 14px;
         }
+
+        /* ============================================
+           SEPARATE GAME SECTIONS
+           ============================================ */
+        .game-section {
+            margin-bottom: 40px;
+        }
+
+        .game-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-wrap: wrap;
+        }
+
+        .game-section-title {
+            font-size: 22px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: white;
+            margin: 0;
+        }
+
+        .game-section-stats {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .game-section-stat {
+            text-align: right;
+        }
+
+        .game-section-stat-label {
+            font-size: 9px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 2px;
+        }
+
+        .game-section-stat-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #2ecc71;
+        }
+
+        @media (max-width: 700px) {
+            .game-section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .game-section-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .game-section-stat {
+                text-align: left;
+            }
+        }
     </style>
 </head>
 <body class="profile-page" data-bg="<?= htmlspecialchars($user['preferred_background'] ?? 'bg-home') ?>">
@@ -348,7 +414,6 @@ $game_leaders = $stmt->fetchAll();
             </svg>
         </button>
         
-        <!-- UPDATED USER AVATAR -->
         <div class="user-avatar">
             <?php render_nav_avatar($user['profile_picture'] ?? ''); ?>
         </div>
@@ -402,7 +467,6 @@ $game_leaders = $stmt->fetchAll();
                         elseif ($rank === 3) $row_class = 'top-3';
                         if ($row['id'] == $_SESSION['user_id']) $row_class .= ' you';
                         
-                        // Use DiceBear avatar if set, otherwise initials
                         $row_avatar = get_avatar_url($row['profile_picture'] ?? '');
                     ?>
                     <div class="rank-row <?= $row_class ?>">
@@ -439,35 +503,124 @@ $game_leaders = $stmt->fetchAll();
         <?php endif; ?>
     </div>
 
-    <!-- PANEL: BY GAME -->
+    <!-- PANEL: BY GAME (SEPARATE LEADERBOARDS) -->
     <div class="lb-panel" data-panel="games">
-        <?php if (empty($game_leaders)): ?>
+
+        <?php
+        // Separate leaderboards per game
+        $per_game_leaders = [];
+
+        foreach ($game_leaders as $g) {
+            $game_id = $g['game_id'];
+
+            // Top 10 players for this game
+            $stmt = $pdo->prepare(
+                "SELECT 
+                    u.id, u.username, u.profile_picture, u.level, u.xp,
+                    MAX(gs.score) AS high_score,
+                    COUNT(gs.id) AS plays,
+                    COALESCE(AVG(gs.score), 0) AS avg_score
+                 FROM game_sessions gs
+                 JOIN users u ON u.id = gs.user_id
+                 WHERE gs.game_id = ?
+                 GROUP BY u.id
+                 ORDER BY high_score DESC, plays DESC
+                 LIMIT 10"
+            );
+            $stmt->execute([$game_id]);
+            $per_game_leaders[$game_id] = [
+                'stats'   => $g,
+                'players' => $stmt->fetchAll(),
+            ];
+        }
+        ?>
+
+        <?php if (empty($per_game_leaders)): ?>
             <div class="empty-state">
                 No games played yet. Start playing to see stats here.
             </div>
         <?php else: ?>
-            <div class="game-leaders-grid">
-                <?php foreach ($game_leaders as $g): ?>
-                    <div class="game-leader-card">
-                        <div class="game-leader-name">
-                            <?= htmlspecialchars(strtoupper(str_replace('-', ' ', $g['game_id']))) ?>
-                        </div>
-                        <div class="game-leader-stats">
-                            <div>
-                                <div class="game-leader-stat-label"><?= __('high_score') ?></div>
-                                <div class="game-leader-stat-value"><?= number_format($g['high_score']) ?></div>
+
+            <?php foreach ($per_game_leaders as $game_id => $data): ?>
+                <?php
+                    $stats   = $data['stats'];
+                    $players = $data['players'];
+                    $game_title = strtoupper(str_replace('-', ' ', $game_id));
+                ?>
+
+                <div class="game-section">
+                    <div class="game-section-header">
+                        <h2 class="game-section-title"><?= htmlspecialchars($game_title) ?></h2>
+
+                        <div class="game-section-stats">
+                            <div class="game-section-stat">
+                                <div class="game-section-stat-label"><?= __('high_score') ?></div>
+                                <div class="game-section-stat-value"><?= number_format($stats['high_score']) ?></div>
                             </div>
-                            <div>
-                                <div class="game-leader-stat-label"><?= __('plays') ?></div>
-                                <div class="game-leader-stat-value"><?= number_format($g['plays']) ?></div>
+                            <div class="game-section-stat">
+                                <div class="game-section-stat-label"><?= __('plays') ?></div>
+                                <div class="game-section-stat-value"><?= number_format($stats['plays']) ?></div>
                             </div>
-                        </div>
-                        <div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.4);">
-                            <?= $g['players'] ?> <?= $g['players'] == 1 ? 'player' : 'players' ?>
+                            <div class="game-section-stat">
+                                <div class="game-section-stat-label">Players</div>
+                                <div class="game-section-stat-value"><?= number_format($stats['players']) ?></div>
+                            </div>
                         </div>
                     </div>
-                <?php endforeach; ?>
-            </div>
+
+                    <?php if (empty($players)): ?>
+                        <div class="empty-state" style="padding:30px;">
+                            No players yet for this game.
+                        </div>
+                    <?php else: ?>
+                        <div class="rank-list">
+                            <?php foreach ($players as $i => $row): ?>
+                                <?php
+                                    $rank = $i + 1;
+                                    $row_class = '';
+                                    if ($rank === 1) $row_class = 'top-1';
+                                    elseif ($rank === 2) $row_class = 'top-2';
+                                    elseif ($rank === 3) $row_class = 'top-3';
+                                    if ($row['id'] == $_SESSION['user_id']) $row_class .= ' you';
+
+                                    $row_avatar = get_avatar_url($row['profile_picture'] ?? '');
+                                ?>
+                                <div class="rank-row <?= $row_class ?>">
+                                    <div class="rank-number"><?= $rank ?></div>
+                                    <div class="rank-avatar">
+                                        <?php if ($row_avatar): ?>
+                                            <img src="<?= htmlspecialchars($row_avatar) ?>" alt="<?= htmlspecialchars($row['username']) ?>">
+                                        <?php else: ?>
+                                            <?= strtoupper(substr($row['username'], 0, 2)) ?>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="rank-info">
+                                        <div class="rank-name">
+                                            <?= htmlspecialchars($row['username']) ?>
+                                            <?php if ($row['id'] == $_SESSION['user_id']): ?>
+                                                <span style="color:#d13639; font-size:11px;">(<?= __('you') ?>)</span>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="rank-meta">
+                                            <span><?= __('level') ?> <?= $row['level'] ?></span>
+                                            <span>·</span>
+                                            <span><?= number_format($row['xp']) ?> XP</span>
+                                            <span>·</span>
+                                            <span><?= number_format($row['plays']) ?> <?= __('plays') ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="rank-score">
+                                        <div class="rank-score-value"><?= number_format($row['high_score']) ?></div>
+                                        <div class="rank-score-label"><?= __('high_score') ?></div>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+            <?php endforeach; ?>
+
         <?php endif; ?>
     </div>
 
