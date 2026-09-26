@@ -1,37 +1,14 @@
 [gd_scene format=3 uid="uid://bid1vxkiq5ri8"]
 
 [ext_resource type="Texture2D" uid="uid://bxpjintdady5k" path="res://Background/Hallway.png" id="1_6vjkr"]
-
-[sub_resource type="SpriteFrames" id="SpriteFrames_6vjkr"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_5j84n"]
 
 [node name="SchoolHallway" type="Node3D" unique_id=1233152468]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1051919782]
 texture = ExtResource("1_6vjkr")
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=113894474]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1457412088]
-sprite_frames = SubResource("SpriteFrames_6vjkr")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=455875732]
-
-[node name="Camera3D" type="Camera3D" parent="." unique_id=925320879]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
-projection = 1
-current = true
-size = 9.0
-
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1802945056]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_5j84n")]
+transform = Transform3D(2.6163352, 0, 0, 0, 2.6163352, 0, 0, 0, 2.6163352, -4.823835, -0.17782605, 0.5938827)
