@@ -1,32 +1,16 @@
 [gd_scene format=3 uid="uid://tkxmncvirnsx"]
 
 [ext_resource type="Texture2D" uid="uid://ckem7mch8hjcb" path="res://Background/Computer Room.png" id="1_70d7g"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_4fvh6"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_vlrva"]
+[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="4_et68q"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_70d7g"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[sub_resource type="BoxShape3D" id="BoxShape3D_et68q"]
 
 [node name="ComputerRoom" type="Node3D" unique_id=450939779]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1184715592]
 texture = ExtResource("1_70d7g")
-
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1174086259]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=139271445]
-sprite_frames = SubResource("SpriteFrames_70d7g")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=772361372]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=1626913814]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
@@ -35,3 +19,35 @@ current = true
 size = 9.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1676834619]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_4fvh6")]
+transform = Transform3D(2.76677, 0, 0, 0, 2.76677, 0, 0, 0, 2.76677, -3.7426767, -0.058068395, 0.57099307)
+
+[node name="Exit_computer_room" type="Area3D" parent="." unique_id=1631995616]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+script = ExtResource("3_vlrva")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_computer_room" unique_id=1725309385]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7407737, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_et68q")
+
+[node name="FPrompt" type="Label3D" parent="Exit_computer_room" unique_id=1869484316]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384466)
+visible = false
+text = "[F] Exit"
+
+[node name="Use Computer" type="Area3D" parent="." unique_id=1540212446]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.580117, -0.908, 0.16224253)
+script = ExtResource("3_vlrva")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Use Computer" unique_id=262726831]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.3373294, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_et68q")
+
+[node name="FPrompt" type="Label3D" parent="Use Computer" unique_id=1259292204]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.235946, 1.0314863, 0.7384466)
+visible = false
+text = "[F] Use Computer
+"
+
+[node name="TaskUI" parent="Use Computer/FPrompt" unique_id=2113353932 instance=ExtResource("4_et68q")]

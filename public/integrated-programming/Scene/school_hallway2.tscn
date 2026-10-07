@@ -1,0 +1,101 @@
+[gd_scene format=3 uid="uid://bbls5v8wl17ty"]
+
+[ext_resource type="Texture2D" uid="uid://dvb585smk0atf" path="res://Background/Hallway 2.png" id="1_5j48p"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_xuoaw"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_7uwa6"]
+[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="4_xuoaw"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tud7o"]
+size = Vector3(1, 1, 1.0556641)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_5j48p"]
+
+[node name="SchoolHallway" type="Node3D" unique_id=1233152468]
+
+[node name="Sprite3D" type="Sprite3D" parent="." unique_id=1051919782]
+texture = ExtResource("1_5j48p")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1802945056]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_xuoaw")]
+transform = Transform3D(2.6163352, 0, 0, 0, 2.6163352, 0, 0, 0, 2.6163352, -0.85301757, -0.17782605, 0.5938827)
+
+[node name="Library" type="Area3D" parent="." unique_id=1222622167]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.3996072, -0.908, 0.16224253)
+script = ExtResource("3_7uwa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Library" unique_id=1232991672]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.74511766, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_tud7o")
+
+[node name="FPrompt" type="Label3D" parent="Library" unique_id=834130922]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.0303273, 0.7693527, 0.76004696)
+visible = false
+text = "[H] Enter Library"
+
+[node name="Clinic" type="Area3D" parent="." unique_id=1900957873]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7992144, -1.816, 0.22287548)
+script = ExtResource("3_7uwa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Clinic" unique_id=1499495472]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.031188, 1.5549158, 0.39227533)
+shape = SubResource("BoxShape3D_tud7o")
+
+[node name="FPrompt" type="Label3D" parent="Clinic" unique_id=141911149]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9004717, 1.8589113, 0.5321599)
+visible = false
+text = "[G] Enter Clinic"
+
+[node name="Cafeteria" type="Area3D" parent="." unique_id=1416971882]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.514228, -0.908, 0.16224253)
+script = ExtResource("3_7uwa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cafeteria" unique_id=1574533165]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.599101, 1.0358706, 0.39227533)
+shape = SubResource("BoxShape3D_5j48p")
+
+[node name="FPrompt" type="Label3D" parent="Cafeteria" unique_id=700881456]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4884596, 1.133857, 0.7384466)
+visible = false
+text = "[C] Cafeteria"
+
+[node name="Hallway_1" type="Area3D" parent="." unique_id=1549452338]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+script = ExtResource("3_7uwa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hallway_1" unique_id=1295991463]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.095129, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_5j48p")
+
+[node name="FPrompt" type="Label3D" parent="Hallway_1" unique_id=1581932986]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.898607, 0.48157, 0.7384466)
+visible = false
+text = "[F] Enter"
+
+[node name="Computer_room" type="Area3D" parent="." unique_id=1747814650]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.816, 0.32448506)
+script = ExtResource("3_7uwa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Computer_room" unique_id=2001239030]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.697351, 1.7577424, 0.39227533)
+shape = SubResource("BoxShape3D_5j48p")
+
+[node name="FPrompt" type="Label3D" parent="Computer_room" unique_id=1189799164]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.558382, 1.8964028, 0.7384466)
+visible = false
+text = "[R] Computer Room"
+
+[node name="TaskUI" parent="Computer_room/FPrompt" unique_id=2113353932 instance=ExtResource("4_xuoaw")]
+
+[node name="School_grounds" type="Area3D" parent="." unique_id=948202443]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+script = ExtResource("3_7uwa6")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="School_grounds" unique_id=877968566]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.197866, -0.057161033, 0.39227533)
+shape = SubResource("BoxShape3D_5j48p")
+
+[node name="FPrompt" type="Label3D" parent="School_grounds" unique_id=1533927926]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.364012, -0.14742517, 0.7384466)
+visible = false
+text = "[T] School Grounds"

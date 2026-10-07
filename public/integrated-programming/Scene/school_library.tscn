@@ -1,32 +1,16 @@
 [gd_scene format=3 uid="uid://xk1as18tuu1e"]
 
 [ext_resource type="Texture2D" uid="uid://ugqbkje7i1n2" path="res://Background/Library.png" id="1_bv20e"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_3kbmx"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_tn0uj"]
+[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="4_ms3ir"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_bv20e"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[sub_resource type="BoxShape3D" id="BoxShape3D_ms3ir"]
 
 [node name="SchoolLibrary" type="Node3D" unique_id=44564354]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=827797181]
 texture = ExtResource("1_bv20e")
-
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1877703992]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1618142907]
-sprite_frames = SubResource("SpriteFrames_bv20e")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=479838663]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=619812178]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
@@ -35,3 +19,21 @@ current = true
 size = 9.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=557507545]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_3kbmx")]
+transform = Transform3D(2.680529, 0, 0, 0, 2.680529, 0, 0, 0, 2.680529, -5.313197, 0.3266828, 0.16125298)
+
+[node name="Exit_library" type="Area3D" parent="." unique_id=2043842475]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+script = ExtResource("3_tn0uj")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_library" unique_id=411821187]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7407737, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_ms3ir")
+
+[node name="FPrompt" type="Label3D" parent="Exit_library" unique_id=1818105784]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384466)
+visible = false
+text = "[F] Exit Classroom"
+
+[node name="TaskUI" parent="Exit_library/FPrompt" unique_id=2113353932 instance=ExtResource("4_ms3ir")]

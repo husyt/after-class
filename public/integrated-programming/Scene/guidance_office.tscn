@@ -1,32 +1,16 @@
 [gd_scene format=3 uid="uid://cw5ma6ye5jwp6"]
 
 [ext_resource type="Texture2D" uid="uid://d3qmokq7mgpad" path="res://Background/Guidance Office.png" id="1_70ruv"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_m5pbu"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_2ud4d"]
+[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="4_jlciy"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_70ruv"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[sub_resource type="BoxShape3D" id="BoxShape3D_jlciy"]
 
 [node name="GuidanceOffice" type="Node3D" unique_id=136903756]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1581193805]
 texture = ExtResource("1_70ruv")
-
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=935095937]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1672171603]
-sprite_frames = SubResource("SpriteFrames_70ruv")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1052138037]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=901311564]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
@@ -35,3 +19,21 @@ current = true
 size = 9.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1552847795]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_m5pbu")]
+transform = Transform3D(2.5446637, 0, 0, 0, 2.5446637, 0, 0, 0, 2.5446637, -5.482028, 0.2598437, 0.9706156)
+
+[node name="Exit_clinic" type="Area3D" parent="." unique_id=1300361854]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+script = ExtResource("3_2ud4d")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_clinic" unique_id=1398445672]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7407737, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_jlciy")
+
+[node name="FPrompt" type="Label3D" parent="Exit_clinic" unique_id=1634566202]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384466)
+visible = false
+text = "[F] Exit Classroom"
+
+[node name="TaskUI" parent="." unique_id=2113353932 instance=ExtResource("4_jlciy")]

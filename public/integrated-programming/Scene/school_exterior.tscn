@@ -13,29 +13,18 @@ texture = ExtResource("1_pdh1k")
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1270308278]
 
-[node name="FPrompt" type="Label" parent="CanvasLayer" unique_id=1924522401]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = 93.0
-offset_top = -302.0
-offset_right = 222.0
-offset_bottom = -257.0
-grow_horizontal = 2
-grow_vertical = 0
-theme_override_font_sizes/font_size = 32
-text = "[F] Enter"
-
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_r3fqk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.083, -0.9900284, 0.4254926)
 
 [node name="SchoolEntrance" type="Area3D" parent="." unique_id=28903567]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
 script = ExtResource("3_phkjw")
-target_scene = "uid://bid1vxkiq5ri8"
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SchoolEntrance" unique_id=1022880517]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.40100002, 0.39227533)
 shape = SubResource("BoxShape3D_1scgm")
+
+[node name="FPrompt" type="Label3D" parent="SchoolEntrance" unique_id=2018918172]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.20838118, -0.16224253)
+visible = false
+text = "[F] Enter School"

@@ -1,37 +1,36 @@
 [gd_scene format=3 uid="uid://du1r32mrubjpo"]
 
 [ext_resource type="Texture2D" uid="uid://cj1mvpmjbnvxl" path="res://Background/Student’s House  Bedroom.png" id="1_muoxo"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_pgkja"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_31wlc"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_muoxo"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[sub_resource type="BoxShape3D" id="BoxShape3D_8er82"]
 
 [node name="StudentBedroom" type="Node3D" unique_id=1240360849]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1472228789]
 texture = ExtResource("1_muoxo")
 
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1765907195]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=20543183]
-sprite_frames = SubResource("SpriteFrames_muoxo")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=2117684857]
-
 [node name="Camera3D" type="Camera3D" parent="." unique_id=669560452]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 17.44947)
 projection = 1
 current = true
 size = 9.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1178532998]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_pgkja")]
+transform = Transform3D(3.010441, 0, 0, 0, 3.010441, 0, 0, 0, 3.010441, -3.7301311, 0, 0.5451015)
+
+[node name="Bedroom" type="Area3D" parent="." unique_id=1904495833]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2688136, -0.38917017, 0.28540528)
+script = ExtResource("3_31wlc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bedroom" unique_id=248493722]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1512048, 0.42486858, 0.39227533)
+shape = SubResource("BoxShape3D_8er82")
+
+[node name="FPrompt" type="Label3D" parent="Bedroom" unique_id=1185220516]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6271346, 0.43158358, 0.7384466)
+visible = false
+text = "[F] Sleep"

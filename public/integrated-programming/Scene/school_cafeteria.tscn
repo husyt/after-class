@@ -1,32 +1,18 @@
 [gd_scene format=3 uid="uid://cwe2x2vfxih4k"]
 
 [ext_resource type="Texture2D" uid="uid://cge7wgjghwisj" path="res://Background/Cafeteria.png" id="1_0qobw"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_npnue"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_usb1h"]
+[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="4_uxj7v"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_0qobw"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[sub_resource type="BoxShape3D" id="BoxShape3D_uxj7v"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_usb1h"]
 
 [node name="SchoolCafeteria" type="Node3D" unique_id=445969684]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=1341150194]
 texture = ExtResource("1_0qobw")
-
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=177917985]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=642408019]
-sprite_frames = SubResource("SpriteFrames_0qobw")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=2046708997]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=92447245]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
@@ -35,3 +21,47 @@ current = true
 size = 9.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1929482839]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_npnue")]
+transform = Transform3D(2.3713825, 0, 0, 0, 2.3713825, 0, 0, 0, 2.3713825, 4.1917067, -0.39161044, 0.5003445)
+
+[node name="Exit_cafeteria" type="Area3D" parent="." unique_id=509288230]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.650625, -0.908, 0.16224253)
+script = ExtResource("3_usb1h")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_cafeteria" unique_id=2126406106]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2612495, 0.3964514, 0.39227533)
+shape = SubResource("BoxShape3D_uxj7v")
+
+[node name="FPrompt" type="Label3D" parent="Exit_cafeteria" unique_id=1093609911]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.1237507, 0.7579136, 0.7384466)
+visible = false
+text = "[F] Exit Cafeteria"
+
+[node name="Buy" type="Area3D" parent="." unique_id=918958498]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.8659096, 0.34296793, 0.16224253)
+script = ExtResource("3_usb1h")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buy" unique_id=1767850245]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.14486027, -0.42486614, 0.39227533)
+shape = SubResource("BoxShape3D_usb1h")
+
+[node name="FPrompt" type="Label3D" parent="Buy" unique_id=1683870010]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.31621242, -0.29924828, 0.7384466)
+visible = false
+text = "[F] Buy"
+
+[node name="Eat" type="Area3D" parent="Buy" unique_id=965082411]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.0629296, -0.908, 0.16224253)
+script = ExtResource("3_usb1h")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Buy/Eat" unique_id=711700595]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.71586514, 0.14943165, 0.39227533)
+shape = SubResource("BoxShape3D_usb1h")
+
+[node name="FPrompt" type="Label3D" parent="Buy/Eat" unique_id=1926486138]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9457059, 0.4473595, 0.7384466)
+visible = false
+text = "[F] Eat"
+
+[node name="TaskUI" parent="Buy/Eat/FPrompt" unique_id=2113353932 instance=ExtResource("4_uxj7v")]

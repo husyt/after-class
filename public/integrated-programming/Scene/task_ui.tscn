@@ -1,0 +1,45 @@
+[gd_scene format=3 uid="uid://7u4dmjjs4yes"]
+
+[node name="TaskUI" type="CanvasLayer" unique_id=2113353932]
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1528415384]
+offset_right = 249.0
+offset_bottom = 132.0
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=289449862]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/MarginContainer" unique_id=50064404]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=450300935]
+layout_mode = 2
+text = "SCHOOL TASKS"
+horizontal_alignment = 1
+
+[node name="Progress" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1880828100]
+layout_mode = 2
+text = "Progress
+0 / 5 Completed
+"
+horizontal_alignment = 1
+
+[node name="Task1" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1553226744]
+layout_mode = 2
+text = "□ Attend Class"
+
+[node name="Task2" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=1210280048]
+layout_mode = 2
+text = "□ Borrow a Book"
+
+[node name="Task3" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=234108755]
+layout_mode = 2
+text = "□ Get Health Form"
+
+[node name="Task4" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=352019396]
+layout_mode = 2
+text = "□ Eat Lunch"
+
+[node name="Task5" type="Label" parent="PanelContainer/MarginContainer/VBoxContainer" unique_id=363707128]
+layout_mode = 2
+text = "□ Finish Computer Activity"

@@ -1,32 +1,15 @@
 [gd_scene format=3 uid="uid://6cvtvwfr7y1o"]
 
 [ext_resource type="Texture2D" uid="uid://cevk2g6tq6r5c" path="res://Background/Bus Stop.png" id="1_uw4et"]
+[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_8qn4i"]
+[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_qrfli"]
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_uw4et"]
-animations = [{
-"frames": [],
-"loop": 1,
-"name": &"Idle",
-"speed": 5.0
-}, {
-"frames": [],
-"loop": 1,
-"name": &"Walk",
-"speed": 5.0
-}]
+[sub_resource type="BoxShape3D" id="BoxShape3D_wivvi"]
 
 [node name="BusStop" type="Node3D" unique_id=1111346381]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=848290393]
 texture = ExtResource("1_uw4et")
-
-[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=959043364]
-
-[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=561936923]
-sprite_frames = SubResource("SpriteFrames_uw4et")
-animation = &"Walk"
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=168294031]
 
 [node name="Camera3D" type="Camera3D" parent="." unique_id=928155263]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
@@ -35,3 +18,19 @@ current = true
 size = 9.0
 
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1374310500]
+
+[node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_8qn4i")]
+transform = Transform3D(1.9099357, 0, 0, 0, 1.9099357, 0, 0, 0, 1.9099357, 0, -0.6205513, 0.7881001)
+
+[node name="Bus" type="Area3D" parent="." unique_id=1266749782]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+script = ExtResource("3_qrfli")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bus" unique_id=537778219]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7407737, 0.84197974, 0.39227533)
+shape = SubResource("BoxShape3D_wivvi")
+
+[node name="FPrompt" type="Label3D" parent="Bus" unique_id=1906713276]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384466)
+visible = false
+text = "[F] Exit Classroom"
