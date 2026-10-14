@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://doji2g7g6bejv"]
+[gd_scene format=3 uid="uid://ly40tdr2hgkv"]
 
 [ext_resource type="Script" uid="uid://buwtuaj8g0tyw" path="res://Script/vehicle.gd" id="1_2lb0n"]
 [ext_resource type="Texture2D" uid="uid://cdp6ha8lrnurv" path="res://Vehicle/tricycle/boarding_01.png" id="1_aaqgd"]

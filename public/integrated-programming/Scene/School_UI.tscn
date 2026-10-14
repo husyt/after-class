@@ -1,5 +1,0 @@
-[gd_scene format=3 uid="uid://bj5m7klcvcq8v"]
-
-[node name="SchoolHUD" type="CanvasLayer" unique_id=2139563838]
-process_mode = 3
-layer = 50

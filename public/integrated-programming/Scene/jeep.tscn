@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://ceiufuxopkork"]
+[gd_scene format=3 uid="uid://d1fxojp4bboft"]
 
 [ext_resource type="Texture2D" uid="uid://5ru3wa3ybup" path="res://Vehicle/jeepney/boarding_01.png" id="1_qunw4"]
 [ext_resource type="Script" uid="uid://buwtuaj8g0tyw" path="res://Script/vehicle.gd" id="1_toh4g"]

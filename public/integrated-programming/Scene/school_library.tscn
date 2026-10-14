@@ -1,10 +1,10 @@
-[gd_scene format=3 uid="uid://xk1as18tuu1e"]
+[gd_scene format=3 uid="uid://ce5qytfaxxc5b"]
 
 [ext_resource type="Texture2D" uid="uid://ugqbkje7i1n2" path="res://Background/Library.png" id="1_bv20e"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_3kbmx"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_3kbmx"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_tn0uj"]
 [ext_resource type="Script" uid="uid://v0spd80t2ann" path="res://Script/school_task.gd" id="5_h1uy8"]
-[ext_resource type="PackedScene" uid="uid://c50a7hnwhdfs1" path="res://Scene/Staff_Liza.tscn" id="5_q487d"]
+[ext_resource type="PackedScene" uid="uid://cc5h8velfxbxi" path="res://Scene/Staff_Liza.tscn" id="5_q487d"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ms3ir"]
 

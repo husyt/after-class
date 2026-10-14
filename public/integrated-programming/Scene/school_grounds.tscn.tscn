@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://cptyvs417p8x5"]
+[gd_scene format=3 uid="uid://csbtvi05x86ps"]
 
 [ext_resource type="Texture2D" uid="uid://datbdj43v0ey3" path="res://Background/Playground  School Grounds.png" id="1_xonmp"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_bk7o2"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_bk7o2"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_6ao61"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7pbsr"]

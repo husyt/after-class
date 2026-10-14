@@ -1,11 +1,11 @@
-[gd_scene format=3 uid="uid://6cvtvwfr7y1o"]
+[gd_scene format=3 uid="uid://cgk7pis0m2y5"]
 
 [ext_resource type="Texture2D" uid="uid://cevk2g6tq6r5c" path="res://Background/Bus Stop.png" id="1_uw4et"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_8qn4i"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_8qn4i"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_qrfli"]
 [ext_resource type="AudioStream" uid="uid://b3nd7gwwobkwx" path="res://Music/PHILIPPINES CITY 1 - Sound Effect.mp3" id="4_wivvi"]
-[ext_resource type="PackedScene" uid="uid://doji2g7g6bejv" path="res://Scene/tricycle.tscn" id="5_c5s5o"]
-[ext_resource type="PackedScene" uid="uid://ceiufuxopkork" path="res://Scene/jeep.tscn" id="6_cf342"]
+[ext_resource type="PackedScene" uid="uid://ly40tdr2hgkv" path="res://Scene/tricycle.tscn" id="5_c5s5o"]
+[ext_resource type="PackedScene" uid="uid://d1fxojp4bboft" path="res://Scene/jeep.tscn" id="6_cf342"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wivvi"]
 

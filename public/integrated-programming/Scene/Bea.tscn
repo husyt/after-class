@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://ba0gh7nrp6q3s"]
+[gd_scene format=3 uid="uid://cwht52yae1vht"]
 
 [ext_resource type="Texture2D" uid="uid://bgf3k4glrkxph" path="res://Character/student_bea/frames/idle_01.png" id="1_bhyxp"]
 [ext_resource type="Script" uid="uid://cccrl6nuvgo0v" path="res://Script/NPC.gd" id="1_g4ebo"]

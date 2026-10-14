@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://b4d52fm08886f"]
+[gd_scene format=3 uid="uid://1xcui3y0fgdk"]
 
 [ext_resource type="Texture2D" uid="uid://dcolrindapxyr" path="res://Background/Convenience Store.png" id="1_necos"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_46f7p"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_46f7p"]
 
 [node name="ConvenieceStore" type="Node3D" unique_id=427723958]
 

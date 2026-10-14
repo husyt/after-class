@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://ckxnhv1v4h86q"]
+[gd_scene format=3 uid="uid://bog123y25pbdj"]
 
 [ext_resource type="Texture2D" uid="uid://c5rn0bj7obuix" path="res://Background/School Exterior4.png" id="1_pdh1k"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_r3fqk"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_r3fqk"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_phkjw"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1scgm"]

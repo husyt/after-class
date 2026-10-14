@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://b3aj8er2e66ch"]
+[gd_scene format=3 uid="uid://dki7xsbq356mc"]
 
 [ext_resource type="Script" uid="uid://dnc2emfsvwko4" path="res://Script/player.gd" id="1_tgux0"]
 [ext_resource type="Texture2D" uid="uid://df4qrilsp0l6f" path="res://Character/Idle/idle_01.png" id="2_73ll3"]
@@ -19,7 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://ek5s5se7yjqr" path="res://Character/Idle/idle_08.png" id="9_vm1eq"]
 [ext_resource type="Texture2D" uid="uid://d4c4xhhmyjn34" path="res://Character/Walk/walk_08.png" id="10_73ll3"]
 [ext_resource type="Script" uid="uid://bgkx4xnawrp5d" path="res://Script/camera.gd" id="18_ilft0"]
-[ext_resource type="PackedScene" uid="uid://bmt5xfxpk85yu" path="res://Scene/SchoolHUD.tscn" id="19_ljc6b"]
+[ext_resource type="PackedScene" uid="uid://dj88ioas0nksu" path="res://Scene/SchoolHUD.tscn" id="19_ljc6b"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_2ht62"]
 animations = [{

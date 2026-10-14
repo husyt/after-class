@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://bbls5v8wl17ty"]
+[gd_scene format=3 uid="uid://k4vxo7p5u0w"]
 
 [ext_resource type="Texture2D" uid="uid://dvb585smk0atf" path="res://Background/Hallway 2.png" id="1_5j48p"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_xuoaw"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_xuoaw"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_7uwa6"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tud7o"]

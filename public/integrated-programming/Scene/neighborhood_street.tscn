@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://bpxbngalwjlj0"]
+[gd_scene format=3 uid="uid://b7ix4rk3ovnaq"]
 
 [ext_resource type="Texture2D" uid="uid://bspatewmrelyh" path="res://Background/Street  Neighborhood.png" id="1_kbg5c"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_jxw52"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_jxw52"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_fq5qy"]
 [ext_resource type="AudioStream" uid="uid://bwlbtiyhfnuoe" path="res://Music/(Audio) Average Filipino Sunday be Like.mp3" id="4_m2ok2"]
 

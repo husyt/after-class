@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://du1r32mrubjpo"]
+[gd_scene format=3 uid="uid://ji513kf4vrl5"]
 
 [ext_resource type="Texture2D" uid="uid://cj1mvpmjbnvxl" path="res://Background/Student’s House  Bedroom.png" id="1_muoxo"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_pgkja"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_pgkja"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_31wlc"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8er82"]
@@ -25,9 +25,6 @@ transform = Transform3D(3.010441, 0, 0, 0, 3.010441, 0, 0, 0, 3.010441, -3.73013
 [node name="Bedroom" type="Area3D" parent="." unique_id=1904495833]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2688136, -0.38917017, 0.28540528)
 script = ExtResource("3_31wlc")
-task_id = null
-target_scene_path = null
-click_padding = null
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Bedroom" unique_id=248493722]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1512048, 0.42486858, 0.39227533)

@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://cw5ma6ye5jwp6"]
+[gd_scene format=3 uid="uid://cxe6nhyy2rnh1"]
 
 [ext_resource type="Texture2D" uid="uid://d3qmokq7mgpad" path="res://Background/Guidance Office.png" id="1_70ruv"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_m5pbu"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_m5pbu"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_2ud4d"]
-[ext_resource type="PackedScene" uid="uid://c50a7hnwhdfs1" path="res://Scene/Staff_Liza.tscn" id="4_jlciy"]
+[ext_resource type="PackedScene" uid="uid://cc5h8velfxbxi" path="res://Scene/Staff_Liza.tscn" id="4_jlciy"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jlciy"]
 

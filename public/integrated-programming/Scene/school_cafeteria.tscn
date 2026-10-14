@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://cwe2x2vfxih4k"]
+[gd_scene format=3 uid="uid://c5i8jt2iqt42r"]
 
 [ext_resource type="Texture2D" uid="uid://cge7wgjghwisj" path="res://Background/Cafeteria.png" id="1_0qobw"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_npnue"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_npnue"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_usb1h"]
 [ext_resource type="Script" uid="uid://v0spd80t2ann" path="res://Script/school_task.gd" id="4_v7xcj"]
 

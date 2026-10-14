@@ -1,10 +1,10 @@
-[gd_scene format=3 uid="uid://bid1vxkiq5ri8"]
+[gd_scene format=3 uid="uid://cu7xbl1ajhon8"]
 
 [ext_resource type="Texture2D" uid="uid://bxpjintdady5k" path="res://Background/Hallway.png" id="1_6vjkr"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_5j84n"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_5j84n"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_6rxgk"]
-[ext_resource type="PackedScene" uid="uid://gglwrsj0sx7o" path="res://Scene/Mara.tscn" id="4_g6b8d"]
-[ext_resource type="PackedScene" uid="uid://ba0gh7nrp6q3s" path="res://Scene/Bea.tscn" id="5_o46p4"]
+[ext_resource type="PackedScene" uid="uid://dai8ndbkj8kvg" path="res://Scene/Mara.tscn" id="4_g6b8d"]
+[ext_resource type="PackedScene" uid="uid://cwht52yae1vht" path="res://Scene/Bea.tscn" id="5_o46p4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tud7o"]
 size = Vector3(1, 1, 1.0556641)

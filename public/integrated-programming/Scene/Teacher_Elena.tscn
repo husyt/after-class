@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://d3m85ygd2cvii"]
+[gd_scene format=3 uid="uid://cl13e0rexu7yf"]
 
 [ext_resource type="Texture2D" uid="uid://bs0c20d72k1al" path="res://Character/teacher_elena/frames/idle_01.png" id="1_gvl55"]
 [ext_resource type="Script" uid="uid://cccrl6nuvgo0v" path="res://Script/NPC.gd" id="1_rfoa3"]

@@ -1,9 +1,9 @@
-[gd_scene format=3 uid="uid://uqje3bjjr0lx"]
+[gd_scene format=3 uid="uid://bdo1pww2ic0nh"]
 
 [ext_resource type="Texture2D" uid="uid://cklwfr4bmxmfx" path="res://Background/Classroom.png" id="1_ym234"]
-[ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_r27vx"]
+[ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_r27vx"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_1euv5"]
-[ext_resource type="PackedScene" uid="uid://d3m85ygd2cvii" path="res://Scene/Teacher_Elena.tscn" id="5_8dj3n"]
+[ext_resource type="PackedScene" uid="uid://cl13e0rexu7yf" path="res://Scene/Teacher_Elena.tscn" id="5_8dj3n"]
 [ext_resource type="Script" uid="uid://v0spd80t2ann" path="res://Script/school_task.gd" id="5_gj1mp"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3p5wk"]

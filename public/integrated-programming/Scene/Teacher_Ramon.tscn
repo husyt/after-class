@@ -1,4 +1,4 @@
-[gd_scene format=3 uid="uid://cx8lpl3p1meg1"]
+[gd_scene format=3 uid="uid://bheextopgbgq0"]
 
 [ext_resource type="Texture2D" uid="uid://cvuasxevc6hvk" path="res://Character/teacher_ramon/frames/idle_01.png" id="1_hbivk"]
 [ext_resource type="Script" uid="uid://cccrl6nuvgo0v" path="res://Script/NPC.gd" id="1_y2ggq"]
