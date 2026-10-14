@@ -72,3 +72,11 @@ shape = SubResource("BoxShape3D_8dj3n")
 
 [node name="Character2" parent="." unique_id=518310875 instance=ExtResource("5_8dj3n")]
 transform = Transform3D(-2.4507375, 0, 0.16326594, 0, 2.4561696, 0, -0.16326594, 0, -2.4507375, 3.8525765, -0.18201786, 2.4178176)
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=777010580]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.409314, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=349134719]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3114805, 0, 0)
+gizmo_extents = 2.36

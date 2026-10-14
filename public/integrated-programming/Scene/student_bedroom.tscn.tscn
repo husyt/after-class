@@ -25,8 +25,8 @@ transform = Transform3D(3.010441, 0, 0, 0, 3.010441, 0, 0, 0, 3.010441, -3.73013
 [node name="Bedroom" type="Area3D" parent="." unique_id=1904495833]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2688136, -0.38917017, 0.28540528)
 script = ExtResource("3_31wlc")
-target_scene_path = null
 task_id = null
+target_scene_path = null
 click_padding = null
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Bedroom" unique_id=248493722]
@@ -37,3 +37,11 @@ shape = SubResource("BoxShape3D_8er82")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6271346, 0.43158358, 0.7384466)
 visible = false
 text = "[F] Sleep"
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=896440679]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.074772, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1087444210]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.2318945, 0, 0)
+gizmo_extents = 2.36

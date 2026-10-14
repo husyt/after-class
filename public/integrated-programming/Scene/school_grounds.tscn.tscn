@@ -30,7 +30,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1958191, -0.908, 0.16224253
 script = ExtResource("3_6ao61")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Enter_grounds" unique_id=1390373249]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.588568, -0.45056796, 0.5776253)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.588568, -0.45056796, 0.638754)
 shape = SubResource("BoxShape3D_7pbsr")
 
 [node name="FPrompt" type="Label3D" parent="Enter_grounds" unique_id=320296195]
@@ -47,7 +47,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.31028104, -0.6606009, 0.392
 shape = SubResource("BoxShape3D_7pbsr")
 
 [node name="FPrompt" type="Label3D" parent="Play" unique_id=134675222]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20244575, -0.017683148, 0.7384466)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.20244575, -0.34862328, 0.7384466)
 visible = false
 text = "[F] Play"
 
@@ -64,3 +64,11 @@ transform = Transform3D(0.10557002, 0, 0, 0, 1, 0, 0, 0, 1, 7.910836, 0, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=1799654738]
 transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.1676513, 1.2917477)
 shape = SubResource("BoxShape3D_6ao61")
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=686890642]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.230696, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=610791708]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.215375, 0, 0)
+gizmo_extents = 2.36

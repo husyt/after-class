@@ -64,3 +64,11 @@ transform = Transform3D(3.1318536, 0, 0, 0, 3.2893646, 0, 0, 0, 1, -12.124142, -
 
 [node name="Jeep" parent="." unique_id=1171187647 instance=ExtResource("6_cf342")]
 transform = Transform3D(5.4309664, 0, 0, 0, 4.9239736, 0, 0, 0, 1, -0.9675398, -0.26665604, 0.98041034)
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=683875230]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.136024, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1435757697]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.038, 0, 0)
+gizmo_extents = 2.36

@@ -106,3 +106,11 @@ transform = Transform3D(0.10557002, 0, 0, 0, 1, 0, 0, 0, 1, -8.797152, 0, 0)
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1707457363]
 transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.1676513, 1.2917477)
 shape = SubResource("BoxShape3D_xuoaw")
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=1531663374]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.646738, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1254545078]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.674321, 0, 0)
+gizmo_extents = 2.36

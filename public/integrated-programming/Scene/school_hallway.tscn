@@ -89,3 +89,11 @@ transform = Transform3D(2.2058318, 0, 0, 0, 2.2058318, 0, 0, 0, 2.2058318, -0.39
 
 [node name="Character3" parent="." unique_id=1681138276 instance=ExtResource("5_o46p4")]
 transform = Transform3D(2.0238914, 0, 0, 0, 2.0238914, 0, 0, 0, 2.0238914, 0.7386159, -0.15940297, 0.52372885)
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=1853463140]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.357118, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1698534523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3114805, 0, 0)
+gizmo_extents = 2.36

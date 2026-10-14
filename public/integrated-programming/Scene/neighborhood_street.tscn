@@ -53,3 +53,11 @@ text = "[F] Buy something"
 stream = ExtResource("4_m2ok2")
 volume_db = 3.5
 autoplay = true
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=1926772489]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9561715, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=284562460]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3114805, 0, 0)
+gizmo_extents = 2.36

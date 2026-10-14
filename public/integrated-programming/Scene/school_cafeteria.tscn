@@ -63,3 +63,11 @@ shape = SubResource("BoxShape3D_usb1h")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9457059, 0.4473595, 0.7384466)
 visible = false
 text = "[F] Eat"
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=597636429]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.321817, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1650489805]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3114805, 0, 0)
+gizmo_extents = 2.36

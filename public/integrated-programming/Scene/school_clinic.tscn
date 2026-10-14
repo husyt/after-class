@@ -82,3 +82,11 @@ shape = SubResource("BoxShape3D_wccga")
 
 [node name="Character2" parent="." unique_id=768060230 instance=ExtResource("5_6tp8t")]
 transform = Transform3D(-2.8294785, 0, 0.03217543, 0, 2.8296614, 0, -0.03217543, 0, -2.8294785, 4.418295, 0.4018974, 1.0385668)
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=1248074922]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.065701, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1218489753]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.087453, 0, 0)
+gizmo_extents = 2.36
