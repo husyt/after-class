@@ -1,0 +1,73 @@
+[gd_scene format=3 uid="uid://ceiufuxopkork"]
+
+[ext_resource type="Texture2D" uid="uid://5ru3wa3ybup" path="res://Vehicle/jeepney/boarding_01.png" id="1_qunw4"]
+[ext_resource type="Script" uid="uid://buwtuaj8g0tyw" path="res://Script/vehicle.gd" id="1_toh4g"]
+[ext_resource type="Texture2D" uid="uid://bxkfv3yjspc61" path="res://Vehicle/jeepney/boarding_03.png" id="2_toh4g"]
+[ext_resource type="Texture2D" uid="uid://sxmmovt4csf8" path="res://Vehicle/jeepney2/boarding_01.png" id="3_iy40e"]
+[ext_resource type="Texture2D" uid="uid://bu31vyr73f4ry" path="res://Vehicle/jeepney2/boarding_03.png" id="4_7h0yx"]
+[ext_resource type="Texture2D" uid="uid://b4y3cnpooviq7" path="res://Vehicle/jeepney/drive_01.png" id="5_8saw4"]
+[ext_resource type="Texture2D" uid="uid://bqhhv7ahnw4jv" path="res://Vehicle/jeepney/drive_03.png" id="6_wpev4"]
+[ext_resource type="Texture2D" uid="uid://bfvlg0gm71wy0" path="res://Vehicle/jeepney/idle_01.png" id="7_3pw58"]
+[ext_resource type="Texture2D" uid="uid://ce4jwrkwfje7" path="res://Vehicle/jeepney/idle_02.png" id="8_kkqrn"]
+[ext_resource type="Texture2D" uid="uid://d1ydeetfkaole" path="res://Vehicle/jeepney/idle_03.png" id="9_c32yt"]
+[ext_resource type="Texture2D" uid="uid://rmanxxrht3tq" path="res://Vehicle/jeepney/idle_04.png" id="10_mv361"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_qt4ce"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_qunw4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_toh4g")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_iy40e")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7h0yx")
+}],
+"loop": 1,
+"name": &"Boarding",
+"speed": 2.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_8saw4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_wpev4")
+}],
+"loop": 1,
+"name": &"Drive",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_3pw58")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_kkqrn")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_c32yt")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_mv361")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}]
+
+[node name="Jeep" type="Node3D" unique_id=719971783]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+script = ExtResource("1_toh4g")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
+transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
+sprite_frames = SubResource("SpriteFrames_qt4ce")
+animation = &"Drive"
+frame_progress = 0.23579293

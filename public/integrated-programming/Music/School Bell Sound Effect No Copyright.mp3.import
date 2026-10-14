@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dcftn6lnhujih"
+path="res://.godot/imported/School Bell Sound Effect No Copyright.mp3-fea306d00545efe8c86f1ca37677d985.mp3str"
+
+[deps]
+
+source_file="res://Music/School Bell Sound Effect No Copyright.mp3"
+dest_files=["res://.godot/imported/School Bell Sound Effect No Copyright.mp3-fea306d00545efe8c86f1ca37677d985.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

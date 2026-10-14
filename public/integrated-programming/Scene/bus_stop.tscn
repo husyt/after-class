@@ -3,8 +3,14 @@
 [ext_resource type="Texture2D" uid="uid://cevk2g6tq6r5c" path="res://Background/Bus Stop.png" id="1_uw4et"]
 [ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_8qn4i"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_qrfli"]
+[ext_resource type="AudioStream" uid="uid://b3nd7gwwobkwx" path="res://Music/PHILIPPINES CITY 1 - Sound Effect.mp3" id="4_wivvi"]
+[ext_resource type="PackedScene" uid="uid://doji2g7g6bejv" path="res://Scene/tricycle.tscn" id="5_c5s5o"]
+[ext_resource type="PackedScene" uid="uid://ceiufuxopkork" path="res://Scene/jeep.tscn" id="6_cf342"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wivvi"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_qrfli"]
+size = Vector3(1, 1, 2.8155518)
 
 [node name="BusStop" type="Node3D" unique_id=1111346381]
 
@@ -20,17 +26,41 @@ size = 9.0
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1374310500]
 
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_8qn4i")]
-transform = Transform3D(1.9099357, 0, 0, 0, 1.9099357, 0, 0, 0, 1.9099357, 0, -0.6205513, 0.7881001)
+transform = Transform3D(1.9099357, 0, 0, 0, 1.9099357, 0, 0, 0, 1.9099357, -4.6526175, -0.6205513, 0.7881001)
 
 [node name="Bus" type="Area3D" parent="." unique_id=1266749782]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9623215, -0.908, 0.16224253)
 script = ExtResource("3_qrfli")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Bus" unique_id=537778219]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7407737, 0.84197974, 0.39227533)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.4659836, 0.0747022, 0.14432502)
 shape = SubResource("BoxShape3D_wivvi")
 
 [node name="FPrompt" type="Label3D" parent="Bus" unique_id=1906713276]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384466)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8261955, -0.02540946, 0.24133265)
 visible = false
-text = "[F] Exit Classroom"
+text = "[F] Wait"
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1835816688]
+transform = Transform3D(0.10557002, 0, 0, 0, 1, 0, 0, 0, 1, -7.1751113, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=429056178]
+transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.1676513, 1.2917477)
+shape = SubResource("BoxShape3D_qrfli")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=1753669884]
+transform = Transform3D(0.011145029, 0, 0, 0, 1, 0, 0, 0, 1, 7.883074, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=954749401]
+transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.1676513, 1.2917477)
+shape = SubResource("BoxShape3D_qrfli")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1200104382]
+stream = ExtResource("4_wivvi")
+autoplay = true
+
+[node name="Tricyle" parent="." unique_id=1961221490 instance=ExtResource("5_c5s5o")]
+transform = Transform3D(3.1318536, 0, 0, 0, 3.2893646, 0, 0, 0, 1, -12.124142, -0.537, 2)
+
+[node name="Jeep" parent="." unique_id=1171187647 instance=ExtResource("6_cf342")]
+transform = Transform3D(5.4309664, 0, 0, 0, 4.9239736, 0, 0, 0, 1, -0.9675398, -0.26665604, 0.98041034)

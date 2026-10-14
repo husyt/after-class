@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://dwv4irfoucvvu"]
+
+[ext_resource type="Texture2D" uid="uid://b8xoykbma4d35" path="res://Character/student_nico/frames/idle_01.png" id="1_bg0a7"]
+[ext_resource type="Script" uid="uid://cccrl6nuvgo0v" path="res://Script/NPC.gd" id="1_kwd6i"]
+[ext_resource type="Texture2D" uid="uid://yhp0ekrcu7w8" path="res://Character/student_nico/frames/idle_02.png" id="2_kwd6i"]
+[ext_resource type="Texture2D" uid="uid://buyul3h3xxh6g" path="res://Character/student_nico/frames/idle_03.png" id="3_5gix8"]
+[ext_resource type="Texture2D" uid="uid://c1fs6sc045381" path="res://Character/student_nico/frames/idle_04.png" id="4_xcne5"]
+[ext_resource type="Texture2D" uid="uid://cvq1xdj034vnf" path="res://Character/student_nico/frames/idle_05.png" id="5_kgart"]
+[ext_resource type="Texture2D" uid="uid://44pl8c07f4b" path="res://Character/student_nico/frames/idle_06.png" id="6_lvn2y"]
+[ext_resource type="Texture2D" uid="uid://c8yxndufeuyws" path="res://Character/student_nico/frames/idle_07.png" id="7_jhyy0"]
+[ext_resource type="Texture2D" uid="uid://cggtij3h2auhf" path="res://Character/student_nico/frames/idle_08.png" id="8_0xmwe"]
+[ext_resource type="Texture2D" uid="uid://cfcjg5hk0ptvh" path="res://Character/student_nico/frames/walk_01.png" id="9_sl23r"]
+[ext_resource type="Texture2D" uid="uid://cggpsowukx4ct" path="res://Character/student_nico/frames/walk_02.png" id="10_a6ai3"]
+[ext_resource type="Texture2D" uid="uid://bwcjij8c657f1" path="res://Character/student_nico/frames/walk_03.png" id="11_w6yaa"]
+[ext_resource type="Texture2D" uid="uid://dajd2opmdx8f2" path="res://Character/student_nico/frames/walk_04.png" id="12_3x5mk"]
+[ext_resource type="Texture2D" uid="uid://40pixt0oeoak" path="res://Character/student_nico/frames/walk_05.png" id="13_53e0o"]
+[ext_resource type="Texture2D" uid="uid://dfkxipnerd40q" path="res://Character/student_nico/frames/walk_06.png" id="14_kn1y8"]
+[ext_resource type="Texture2D" uid="uid://dtxfyhc52ihis" path="res://Character/student_nico/frames/walk_07.png" id="15_7to14"]
+[ext_resource type="Texture2D" uid="uid://bcxqyxohj04j1" path="res://Character/student_nico/frames/walk_08.png" id="16_euvvn"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_83nrh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_bg0a7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_kwd6i")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_5gix8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_xcne5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_kgart")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_lvn2y")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_jhyy0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_0xmwe")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_sl23r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_a6ai3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_w6yaa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_3x5mk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_53e0o")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_kn1y8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_7to14")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_euvvn")
+}],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="Character" type="Node3D" unique_id=719971783]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+script = ExtResource("1_kwd6i")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
+transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
+sprite_frames = SubResource("SpriteFrames_83nrh")
+animation = &"Idle"
+frame_progress = 0.55519825

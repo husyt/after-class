@@ -6,6 +6,12 @@
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1scgm"]
 
+[sub_resource type="SystemFont" id="SystemFont_26xku"]
+font_names = PackedStringArray("PT Sans Caption")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_phkjw"]
+size = Vector3(1, 1, 2.8155518)
+
 [node name="school_exterior" type="Node3D" unique_id=324965524]
 
 [node name="Sprite3D" type="Sprite3D" parent="." unique_id=796533262]
@@ -28,3 +34,25 @@ shape = SubResource("BoxShape3D_1scgm")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.20838118, -0.16224253)
 visible = false
 text = "[F] Enter School"
+font = SubResource("SystemFont_26xku")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=1343108871]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=971813175]
+transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, 9.15561, -1.1676513, 1.2917477)
+shape = SubResource("BoxShape3D_phkjw")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=1110482574]
+transform = Transform3D(0.066814125, 0, 0, 0, 0.43689352, 0, 0, 0, 0.31701893, -9.566616, -1.447656, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=978153030]
+transform = Transform3D(1, 0, 0, 0, 4.601042, 0, 0, 0, 0.99999964, 2.124649, 0.3282299, 1.2341)
+shape = SubResource("BoxShape3D_phkjw")
+
+[node name="CameraLeftStop" type="Marker3D" parent="." unique_id=1026471356]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.281331, 0, 0.3013674)
+gizmo_extents = 1.45
+
+[node name="CameraRightStop" type="Marker3D" parent="." unique_id=1455749402]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3114805, 0, 0)
+gizmo_extents = 2.36

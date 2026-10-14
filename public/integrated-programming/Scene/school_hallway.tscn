@@ -3,10 +3,15 @@
 [ext_resource type="Texture2D" uid="uid://bxpjintdady5k" path="res://Background/Hallway.png" id="1_6vjkr"]
 [ext_resource type="PackedScene" uid="uid://b3aj8er2e66ch" path="res://Scene/character.tscn" id="2_5j84n"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_6rxgk"]
-[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="4_tud7o"]
+[ext_resource type="PackedScene" uid="uid://gglwrsj0sx7o" path="res://Scene/Mara.tscn" id="4_g6b8d"]
+[ext_resource type="PackedScene" uid="uid://ba0gh7nrp6q3s" path="res://Scene/Bea.tscn" id="5_o46p4"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_tud7o"]
 size = Vector3(1, 1, 1.0556641)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yy4pj"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_68yko"]
 
 [node name="SchoolHallway" type="Node3D" unique_id=1233152468]
 
@@ -16,7 +21,7 @@ texture = ExtResource("1_6vjkr")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1802945056]
 
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_5j84n")]
-transform = Transform3D(2.6163352, 0, 0, 0, 2.6163352, 0, 0, 0, 2.6163352, -4.823835, -0.17782605, 0.5938827)
+transform = Transform3D(2.6163352, 0, 0, 0, 2.6163352, 0, 0, 0, 2.6163352, -2.208357, -0.17782605, 0.5938827)
 
 [node name="Enter_Classroom" type="Area3D" parent="." unique_id=1222622167]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
@@ -31,6 +36,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.9004717, 1.0596466, 0.53215
 visible = false
 text = "[F] Enter Classroom"
 
+[node name="StaticBody3D" type="StaticBody3D" parent="Enter_Classroom/FPrompt" unique_id=2060471928]
+
 [node name="Exit_Hallway" type="Area3D" parent="." unique_id=528148250]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.104408, -0.15178406, 0.32448506)
 script = ExtResource("3_6rxgk")
@@ -43,6 +50,12 @@ shape = SubResource("BoxShape3D_tud7o")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4126644, 0.10988009, 0.5321599)
 visible = false
 text = "[G] Exit School"
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Exit_Hallway/FPrompt" unique_id=615377132]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_Hallway/FPrompt/StaticBody3D" unique_id=1700956765]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.3208523, 0, 0)
+shape = SubResource("BoxShape3D_yy4pj")
 
 [node name="Middle_hallway" type="Area3D" parent="." unique_id=1067646705]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2340503, -0.30356812, 0.6489701)
@@ -57,4 +70,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4126644, 0.10988009, 0.5321
 visible = false
 text = "[R] Enter"
 
-[node name="TaskUI" parent="." unique_id=2113353932 instance=ExtResource("4_tud7o")]
+[node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=708722249]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.824673, -0.19368804, 1.18113)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D" unique_id=1815206927]
+transform = Transform3D(1, 0, 0, 0, 3.2631953, 0, 0, 0, 1, -1.1325283, 0, -0.75103474)
+shape = SubResource("BoxShape3D_68yko")
+
+[node name="StaticBody3D2" type="StaticBody3D" parent="." unique_id=1465229131]
+transform = Transform3D(1, 0, 0, 0, 1.5325644, 0, 0, 0, 1, -6.746404, -0.38737607, 1.5146008)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2" unique_id=2029192942]
+transform = Transform3D(1, 0, 0, 0, 3.2631953, 0, 0, 0, 1, -1.1325283, 0, -0.75103474)
+shape = SubResource("BoxShape3D_68yko")
+
+[node name="Character4" parent="." unique_id=1797064325 instance=ExtResource("4_g6b8d")]
+transform = Transform3D(2.2058318, 0, 0, 0, 2.2058318, 0, 0, 0, 2.2058318, -0.39403033, 0.08031231, 0.27964306)
+
+[node name="Character3" parent="." unique_id=1681138276 instance=ExtResource("5_o46p4")]
+transform = Transform3D(2.0238914, 0, 0, 0, 2.0238914, 0, 0, 0, 2.0238914, 0.7386159, -0.15940297, 0.52372885)

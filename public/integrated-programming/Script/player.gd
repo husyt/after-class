@@ -1,71 +1,138 @@
 extends CharacterBody3D
+## Attach to CharacterBody3D, the parent of AnimatedSprite3D.
+## Keeps the depth set by each world scene instead of forcing Z = 1.0.
 
-@export var move_speed: float = 3.0
-@export var locked_z: float = 1.0
+@export var move_speed: float = 1.5
+@export var preserve_scene_depth: bool = true
+@export var fixed_z_if_needed: float = 1.0
+@export var restore_saved_position: bool = true
+@export var debug_player: bool = true
 
-@onready var sprite: AnimatedSprite3D = $AnimatedSprite3D
+@onready var sprite: AnimatedSprite3D = get_node_or_null("AnimatedSprite3D") as AnimatedSprite3D
+
+var _game_state: Node = null
+var _idle_animation: StringName = &""
+var _walk_animation: StringName = &""
+var _restoring_position: bool = true
+var _scene_depth: float = 0.0
+var _reported_busy: bool = false
 
 
 func _ready() -> void:
-	position.z = locked_z
+	process_mode = Node.PROCESS_MODE_PAUSABLE
+	add_to_group(&"player")
+	_game_state = get_node_or_null("/root/GameState")
 
-	if sprite.sprite_frames != null:
-		if sprite.sprite_frames.has_animation("Idle"):
-			sprite.play("Idle")
+	# This is the important fix: don't overwrite the scene's Z position.
+	_scene_depth = global_position.z
+	if not preserve_scene_depth:
+		_scene_depth = fixed_z_if_needed
+		global_position.z = _scene_depth
+
+	visible = true
+	if sprite == null:
+		push_error("Player: AnimatedSprite3D child not found.")
+	elif sprite.sprite_frames == null:
+		push_error("Player: AnimatedSprite3D has no SpriteFrames.")
+	else:
+		sprite.visible = true
+		_idle_animation = _find_animation("idle")
+		_walk_animation = _find_animation("walk")
+		_play_animation(_idle_animation)
+
+	if debug_player:
+		print("PLAYER READY at ", global_position, " | depth ", _scene_depth)
 
 	call_deferred("_restore_previous_position")
 
 
 func _physics_process(_delta: float) -> void:
-	var direction: float = Input.get_axis(
-		"move_left",
-		"move_right"
-	)
+	if _restoring_position or get_tree().paused:
+		velocity = Vector3.ZERO
+		return
 
-	velocity = Vector3.ZERO
-	velocity.x = direction * move_speed
+	if _interaction_is_busy():
+		velocity = Vector3.ZERO
+		_play_animation(_idle_animation)
+		if debug_player and not _reported_busy:
+			print("PLAYER MOVEMENT LOCKED: interaction in progress")
+			_reported_busy = true
+		return
 
+	_reported_busy = false
+
+	var direction: float = _get_horizontal_direction()
+	velocity = Vector3(direction * move_speed, 0.0, 0.0)
 	move_and_slide()
 
-	position.z = locked_z
+	# Lock to this scene's ORIGINAL depth, not an arbitrary world Z.
+	global_position.z = _scene_depth
 
-	if direction != 0.0:
-		sprite.flip_h = direction < 0.0
-
-		if sprite.animation != "Walk" or !sprite.is_playing():
-			sprite.play("Walk")
-
+	if not is_zero_approx(direction):
+		if sprite != null:
+			sprite.flip_h = direction < 0.0
+		_play_animation(_walk_animation)
 	else:
-		if sprite.animation != "Idle" or !sprite.is_playing():
-			sprite.play("Idle")
+		_play_animation(_idle_animation)
+
+
+func _get_horizontal_direction() -> float:
+	var result: float = 0.0
+
+	if InputMap.has_action("move_left") and InputMap.has_action("move_right"):
+		result = Input.get_axis("move_left", "move_right")
+
+	# Allows A/D and arrow keys even before Input Map setup.
+	if is_zero_approx(result):
+		if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
+			result -= 1.0
+		if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
+			result += 1.0
+
+	return clampf(result, -1.0, 1.0)
+
+
+func _find_animation(wanted: String) -> StringName:
+	if sprite == null or sprite.sprite_frames == null:
+		return &""
+	for animation_name: StringName in sprite.sprite_frames.get_animation_names():
+		if String(animation_name).to_lower() == wanted:
+			return animation_name
+	return &""
+
+
+func _play_animation(animation_name: StringName) -> void:
+	if sprite == null or animation_name == &"":
+		return
+	if sprite.animation != animation_name or not sprite.is_playing():
+		sprite.play(animation_name)
+
+
+func _interaction_is_busy() -> bool:
+	return (
+		_game_state != null
+		and _game_state.has_method("is_interaction_busy")
+		and bool(_game_state.call("is_interaction_busy"))
+	)
 
 
 func _restore_previous_position() -> void:
 	await get_tree().process_frame
-
-	var current_scene := get_tree().current_scene
-
-	if current_scene == null:
+	if not is_inside_tree():
 		return
 
-	var scene_path: String = current_scene.scene_file_path
+	if restore_saved_position and _game_state != null:
+		var scene: Node = get_tree().current_scene
+		if scene != null and not scene.scene_file_path.is_empty():
+			var path: String = scene.scene_file_path
+			if bool(_game_state.call("has_position", path)):
+				var saved: Vector3 = _game_state.call("get_position", path)
+				# Older scripts may have saved an incorrect Z. Restore X/Y only.
+				global_position = Vector3(saved.x, saved.y, _scene_depth)
 
-	if scene_path.is_empty():
-		return
-
-	if !GameState.has_position(scene_path):
-		print("FIRST VISIT: ", scene_path)
-		return
-
-	var saved_position: Vector3 = GameState.get_position(scene_path)
-
-	global_position = saved_position
-	global_position.z = locked_z
+	global_position.z = _scene_depth
 	velocity = Vector3.ZERO
+	_restoring_position = false
 
-	print(
-		"RESTORED POSITION: ",
-		scene_path,
-		" = ",
-		global_position
-	)
+	if debug_player:
+		print("PLAYER POSITION READY at ", global_position, " | paused=", get_tree().paused)

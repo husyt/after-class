@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bwlbtiyhfnuoe"
+path="res://.godot/imported/(Audio) Average Filipino Sunday be Like.mp3-d57745b736d6728342ad72b02a1b1185.mp3str"
+
+[deps]
+
+source_file="res://Music/(Audio) Average Filipino Sunday be Like.mp3"
+dest_files=["res://.godot/imported/(Audio) Average Filipino Sunday be Like.mp3-d57745b736d6728342ad72b02a1b1185.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

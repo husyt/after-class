@@ -18,6 +18,8 @@ config/icon="res://icon.svg"
 [autoload]
 
 GameState="*uid://dgu678ywurnd0"
+SceneTransition="*uid://dr3cwnepo8c0p"
+SchoolHud="*uid://bmt5xfxpk85yu"
 
 [display]
 

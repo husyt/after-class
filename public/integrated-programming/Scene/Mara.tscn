@@ -1,0 +1,92 @@
+[gd_scene format=3 uid="uid://gglwrsj0sx7o"]
+
+[ext_resource type="Texture2D" uid="uid://cbojb34fpkcam" path="res://Character/student_mara/frames/idle_01.png" id="1_8fgyg"]
+[ext_resource type="Script" uid="uid://cccrl6nuvgo0v" path="res://Script/NPC.gd" id="1_hw70j"]
+[ext_resource type="Texture2D" uid="uid://drswpg3m4bmaq" path="res://Character/student_mara/frames/idle_02.png" id="2_hw70j"]
+[ext_resource type="Texture2D" uid="uid://btevjxj4qwaxf" path="res://Character/student_mara/frames/idle_03.png" id="3_eqjed"]
+[ext_resource type="Texture2D" uid="uid://1lj1owcll8vx" path="res://Character/student_mara/frames/idle_04.png" id="4_5kk61"]
+[ext_resource type="Texture2D" uid="uid://dex0lh6ramxq0" path="res://Character/student_mara/frames/idle_05.png" id="5_x5750"]
+[ext_resource type="Texture2D" uid="uid://cgfliw8fi0p1m" path="res://Character/student_mara/frames/idle_06.png" id="6_w27kh"]
+[ext_resource type="Texture2D" uid="uid://cmcs2polso5om" path="res://Character/student_mara/frames/idle_07.png" id="7_kuhfs"]
+[ext_resource type="Texture2D" uid="uid://bbwggc5fq37ux" path="res://Character/student_mara/frames/idle_08.png" id="8_ic8rw"]
+[ext_resource type="Texture2D" uid="uid://cktvmq0ti81q1" path="res://Character/student_mara/frames/walk_01.png" id="9_7ngef"]
+[ext_resource type="Texture2D" uid="uid://cplfup5sn7u8g" path="res://Character/student_mara/frames/walk_02.png" id="10_ysmy6"]
+[ext_resource type="Texture2D" uid="uid://bq1qakt3eoaq7" path="res://Character/student_mara/frames/walk_03.png" id="11_eih4h"]
+[ext_resource type="Texture2D" uid="uid://cld45bh0yao82" path="res://Character/student_mara/frames/walk_04.png" id="12_0myyj"]
+[ext_resource type="Texture2D" uid="uid://ojcv3ayay3nc" path="res://Character/student_mara/frames/walk_05.png" id="13_eh8bu"]
+[ext_resource type="Texture2D" uid="uid://bns2ehqrx1tv0" path="res://Character/student_mara/frames/walk_06.png" id="14_20yir"]
+[ext_resource type="Texture2D" uid="uid://cj5x76unl3wtj" path="res://Character/student_mara/frames/walk_07.png" id="15_f8og2"]
+[ext_resource type="Texture2D" uid="uid://dtnxnocklukpi" path="res://Character/student_mara/frames/walk_08.png" id="16_sggse"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_p3tx6"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_8fgyg")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_hw70j")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_eqjed")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_5kk61")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_x5750")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_w27kh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_kuhfs")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_ic8rw")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_7ngef")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_ysmy6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_eih4h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_0myyj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_eh8bu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_20yir")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_f8og2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_sggse")
+}],
+"loop": 1,
+"name": &"Walk",
+"speed": 5.0
+}]
+
+[node name="Character" type="Node3D" unique_id=719971783]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+script = ExtResource("1_hw70j")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
+transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
+sprite_frames = SubResource("SpriteFrames_p3tx6")
+animation = &"Walk"
+frame_progress = 0.41006985

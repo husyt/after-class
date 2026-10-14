@@ -25,6 +25,9 @@ transform = Transform3D(3.010441, 0, 0, 0, 3.010441, 0, 0, 0, 3.010441, -3.73013
 [node name="Bedroom" type="Area3D" parent="." unique_id=1904495833]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2688136, -0.38917017, 0.28540528)
 script = ExtResource("3_31wlc")
+target_scene_path = null
+task_id = null
+click_padding = null
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Bedroom" unique_id=248493722]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1512048, 0.42486858, 0.39227533)

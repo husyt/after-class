@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://ljijkvflsmqw"
+path="res://.godot/imported/Jeepney muffler sound effect Sta. Maria Muffler.mp3-9bc9b2f33fa0ce3e221f3bdda5751ab7.mp3str"
+
+[deps]
+
+source_file="res://Music/Jeepney muffler sound effect Sta. Maria Muffler.mp3"
+dest_files=["res://.godot/imported/Jeepney muffler sound effect Sta. Maria Muffler.mp3-9bc9b2f33fa0ce3e221f3bdda5751ab7.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

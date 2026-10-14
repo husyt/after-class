@@ -1,0 +1,216 @@
+[gd_scene format=3 uid="uid://bmt5xfxpk85yu"]
+
+[ext_resource type="PackedScene" uid="uid://7u4dmjjs4yes" path="res://Scene/task_ui.tscn" id="1_qx1vt"]
+[ext_resource type="Script" uid="uid://cb6rmvqgd3atx" path="res://Script/SchoolHUD.gd" id="1_uy6oj"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uy6oj"]
+bg_color = Color(0.15294118, 0.15686275, 0.19215687, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9137255, 0.7137255, 0.36862746, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qx1vt"]
+bg_color = Color(0.15294118, 0.15686275, 0.19215687, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9137255, 0.7137255, 0.36862746, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+corner_detail = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_skh7i"]
+content_margin_left = 10.0
+content_margin_top = 10.0
+content_margin_right = 10.0
+content_margin_bottom = 10.0
+bg_color = Color(0.15294118, 0.15686275, 0.19215687, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9137255, 0.7137255, 0.36862746, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+corner_detail = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e5xjk"]
+bg_color = Color(0.15294118, 0.15686275, 0.19215687, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9137255, 0.7137255, 0.36862746, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6oo4d"]
+bg_color = Color(0.15294118, 0.15686275, 0.19215687, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.9137255, 0.7137255, 0.36862746, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="SchoolHUD" type="CanvasLayer" unique_id=1278393221]
+script = ExtResource("1_uy6oj")
+
+[node name="HUDRoot" type="Control" parent="." unique_id=2040956022]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TasksButton" type="Button" parent="HUDRoot" unique_id=4072267]
+layout_mode = 1
+offset_left = 30.000116
+offset_top = 64.99994
+offset_right = 200.31366
+offset_bottom = 103.07214
+scale = Vector2(0.82682306, 1.0340568)
+theme_override_colors/font_color = Color(1, 0.94509804, 0.8235294, 1)
+theme_override_font_sizes/font_size = 16
+theme_override_styles/normal = SubResource("StyleBoxFlat_uy6oj")
+text = "TASKS [Q]"
+
+[node name="TimerLabel" type="Label" parent="HUDRoot" unique_id=143483243]
+layout_mode = 0
+offset_left = 1030.0
+offset_top = 576.0
+offset_right = 1072.0
+offset_bottom = 599.0
+scale = Vector2(2.5950747, 2.5950747)
+text = "10:00"
+
+[node name="SettingsButton" type="Button" parent="HUDRoot" unique_id=1449210595]
+layout_mode = 1
+offset_left = 30.0
+offset_top = 11.0
+offset_right = 154.66171
+offset_bottom = 55.686035
+scale = Vector2(1.1296103, 1.0165505)
+theme_override_colors/font_color = Color(1, 0.94509804, 0.8235294, 1)
+theme_override_styles/normal = SubResource("StyleBoxFlat_qx1vt")
+text = "SETTINGS [Esc]"
+
+[node name="TaskUI" parent="." unique_id=2113353932 instance=ExtResource("1_qx1vt")]
+
+[node name="SettingsOverlay" type="Control" parent="." unique_id=1517385744]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="SettingsOverlay" unique_id=1766239339]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -384.0
+offset_top = -143.99998
+offset_right = -270.51514
+offset_bottom = -47.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(6.702766, 2.8787315)
+theme_override_styles/panel = SubResource("StyleBoxFlat_skh7i")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsOverlay/PanelContainer" unique_id=638990912]
+layout_mode = 2
+
+[node name="ColorRect" type="ColorRect" parent="SettingsOverlay" unique_id=384518586]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7019608)
+
+[node name="Label2" type="Label" parent="SettingsOverlay" unique_id=845935031]
+layout_mode = 0
+offset_left = 449.0
+offset_top = 187.0
+offset_right = 666.0
+offset_bottom = 264.0
+theme_override_font_sizes/font_size = 42
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="HSlider" type="HSlider" parent="SettingsOverlay" unique_id=800251601]
+layout_mode = 0
+offset_left = 323.00003
+offset_top = 305.00003
+offset_right = 472.54025
+offset_bottom = 321.00003
+scale = Vector2(1.7252884, 1.7252884)
+
+[node name="CheckButton" type="CheckButton" parent="SettingsOverlay" unique_id=318165915]
+layout_mode = 0
+offset_left = 638.0
+offset_top = 303.0
+offset_right = 731.0
+offset_bottom = 327.0
+scale = Vector2(1.57134, 1.57134)
+
+[node name="Button" type="Button" parent="SettingsOverlay" unique_id=31385721]
+layout_mode = 0
+offset_left = 597.0
+offset_top = 383.0
+offset_right = 776.077
+offset_bottom = 414.0
+scale = Vector2(1.0219069, 1.0219069)
+theme_override_styles/normal = SubResource("StyleBoxFlat_e5xjk")
+text = "Restart Challenge"
+
+[node name="Button2" type="Button" parent="SettingsOverlay" unique_id=1544806482]
+layout_mode = 0
+offset_left = 370.0
+offset_top = 383.0
+offset_right = 549.077
+offset_bottom = 414.0
+scale = Vector2(1.0219069, 1.0219069)
+theme_override_styles/normal = SubResource("StyleBoxFlat_6oo4d")
+text = "Resume Game"
+
+[node name="Label" type="Label" parent="SettingsOverlay" unique_id=1044729167]
+layout_mode = 0
+offset_left = 372.0
+offset_top = 276.0
+offset_right = 529.0
+offset_bottom = 299.0
+text = "-          Volume          +"
+
+[node name="Label3" type="Label" parent="SettingsOverlay" unique_id=1595237446]
+layout_mode = 0
+offset_left = 709.0
+offset_top = 277.0
+offset_right = 814.0
+offset_bottom = 300.0
+text = "Full Screen"

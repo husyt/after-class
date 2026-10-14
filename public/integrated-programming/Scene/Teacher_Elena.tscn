@@ -1,0 +1,54 @@
+[gd_scene format=3 uid="uid://d3m85ygd2cvii"]
+
+[ext_resource type="Texture2D" uid="uid://bs0c20d72k1al" path="res://Character/teacher_elena/frames/idle_01.png" id="1_gvl55"]
+[ext_resource type="Script" uid="uid://cccrl6nuvgo0v" path="res://Script/NPC.gd" id="1_rfoa3"]
+[ext_resource type="Texture2D" uid="uid://bay34mlquaswb" path="res://Character/teacher_elena/frames/idle_02.png" id="2_rfoa3"]
+[ext_resource type="Texture2D" uid="uid://bs3sgqgssscyv" path="res://Character/teacher_elena/frames/idle_03.png" id="3_565ii"]
+[ext_resource type="Texture2D" uid="uid://jvcu1u7jyg2s" path="res://Character/teacher_elena/frames/idle_04.png" id="4_jofge"]
+[ext_resource type="Texture2D" uid="uid://cvuwjn7oj10oa" path="res://Character/teacher_elena/frames/idle_05.png" id="5_k3wxu"]
+[ext_resource type="Texture2D" uid="uid://biy4qfmme38r0" path="res://Character/teacher_elena/frames/idle_06.png" id="6_3ed4t"]
+[ext_resource type="Texture2D" uid="uid://ddfjljgtr24hf" path="res://Character/teacher_elena/frames/idle_07.png" id="7_k7ldy"]
+[ext_resource type="Texture2D" uid="uid://cwkp7a7xdpteu" path="res://Character/teacher_elena/frames/idle_08.png" id="8_edq8q"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_ygahh"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_gvl55")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_rfoa3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_565ii")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_jofge")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_k3wxu")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_3ed4t")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_k7ldy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_edq8q")
+}],
+"loop": 1,
+"name": &"Idle",
+"speed": 5.0
+}]
+
+[node name="Character" type="Node3D" unique_id=719971783]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+script = ExtResource("1_rfoa3")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
+transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
+sprite_frames = SubResource("SpriteFrames_ygahh")
+animation = &"Idle"
