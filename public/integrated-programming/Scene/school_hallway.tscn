@@ -62,11 +62,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2340503, -0.30356812, 0.648
 script = ExtResource("3_6rxgk")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Middle_hallway" unique_id=1489727799]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2539244, -0.2344389, 0.42010736)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6113253, -0.2344389, 0.42010736)
 shape = SubResource("BoxShape3D_tud7o")
 
 [node name="FPrompt" type="Label3D" parent="Middle_hallway" unique_id=781677070]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4126644, 0.10988009, 0.5321599)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.27231598, 0.10988009, 0.5321599)
 visible = false
 text = "[R] Enter"
 

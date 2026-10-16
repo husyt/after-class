@@ -20,6 +20,7 @@ config/icon="res://icon.svg"
 GameState="*uid://dgu678ywurnd0"
 SceneTransition="*uid://dr3cwnepo8c0p"
 SchoolHUD="*uid://dj88ioas0nksu"
+SchoolExitGuide="*uid://cv0eupwmniks7"
 
 [display]
 

@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://datbdj43v0ey3" path="res://Background/Playground  School Grounds.png" id="1_xonmp"]
 [ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_bk7o2"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_6ao61"]
+[ext_resource type="Script" uid="uid://cf2ja0klvthpm" path="res://Script/basketball_play.gd" id="3_7pbsr"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7pbsr"]
 
@@ -40,7 +41,7 @@ text = "[F] Enter Hallway"
 
 [node name="Play" type="Area3D" parent="." unique_id=1680682440]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9836013, -0.908, 0.16224253)
-script = ExtResource("3_6ao61")
+script = ExtResource("3_7pbsr")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Play" unique_id=284359156]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.31028104, -0.6606009, 0.39227533)

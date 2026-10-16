@@ -3,6 +3,7 @@ extends CanvasLayer
 signal task_completed(task_id: StringName)
 signal progress_changed(completed: int, total: int)
 signal challenge_completed(seconds_used: float)
+@warning_ignore("unused_signal")
 signal time_expired(completed: int, total: int)
 signal challenge_restarted
 
@@ -10,6 +11,7 @@ signal challenge_restarted
 @export var show_tasks_on_start: bool = false
 @export_file("*.tscn") var restart_scene_path: String = ""
 @export var clear_saved_positions_on_restart: bool = true
+# Legacy Inspector field retained so older scenes still load; no deadline bell.
 @export var ring_bell_on_time_up: bool = true
 
 const TASK_IDS: Array[String] = [
@@ -19,6 +21,8 @@ const TASK_IDS: Array[String] = [
 enum RunState { READY, RUNNING, COMPLETED, EXPIRED }
 
 const TIMER_STATE_META: StringName = &"equalpath_school_timer_state"
+const COMPLETION_TIME_META: StringName = &"equalpath_school_completion_seconds"
+const TIMER_VERSION: String = "elapsed_stop_on_5"
 
 @onready var hud_root: Control = get_node_or_null("HUDRoot") as Control
 @onready var tasks_button: Button = get_node_or_null("HUDRoot/TasksButton") as Button
@@ -34,8 +38,9 @@ var resume_button: Button = null
 var restart_button: Button = null
 var game_state: Node = null
 
-var remaining_seconds: float = 600.0
-var limit_seconds: float = 600.0
+# Stopwatch records active play time; no countdown and no time limit.
+var elapsed_seconds: float = 0.0
+var final_elapsed_seconds: float = -1.0
 var run_state: RunState = RunState.READY
 var _owns_pause: bool = false
 var _pause_before_settings: bool = false
@@ -121,40 +126,44 @@ func _restore_or_initialize_timer() -> void:
 		var snapshot: Variant = game_state.get_meta(TIMER_STATE_META)
 		if snapshot is Dictionary:
 			var saved: Dictionary = snapshot
-			if saved.has("remaining") and saved.has("limit") and saved.has("status"):
-				limit_seconds = maxf(float(saved["limit"]), 1.0)
-				remaining_seconds = clampf(float(saved["remaining"]), 0.0, limit_seconds)
-				match int(saved["status"]):
-					RunState.READY:
-						run_state = RunState.READY
-					RunState.COMPLETED:
-						run_state = RunState.COMPLETED
-					RunState.EXPIRED:
-						run_state = RunState.EXPIRED
-					_:
-						run_state = RunState.RUNNING
+			if String(saved.get("mode", "")) == TIMER_VERSION:
+				elapsed_seconds = maxf(0.0, float(saved.get("elapsed", 0.0)))
+				final_elapsed_seconds = float(saved.get("final", -1.0))
+				run_state = RunState.COMPLETED if int(saved.get("status", 1)) == RunState.COMPLETED else RunState.RUNNING
+				if all_tasks_complete():
+					# Task completion always wins, including when the HUD was reloaded.
+					if final_elapsed_seconds < 0.0:
+						final_elapsed_seconds = elapsed_seconds
+					run_state = RunState.COMPLETED
+					game_state.set_meta(COMPLETION_TIME_META, final_elapsed_seconds)
+				elif run_state == RunState.COMPLETED:
+					# A stale timer must not block a fresh round.
+					run_state = RunState.RUNNING
+					final_elapsed_seconds = -1.0
 				_last_completed = -1
 				_last_timer_second = -1
 				_refresh_tasks()
 				_refresh_timer()
-				print("SCHOOL TIMER RESTORED: ", remaining_seconds)
+				_store_timer_state()
 				return
 
-	limit_seconds = maxf(time_limit_minutes * 60.0, 1.0)
-	remaining_seconds = limit_seconds
+	# Fresh stopwatch, including when an old countdown save is encountered.
+	elapsed_seconds = 0.0
+	final_elapsed_seconds = -1.0
+	if game_state != null:
+		game_state.remove_meta(COMPLETION_TIME_META)
 	_run_start()
 	_store_timer_state()
-
 
 func _store_timer_state() -> void:
 	if game_state == null or not is_instance_valid(game_state):
 		return
 	game_state.set_meta(TIMER_STATE_META, {
-		"remaining": remaining_seconds,
-		"limit": limit_seconds,
+		"mode": TIMER_VERSION,
+		"elapsed": elapsed_seconds,
+		"final": final_elapsed_seconds,
 		"status": int(run_state)
 	})
-
 
 func _run_start() -> void:
 	run_state = RunState.RUNNING
@@ -163,20 +172,23 @@ func _run_start() -> void:
 	_refresh_tasks()
 	_refresh_timer()
 
-
 func _process(delta: float) -> void:
 	var locked: bool = _is_interaction_busy() or _is_scene_transitioning()
 	if tasks_button != null:
 		tasks_button.disabled = locked or (settings_overlay != null and settings_overlay.visible)
 	if settings_button != null:
 		settings_button.disabled = locked
-	if run_state == RunState.RUNNING and not get_tree().paused and not locked:
-		remaining_seconds = maxf(0.0, remaining_seconds - delta)
-		if remaining_seconds <= 0.0:
-			_finish_time_limit()
-		_store_timer_state()
-	_refresh_timer()
 
+	# Completion is checked first, so a finished run never gains more time.
+	if run_state == RunState.RUNNING and all_tasks_complete():
+		_finish_tasks()
+
+	# Count only active game time; pause for menus and scene transitions.
+	if run_state == RunState.RUNNING and not get_tree().paused and not locked:
+		elapsed_seconds += delta
+		_store_timer_state()
+
+	_refresh_timer()
 
 func _input(event: InputEvent) -> void:
 	if not visible or not event is InputEventKey:
@@ -260,47 +272,48 @@ func _refresh_tasks() -> void:
 		progress_changed.emit(count, get_total_tasks())
 		_last_completed = count
 
+	# GameState emits school_task_updated immediately upon task 5/5.
+	if run_state == RunState.RUNNING and all_tasks_complete():
+		_finish_tasks()
 
 func _refresh_timer() -> void:
 	if timer_label == null:
 		return
 
-	var seconds_left: int = maxi(0, int(ceil(remaining_seconds)))
-
-	if run_state == RunState.EXPIRED:
-		timer_label.text = "TIME UP"
-		_last_timer_second = seconds_left
-		return
-
+	# No "COMPLETE!" text replacing the clock: it disappears entirely.
 	if run_state == RunState.COMPLETED:
-		timer_label.text = "COMPLETE!"
-		_last_timer_second = seconds_left
+		timer_label.hide()
 		return
 
-	if _last_timer_second == seconds_left:
+	timer_label.show()
+	var elapsed_whole: int = maxi(0, int(floor(elapsed_seconds)))
+	if _last_timer_second == elapsed_whole:
 		return
 
-	_last_timer_second = seconds_left
-	var minutes: int = floori(float(seconds_left) / 60.0)
-	var seconds: int = seconds_left % 60
+	_last_timer_second = elapsed_whole
+	var minutes: int = int(float(elapsed_whole) / 60.0)
+	var seconds: int = elapsed_whole % 60
 	timer_label.text = "%02d:%02d" % [minutes, seconds]
 
-
-func _finish_time_limit() -> void:
-	if run_state != RunState.RUNNING:
+func _finish_tasks() -> void:
+	if run_state != RunState.RUNNING or not all_tasks_complete():
 		return
-	remaining_seconds = 0.0
-	if ring_bell_on_time_up and time_up_bell != null and time_up_bell.stream != null:
-		time_up_bell.play()
-	if all_tasks_complete():
-		run_state = RunState.COMPLETED
-		challenge_completed.emit(limit_seconds)
-	else:
-		run_state = RunState.EXPIRED
-		time_expired.emit(get_completed_count(), get_total_tasks())
+
+	# Freeze completion time exactly once, then hide the timer.
+	run_state = RunState.COMPLETED
+	final_elapsed_seconds = elapsed_seconds
+	if game_state != null:
+		game_state.set_meta(COMPLETION_TIME_META, final_elapsed_seconds)
 	_last_timer_second = -1
 	_store_timer_state()
+	_refresh_timer()
+	challenge_completed.emit(final_elapsed_seconds)
+	print("SCHOOL TASKS 5/5 COMPLETED IN ", _format_elapsed(final_elapsed_seconds))
 
+
+func _format_elapsed(seconds_used: float) -> String:
+	var total: int = maxi(0, int(floor(seconds_used)))
+	return "%02d:%02d" % [int(float(total) / 60.0), total % 60]
 
 func start_challenge(reset_progress: bool = true) -> void:
 	if time_up_bell != null:
@@ -313,11 +326,12 @@ func start_challenge(reset_progress: bool = true) -> void:
 		_ignoring_reset = true
 		game_state.call("reset_school_tasks")
 		_ignoring_reset = false
-	limit_seconds = maxf(time_limit_minutes * 60.0, 1.0)
-	remaining_seconds = limit_seconds
+
+	elapsed_seconds = 0.0
+	final_elapsed_seconds = -1.0
+	game_state.remove_meta(COMPLETION_TIME_META)
 	_run_start()
 	_store_timer_state()
-
 
 func restart_challenge() -> void:
 	if game_state == null:
@@ -353,8 +367,12 @@ func _on_school_tasks_reset() -> void:
 
 
 func can_accept_task_completion() -> bool:
-	return run_state == RunState.RUNNING and remaining_seconds > 0.0 and settings_overlay != null and not settings_overlay.visible and not get_tree().paused
-
+	return (
+		run_state == RunState.RUNNING
+		and settings_overlay != null
+		and not settings_overlay.visible
+		and not get_tree().paused
+	)
 
 func complete_task(task_id: StringName) -> bool:
 	if game_state == null or not can_accept_task_completion():
@@ -381,9 +399,22 @@ func all_tasks_complete() -> bool:
 	return game_state != null and bool(game_state.call("school_tasks_complete"))
 
 
+# Kept only for compatibility with older scripts: the stopwatch has no deadline.
 func get_remaining_seconds() -> float:
-	return remaining_seconds
+	return INF if run_state == RunState.RUNNING else 0.0
 
+
+func get_elapsed_seconds() -> float:
+	return final_elapsed_seconds if run_state == RunState.COMPLETED else elapsed_seconds
+
+
+func get_completion_seconds() -> float:
+	# Returns -1 until the player has finished all five tasks.
+	return final_elapsed_seconds
+
+
+func has_completed_run() -> bool:
+	return run_state == RunState.COMPLETED
 
 func get_run_state() -> RunState:
 	return run_state

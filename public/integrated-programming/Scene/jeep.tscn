@@ -60,6 +60,9 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_qt4ce"]
+size = Vector3(1.3208008, 1, 1)
+
 [node name="Jeep" type="Node3D" unique_id=719971783]
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
@@ -71,3 +74,16 @@ transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10
 sprite_frames = SubResource("SpriteFrames_qt4ce")
 animation = &"Drive"
 frame_progress = 0.23579293
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=2101892373]
+transform = Transform3D(1.1317378, 0, 0, 0, 1, 0, 0, 0, 1, -7.593632e-05, 0, -1)
+shape = SubResource("BoxShape3D_qt4ce")
+
+[node name="BoardingArea" type="Area3D" parent="CharacterBody3D" unique_id=1852814292]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D/BoardingArea" unique_id=172197153]
+
+[node name="FPrompt" type="Label3D" parent="CharacterBody3D/BoardingArea" unique_id=1634999372]
+
+[node name="Marker3D" type="Marker3D" parent="." unique_id=887245137]
