@@ -1,4 +1,3 @@
-
 extends Node
 
 signal school_task_updated
@@ -10,7 +9,7 @@ const TASK_IDS: Array[String] = [
 	"borrow_book",
 	"health_form",
 	"eat_lunch",
-    "computer_activity"
+	"computer_activity"
 ]
 
 var saved_positions: Dictionary = {}
@@ -25,6 +24,8 @@ var school_tasks: Dictionary = {
 
 var notebook_progress: Dictionary = {}
 var _interaction_owner: Node = null
+var _pending_spawn_scene: String = ""
+var _pending_spawn_marker: String = ""
 
 
 func normalize_school_task_id(task_id: String) -> String:
@@ -39,42 +40,25 @@ func can_complete_school_task(task_id: String) -> bool:
 
 func complete_school_task(task_id: String) -> bool:
 	var id: String = normalize_school_task_id(task_id)
-
 	if not can_complete_school_task(id):
 		return false
 
 	school_tasks[id] = true
-
 	school_task_updated.emit()
 	school_task_completed.emit(id)
-
-	print(
-		"CHECKMARK ADDED: ",
-		id,
-		" (",
-		get_school_task_count(),
-        "/5)"
-	)
-
+	print("CHECKMARK ADDED: ", id, " (", get_school_task_count(), "/", get_school_task_total(), ")")
 	return true
 
 
 func is_school_task_complete(task_id: String) -> bool:
-	return bool(
-		school_tasks.get(
-			normalize_school_task_id(task_id),
-			false
-		)
-	)
+	return bool(school_tasks.get(normalize_school_task_id(task_id), false))
 
 
 func get_school_task_count() -> int:
 	var count: int = 0
-
 	for id: String in TASK_IDS:
 		if bool(school_tasks.get(id, false)):
 			count += 1
-
 	return count
 
 
@@ -89,23 +73,14 @@ func school_tasks_complete() -> bool:
 func reset_school_tasks() -> void:
 	for id: String in TASK_IDS:
 		school_tasks[id] = false
-
 	clear_notebook_progress()
-
 	school_tasks_reset.emit()
 	school_task_updated.emit()
 
 
 func get_school_progress_text() -> String:
-	return "%d / %d Completed" % [
-		get_school_task_count(),
-		get_school_task_total()
-	]
+	return "%d / %d Completed" % [get_school_task_count(), get_school_task_total()]
 
-
-# ========================================
-# NOTEBOOK PROGRESS
-# ========================================
 
 func set_notebook_progress(progress: Dictionary) -> void:
 	notebook_progress = progress.duplicate(true)
@@ -119,14 +94,9 @@ func clear_notebook_progress() -> void:
 	notebook_progress.clear()
 
 
-# ========================================
-# INTERACTION LOCK
-# ========================================
-
 func try_begin_interaction(interaction_node: Node) -> bool:
 	if not is_instance_valid(interaction_node) or is_interaction_busy():
 		return false
-
 	_interaction_owner = interaction_node
 	return true
 
@@ -141,13 +111,8 @@ func is_interaction_busy() -> bool:
 		_interaction_owner = null
 	elif not _interaction_owner.is_inside_tree():
 		_interaction_owner = null
-
 	return _interaction_owner != null
 
-
-# ========================================
-# SAVED PLAYER POSITIONS
-# ========================================
 
 func save_position(scene_path: String, player_position: Vector3) -> void:
 	if not scene_path.is_empty():
@@ -174,5 +139,27 @@ func clear_position(scene_path: String) -> void:
 	saved_positions.erase(scene_path)
 
 
+func queue_spawn_marker(destination_scene_path: String, marker_name: String) -> void:
+	if destination_scene_path.is_empty() or marker_name.is_empty():
+		return
+	_pending_spawn_scene = destination_scene_path
+	_pending_spawn_marker = marker_name
+
+
+func take_spawn_marker(current_scene_path: String) -> String:
+	if current_scene_path != _pending_spawn_scene:
+		return ""
+	var marker_name: String = _pending_spawn_marker
+	_pending_spawn_scene = ""
+	_pending_spawn_marker = ""
+	return marker_name
+
+
+func clear_pending_spawn() -> void:
+	_pending_spawn_scene = ""
+	_pending_spawn_marker = ""
+
+
 func clear_positions() -> void:
 	saved_positions.clear()
+	clear_pending_spawn()

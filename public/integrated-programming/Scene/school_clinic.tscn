@@ -81,7 +81,7 @@ transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.167651
 shape = SubResource("BoxShape3D_wccga")
 
 [node name="Character2" parent="." unique_id=768060230 instance=ExtResource("5_6tp8t")]
-transform = Transform3D(-2.8294785, 0, 0.03217543, 0, 2.8296614, 0, -0.03217543, 0, -2.8294785, 4.418295, 0.4018974, 1.0385668)
+transform = Transform3D(-2.8294785, 0, 0.03217543, 0, 2.8296614, 0, -0.03217543, 0, -2.8294785, 5.882985, 0.4018974, 1.0385668)
 
 [node name="CameraLeftStop" type="Marker3D" parent="." unique_id=1248074922]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.065701, 0, 0.3013674)

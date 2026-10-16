@@ -1,20 +1,18 @@
 extends "res://Script/school_task.gd"
-## Full door / scene-interaction implementation built on school_task.gd.
-## Attach to Area3D doors with FPrompt (Label3D) and CollisionShape3D.
-## Set Target Scene Path in the Inspector for any door not in the map below.
-## This script inherits prompt hover, click/F/G/H support, saved positions,
-## and SceneTransition's 2-second fade from school_task.gd.
+
+@export var arrival_marker_name: String = ""
 
 
 func _configure_interaction() -> void:
-	# Explicit destination/task inspector settings always win.
+	var current_path: String = _source_scene_path()
+	var door: String = String(name).to_lower().replace(" ", "_")
+
+	if door == "exit_clinic" and "guidance_office" in current_path and arrival_marker_name.is_empty():
+		arrival_marker_name = "GuidanceOfficeSpawn"
+
 	if not target_scene_path.is_empty() or not task_id.is_empty():
 		super._configure_interaction()
 		return
-
-	var scene: Node = get_tree().current_scene
-	var current_path: String = scene.scene_file_path.to_lower() if scene != null else ""
-	var door: String = String(name).to_lower().replace(" ", "_")
 
 	match door:
 		"schoolentrance", "school_entrance", "enter_school":
@@ -35,16 +33,31 @@ func _configure_interaction() -> void:
 			target_scene_path = "res://Scene/school_cafeteria.tscn"
 		"computer_room", "enter_computer_room":
 			target_scene_path = "res://Scene/computer_room.tscn"
-		"school_grounds", "enter_school_grounds":
+		"school_grounds", "enter_school_grounds", "enter_grounds", "schoolgrounds":
 			target_scene_path = "res://Scene/school_grounds.tscn"
 			if not ResourceLoader.exists(target_scene_path, "PackedScene"):
 				var alternate: String = "res://Scene/school_grounds.tscn.tscn"
 				if ResourceLoader.exists(alternate, "PackedScene"):
 					target_scene_path = alternate
-		"exit_library", "exit_clinic", "exit_cafeteria", "exit_computer_ro", "exit_computer_room":
+		"exit_library", "exit_clinic", "exit_cafeteria", "exit_computer_ro", "exit_computer_room", "exit_grounds", "exit_school_grounds":
 			target_scene_path = "res://Scene/school_hallway2.tscn"
 
-	# If unrecognized, try task/action text, rather than silently forcing
-	# the player into a hallway.
 	if target_scene_path.is_empty():
 		super._configure_interaction()
+
+
+func _source_scene_path() -> String:
+	if owner != null and not owner.scene_file_path.is_empty():
+		return owner.scene_file_path.to_lower()
+	var current_scene: Node = get_tree().current_scene
+	if current_scene != null:
+		return current_scene.scene_file_path.to_lower()
+	return ""
+
+
+func _change_scene() -> void:
+	if not arrival_marker_name.is_empty() and not target_scene_path.is_empty():
+		var state: Node = get_node_or_null("/root/GameState")
+		if state != null and state.has_method("queue_spawn_marker"):
+			state.call("queue_spawn_marker", target_scene_path, arrival_marker_name)
+	super._change_scene()

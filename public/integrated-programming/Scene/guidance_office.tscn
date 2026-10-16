@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_m5pbu"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_2ud4d"]
 [ext_resource type="PackedScene" uid="uid://cc5h8velfxbxi" path="res://Scene/Staff_Liza.tscn" id="4_jlciy"]
+[ext_resource type="Script" uid="uid://btvy4culd61ll" path="res://Script/guidance_apologize.gd" id="4_ylc6e"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_jlciy"]
 
@@ -39,6 +40,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384
 visible = false
 text = "[F] Exit Office"
 
+[node name="Apologize" type="Area3D" parent="." unique_id=2014032033]
+transform = Transform3D(0.6262182, 0, 0, 0, 1, 0, 0, 0, 1, 3.8583794, -0.104547024, 0.32448506)
+script = ExtResource("4_ylc6e")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Apologize" unique_id=983064588]
+transform = Transform3D(1.390728, 0, 0, 0, 1.8987999, 0, 0, 0, 1, -2.6747355, 0.49722993, 0.5025548)
+shape = SubResource("BoxShape3D_jlciy")
+
+[node name="FPrompt" type="Label3D" parent="Apologize" unique_id=32020757]
+transform = Transform3D(1.6869603, 0, 0, 0, 1, 0, 0, 0, 1, -2.8168447, 0.5029075, 0.7384466)
+visible = false
+text = "[F] Apologize"
+
 [node name="StaticBody3D" type="StaticBody3D" parent="." unique_id=117317532]
 transform = Transform3D(0.10557002, 0, 0, 0, 1, 0, 0, 0, 1, 8.248643, 0, 0)
 
@@ -54,7 +68,7 @@ transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.167651
 shape = SubResource("BoxShape3D_ylc6e")
 
 [node name="Character2" parent="." unique_id=846150719 instance=ExtResource("4_jlciy")]
-transform = Transform3D(-2.7800791, 0, 0.198123, 0, 2.7871299, 0, -0.198123, 0, -2.7800791, 3.3927948, 0.5212252, 1.732281)
+transform = Transform3D(-2.7800791, 0, 0.198123, 0, 2.7871299, 0, -0.198123, 0, -2.7800791, 3.3927948, 0.5212252, 0.64795613)
 
 [node name="CameraLeftStop" type="Marker3D" parent="." unique_id=84935499]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.962691, 0, 0.3013674)

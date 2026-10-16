@@ -1,6 +1,4 @@
 extends CanvasLayer
-## Godot 4. Attach to SchoolHUD (CanvasLayer), then autoload its .tscn as SchoolHUD.
-## Uses the ACTUAL editor tree: HUDRoot, TaskUI and SettingsOverlay are siblings.
 
 signal task_completed(task_id: StringName)
 signal progress_changed(completed: int, total: int)
@@ -12,6 +10,7 @@ signal challenge_restarted
 @export var show_tasks_on_start: bool = false
 @export_file("*.tscn") var restart_scene_path: String = ""
 @export var clear_saved_positions_on_restart: bool = true
+@export var ring_bell_on_time_up: bool = true
 
 const TASK_IDS: Array[String] = [
 	"attend_class", "borrow_book", "health_form", "eat_lunch", "computer_activity"
@@ -19,7 +18,6 @@ const TASK_IDS: Array[String] = [
 
 enum RunState { READY, RUNNING, COMPLETED, EXPIRED }
 
-# Stored on GameState Autoload so the timer survives recreating the HUD.
 const TIMER_STATE_META: StringName = &"equalpath_school_timer_state"
 
 @onready var hud_root: Control = get_node_or_null("HUDRoot") as Control
@@ -28,6 +26,7 @@ const TIMER_STATE_META: StringName = &"equalpath_school_timer_state"
 @onready var timer_label: Label = get_node_or_null("HUDRoot/TimerLabel") as Label
 @onready var task_ui: Node = get_node_or_null("TaskUI")
 @onready var settings_overlay: Control = get_node_or_null("SettingsOverlay") as Control
+@onready var time_up_bell: AudioStreamPlayer = get_node_or_null("TimeUpBell") as AudioStreamPlayer
 
 var volume_slider: HSlider = null
 var fullscreen_toggle: CheckButton = null
@@ -44,27 +43,25 @@ var _ignoring_reset: bool = false
 var _last_completed: int = -1
 var _last_timer_second: int = -1
 var _starting_scene_path: String = ""
-var _duplicate_scan_elapsed: float = 0.0
-var _hidden_duplicate_paths: Dictionary = {}
 
 
 func _ready() -> void:
-	# The Autoload is the sole HUD; extra copies inside room scenes must not run.
 	var main_hud: Node = get_node_or_null("/root/SchoolHUD")
 	if main_hud != null and main_hud != self:
-		push_warning("Duplicate SchoolHUD found at %s. Keep only the Autoload SchoolHUD.tscn." % str(get_path()))
 		hide()
 		process_mode = Node.PROCESS_MODE_DISABLED
+		queue_free()
 		return
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	layer = 50
+	if time_up_bell != null:
+		time_up_bell.process_mode = Node.PROCESS_MODE_ALWAYS
+		time_up_bell.autoplay = false
 	if hud_root == null or tasks_button == null or settings_button == null or timer_label == null or settings_overlay == null:
 		push_error("SchoolHUD: Missing HUDRoot/TasksButton, TimerLabel, SettingsButton or SettingsOverlay. Check Scene tree names.")
 		return
 
 	hud_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	# Some Settings controls were placed as direct siblings of SettingsOverlay.
-	# Reparent them into the overlay at runtime while keeping their positions.
 	_move_stray_settings_controls_inside_overlay()
 	volume_slider = settings_overlay.find_child("HSlider", true, false) as HSlider
 	fullscreen_toggle = settings_overlay.find_child("CheckButton", true, false) as CheckButton
@@ -77,8 +74,9 @@ func _ready() -> void:
 	if dimmer != null:
 		dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
 	settings_overlay.hide()
+	show_tasks_on_start = false
 	if task_ui != null:
-		_set_tasks_visible(show_tasks_on_start)
+		_set_tasks_visible(false)
 
 	tasks_button.pressed.connect(toggle_tasks)
 	settings_button.pressed.connect(toggle_settings)
@@ -109,54 +107,9 @@ func _ready() -> void:
 
 	_restore_or_initialize_timer()
 	call_deferred("_remember_starting_scene")
-	call_deferred("_suppress_duplicate_timer_ui")
-
-
-func _suppress_duplicate_timer_ui() -> void:
-	# This is intentionally restricted to duplicate HUD CanvasLayers or clock
-	# Labels drawn over the primary TimerLabel. It leaves task and mini-game UI alone.
-	if not is_inside_tree() or timer_label == null:
-		return
-	var main_rect: Rect2 = timer_label.get_global_rect().grow(95.0)
-	var pending: Array[Node] = [get_tree().root]
-	while not pending.is_empty():
-		var current: Node = pending.pop_back()
-		if current != self and current is CanvasLayer and String(current.name).to_lower().begins_with("schoolhud"):
-			_hide_duplicate_canvas(current as CanvasLayer)
-			continue
-		if current is Label and current != timer_label:
-			var other_label: Label = current as Label
-			if other_label.is_visible_in_tree() and _looks_like_clock(other_label.text):
-				if main_rect.intersects(other_label.get_global_rect()):
-					other_label.hide()
-					_report_duplicate(other_label)
-		for child: Node in current.get_children():
-			pending.append(child)
-
-
-func _hide_duplicate_canvas(other_hud: CanvasLayer) -> void:
-	if other_hud == self:
-		return
-	other_hud.hide()
-	other_hud.process_mode = Node.PROCESS_MODE_DISABLED
-	_report_duplicate(other_hud)
-
-
-func _looks_like_clock(value: String) -> bool:
-	var trimmed: String = value.strip_edges()
-	return trimmed.length() == 5 and trimmed.substr(2, 1) == ":" and trimmed.substr(0, 2).is_valid_int() and trimmed.substr(3, 2).is_valid_int()
-
-
-func _report_duplicate(node: Node) -> void:
-	var path: String = str(node.get_path())
-	if _hidden_duplicate_paths.has(path):
-		return
-	_hidden_duplicate_paths[path] = true
-	print("HIDDEN OVERLAPPING TIMER/HUD: ", path)
 
 
 func _move_stray_settings_controls_inside_overlay() -> void:
-	# Keep your existing 2D-editor positions. This only fixes visibility.
 	for node_name: String in ["Label2", "HSlider", "CheckButton", "Button", "Button2", "Label", "Label3"]:
 		var stray: Control = get_node_or_null(node_name) as Control
 		if stray != null:
@@ -164,8 +117,6 @@ func _move_stray_settings_controls_inside_overlay() -> void:
 
 
 func _restore_or_initialize_timer() -> void:
-	# A room scene can be replaced at any moment. The GameState Autoload
-	# keeps the remaining time and outcome even if this CanvasLayer reloads.
 	if game_state != null and game_state.has_meta(TIMER_STATE_META):
 		var snapshot: Variant = game_state.get_meta(TIMER_STATE_META)
 		if snapshot is Dictionary:
@@ -189,7 +140,6 @@ func _restore_or_initialize_timer() -> void:
 				print("SCHOOL TIMER RESTORED: ", remaining_seconds)
 				return
 
-	# Only the first HUD of this game session starts at ten minutes.
 	limit_seconds = maxf(time_limit_minutes * 60.0, 1.0)
 	remaining_seconds = limit_seconds
 	_run_start()
@@ -215,11 +165,6 @@ func _run_start() -> void:
 
 
 func _process(delta: float) -> void:
-	# Detect leftover HUD scenes and overlapping legacy timer labels.
-	_duplicate_scan_elapsed += delta
-	if _duplicate_scan_elapsed >= 0.5:
-		_duplicate_scan_elapsed = 0.0
-		_suppress_duplicate_timer_ui()
 	var locked: bool = _is_interaction_busy() or _is_scene_transitioning()
 	if tasks_button != null:
 		tasks_button.disabled = locked or (settings_overlay != null and settings_overlay.visible)
@@ -234,7 +179,7 @@ func _process(delta: float) -> void:
 
 
 func _input(event: InputEvent) -> void:
-	if not event is InputEventKey:
+	if not visible or not event is InputEventKey:
 		return
 	var key: InputEventKey = event as InputEventKey
 	if not key.pressed or key.echo or _is_interaction_busy() or _is_scene_transitioning():
@@ -249,6 +194,10 @@ func _input(event: InputEvent) -> void:
 		if not settings_overlay.visible and not get_tree().paused:
 			toggle_tasks()
 			get_viewport().set_input_as_handled()
+
+
+func hide_tasks() -> void:
+	_set_tasks_visible(false)
 
 
 func toggle_tasks() -> void:
@@ -310,25 +259,39 @@ func _refresh_tasks() -> void:
 	if count != _last_completed:
 		progress_changed.emit(count, get_total_tasks())
 		_last_completed = count
-	# TaskUI.gd listens to the same GameState signal and updates each checkbox.
 
 
 func _refresh_timer() -> void:
 	if timer_label == null:
 		return
-	var second: int = maxi(0, int(ceil(remaining_seconds)))
-	if _last_timer_second == second:
-		return
-	_last_timer_second = second
-	timer_label.text = "%02d:%02d" % [int(second / 60), second % 60]
+
+	var seconds_left: int = maxi(0, int(ceil(remaining_seconds)))
+
 	if run_state == RunState.EXPIRED:
 		timer_label.text = "TIME UP"
-	elif run_state == RunState.COMPLETED:
+		_last_timer_second = seconds_left
+		return
+
+	if run_state == RunState.COMPLETED:
 		timer_label.text = "COMPLETE!"
+		_last_timer_second = seconds_left
+		return
+
+	if _last_timer_second == seconds_left:
+		return
+
+	_last_timer_second = seconds_left
+	var minutes: int = floori(float(seconds_left) / 60.0)
+	var seconds: int = seconds_left % 60
+	timer_label.text = "%02d:%02d" % [minutes, seconds]
 
 
 func _finish_time_limit() -> void:
+	if run_state != RunState.RUNNING:
+		return
 	remaining_seconds = 0.0
+	if ring_bell_on_time_up and time_up_bell != null and time_up_bell.stream != null:
+		time_up_bell.play()
 	if all_tasks_complete():
 		run_state = RunState.COMPLETED
 		challenge_completed.emit(limit_seconds)
@@ -340,7 +303,10 @@ func _finish_time_limit() -> void:
 
 
 func start_challenge(reset_progress: bool = true) -> void:
+	if time_up_bell != null:
+		time_up_bell.stop()
 	close_settings()
+	_set_tasks_visible(false)
 	if game_state == null:
 		return
 	if reset_progress:
@@ -387,7 +353,7 @@ func _on_school_tasks_reset() -> void:
 
 
 func can_accept_task_completion() -> bool:
-	return run_state == RunState.RUNNING and remaining_seconds > 0.0 and not settings_overlay.visible and not get_tree().paused
+	return run_state == RunState.RUNNING and remaining_seconds > 0.0 and settings_overlay != null and not settings_overlay.visible and not get_tree().paused
 
 
 func complete_task(task_id: StringName) -> bool:
@@ -456,7 +422,8 @@ func _set_fullscreen(enabled: bool) -> void:
 
 
 func _exit_tree() -> void:
-	_store_timer_state()
+	if get_node_or_null("/root/SchoolHUD") == self:
+		_store_timer_state()
 	if _owns_pause:
 		get_tree().paused = _pause_before_settings
 		_owns_pause = false

@@ -1,12 +1,11 @@
 extends CharacterBody3D
-## Attach to CharacterBody3D, the parent of AnimatedSprite3D.
-## Keeps the depth set by each world scene instead of forcing Z = 1.0.
 
 @export var move_speed: float = 1.5
 @export var preserve_scene_depth: bool = true
 @export var fixed_z_if_needed: float = 1.0
 @export var restore_saved_position: bool = true
-@export var debug_player: bool = true
+@export var debug_player: bool = false
+@export var original_art_faces_right: bool = true
 
 @onready var sprite: AnimatedSprite3D = get_node_or_null("AnimatedSprite3D") as AnimatedSprite3D
 
@@ -23,7 +22,6 @@ func _ready() -> void:
 	add_to_group(&"player")
 	_game_state = get_node_or_null("/root/GameState")
 
-	# This is the important fix: don't overwrite the scene's Z position.
 	_scene_depth = global_position.z
 	if not preserve_scene_depth:
 		_scene_depth = fixed_z_if_needed
@@ -60,17 +58,14 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	_reported_busy = false
-
 	var direction: float = _get_horizontal_direction()
 	velocity = Vector3(direction * move_speed, 0.0, 0.0)
 	move_and_slide()
-
-	# Lock to this scene's ORIGINAL depth, not an arbitrary world Z.
 	global_position.z = _scene_depth
 
 	if not is_zero_approx(direction):
 		if sprite != null:
-			sprite.flip_h = direction < 0.0
+			sprite.flip_h = (direction < 0.0) if original_art_faces_right else (direction > 0.0)
 		_play_animation(_walk_animation)
 	else:
 		_play_animation(_idle_animation)
@@ -78,17 +73,13 @@ func _physics_process(_delta: float) -> void:
 
 func _get_horizontal_direction() -> float:
 	var result: float = 0.0
-
 	if InputMap.has_action("move_left") and InputMap.has_action("move_right"):
 		result = Input.get_axis("move_left", "move_right")
-
-	# Allows A/D and arrow keys even before Input Map setup.
 	if is_zero_approx(result):
 		if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
 			result -= 1.0
 		if Input.is_key_pressed(KEY_D) or Input.is_key_pressed(KEY_RIGHT):
 			result += 1.0
-
 	return clampf(result, -1.0, 1.0)
 
 
@@ -121,18 +112,33 @@ func _restore_previous_position() -> void:
 	if not is_inside_tree():
 		return
 
-	if restore_saved_position and _game_state != null:
-		var scene: Node = get_tree().current_scene
-		if scene != null and not scene.scene_file_path.is_empty():
-			var path: String = scene.scene_file_path
-			if bool(_game_state.call("has_position", path)):
-				var saved: Vector3 = _game_state.call("get_position", path)
-				# Older scripts may have saved an incorrect Z. Restore X/Y only.
+	var restored: bool = false
+	var scene: Node = get_tree().current_scene
+
+	if scene != null and _game_state != null and not scene.scene_file_path.is_empty():
+		var scene_path: String = scene.scene_file_path
+
+		if _game_state.has_method("take_spawn_marker"):
+			var marker_name: String = String(_game_state.call("take_spawn_marker", scene_path))
+			if not marker_name.is_empty():
+				var marker: Marker3D = scene.find_child(marker_name, true, false) as Marker3D
+				if marker != null:
+					global_position = Vector3(marker.global_position.x, marker.global_position.y, _scene_depth)
+					restored = true
+					if debug_player:
+						print("PLAYER ARRIVED AT MARKER: ", marker_name, " -> ", global_position)
+				else:
+					push_warning("Spawn marker '%s' not found in %s." % [marker_name, scene_path])
+
+		if not restored and restore_saved_position and _game_state.has_method("has_position"):
+			if bool(_game_state.call("has_position", scene_path)):
+				var saved: Vector3 = _game_state.call("get_position", scene_path)
 				global_position = Vector3(saved.x, saved.y, _scene_depth)
+				restored = true
 
 	global_position.z = _scene_depth
 	velocity = Vector3.ZERO
 	_restoring_position = false
 
 	if debug_player:
-		print("PLAYER POSITION READY at ", global_position, " | paused=", get_tree().paused)
+		print("PLAYER POSITION READY at ", global_position, " | restored=", restored)

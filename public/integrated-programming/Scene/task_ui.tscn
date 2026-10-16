@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://dflb4fc0krwc8" path="res://Script/task_ui.gd" id="1_usoxc"]
 
 [node name="TaskUI" type="CanvasLayer" unique_id=2113353932]
+visible = false
 script = ExtResource("1_usoxc")
 
 [node name="PanelContainer" type="PanelContainer" parent="." unique_id=1528415384]

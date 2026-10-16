@@ -2,6 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://jqvp07j0m7od" path="res://Scene/task_ui.tscn" id="1_qx1vt"]
 [ext_resource type="Script" uid="uid://cb6rmvqgd3atx" path="res://Script/SchoolHUD.gd" id="1_uy6oj"]
+[ext_resource type="AudioStream" uid="uid://dcftn6lnhujih" path="res://Music/School Bell Sound Effect No Copyright.mp3" id="3_skh7i"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_uy6oj"]
 bg_color = Color(0.15294118, 0.15686275, 0.19215687, 1)
@@ -214,3 +215,7 @@ offset_top = 277.0
 offset_right = 814.0
 offset_bottom = 300.0
 text = "Full Screen"
+
+[node name="TimeUpBell" type="AudioStreamPlayer" parent="." unique_id=432812468]
+stream = ExtResource("3_skh7i")
+volume_db = 2.0

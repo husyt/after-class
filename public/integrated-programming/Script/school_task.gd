@@ -1,7 +1,10 @@
-
 extends Area3D
 
 const CLASS_NOTEBOOK_SCENE: String = "res://Scene/class_activity.tscn"
+const COMPUTER_ACTIVITY_SCENE: String = "res://Scene/computer_activity.tscn"
+const LIBRARY_BORROWING_SCENE: String = "res://Scene/library_borrowing.tscn"
+const CLINIC_HEALTH_SCENE: String = "res://Scene/clinic_health_checkup.tscn"
+const CLINIC_SLEEP_SCENE: String = "res://Scene/clinic_sleep.tscn"
 
 @export var task_id: String = ""
 @export_file("*.tscn") var target_scene_path: String = ""
@@ -11,6 +14,18 @@ const CLASS_NOTEBOOK_SCENE: String = "res://Scene/class_activity.tscn"
 @export var click_padding: float = 0.05
 @export var hover_scale: float = 1.15
 @export var hover_color: Color = Color(1.0, 0.85, 0.2, 1.0)
+@export_group("Cafeteria Audio")
+@export var buy_sound: AudioStream
+@export var eat_sound: AudioStream
+@export_range(-30.0, 6.0, 0.5) var cafeteria_volume_db: float = 0.0
+@export var repeat_eating_sound: bool = true
+@export var show_eating_progress: bool = true
+@export_group("Prompt Visibility")
+@export var proximity_fallback: bool = true
+@export_range(0.5, 5.0, 0.1) var proximity_horizontal: float = 1.7
+@export_range(0.5, 5.0, 0.1) var proximity_vertical: float = 2.0
+@export_range(0.5, 10.0, 0.5) var proximity_depth: float = 5.0
+@export var show_prompt_through_background: bool = true
 
 @onready var prompt: Label3D = get_node_or_null("FPrompt") as Label3D
 
@@ -32,6 +47,13 @@ var previous_pause: bool = false
 var _owns_transition_pause: bool = false
 var _transition_generation: int = 0
 var _fade_tween: Tween = null
+var _loading_tween: Tween = null
+var _cafeteria_action: String = ""
+var _eat_audio_active: bool = false
+var cafeteria_sound_player: AudioStreamPlayer = null
+var eating_progress_container: CenterContainer = null
+var eating_progress_label: Label = null
+var eating_progress_bar: ProgressBar = null
 
 
 func _ready() -> void:
@@ -58,9 +80,14 @@ func _ready() -> void:
 		old_click_area.collision_mask = 0
 
 	_configure_interaction()
+	_ensure_prompt_text()
+	if show_prompt_through_background:
+		prompt.no_depth_test = true
 	task_id = String(game_state.call("normalize_school_task_id", task_id))
+	_cafeteria_action = _find_cafeteria_action()
 	_configure_key()
 	_create_black_screen()
+	_create_cafeteria_sound_player()
 
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
@@ -99,21 +126,138 @@ func _configure_interaction() -> void:
 		action_only = false
 		return
 
-	if not task_id.is_empty() or not target_scene_path.is_empty():
+	var computer_activity: bool = (
+		"use computer" in text
+		or ("computer activity" in text and "exit" not in text)
+	)
+
+	if computer_activity:
+		task_id = ""
+		target_scene_path = COMPUTER_ACTIVITY_SCENE
+		action_only = false
+		return
+
+	if "borrow" in text and "exit" not in text:
+		task_id = ""
+		target_scene_path = LIBRARY_BORROWING_SCENE
+		action_only = false
 		return
 
 	if "get form" in text or "health form" in text:
-		task_id = "health_form"
+		task_id = ""
+		target_scene_path = CLINIC_HEALTH_SCENE
+		action_only = false
+		return
+
+	if "sleep" in text:
+		task_id = ""
+		target_scene_path = CLINIC_SLEEP_SCENE
+		action_only = false
+		return
+
+	if not task_id.is_empty() or not target_scene_path.is_empty():
+		return
+
+	var normalized_name: String = String(name).to_lower().replace("_", " ")
+	if "apologize" in text or "apolagize" in text or "apologise" in text:
+		action_only = true
+	elif "enter grounds" in text or "enter school grounds" in text or normalized_name == "enter grounds":
+		target_scene_path = "res://Scene/school_grounds.tscn"
+		if not ResourceLoader.exists(target_scene_path, "PackedScene"):
+			var alternate: String = "res://Scene/school_grounds.tscn.tscn"
+			if ResourceLoader.exists(alternate, "PackedScene"):
+				target_scene_path = alternate
+	elif "exit grounds" in text or "exit school grounds" in text:
+		target_scene_path = "res://Scene/school_hallway2.tscn"
+	elif normalized_name == "play" or "[f] play" in text or " play " in (" " + text + " "):
+		action_only = true
 	elif "attend class" in text:
 		task_id = "attend_class"
-	elif "borrow" in text:
-		task_id = "borrow_book"
-	elif "use computer" in text or "computer activity" in text:
-		task_id = "computer_activity"
 	elif "eat" in text:
 		task_id = "eat_lunch"
-	elif "buy" in text or "sleep" in text:
+	elif "buy" in text:
 		action_only = true
+
+
+func _ensure_prompt_text() -> void:
+	var current_text: String = prompt.text.strip_edges()
+	var normalized_name: String = String(name).to_lower().replace("_", " ")
+	if "apolagize" in current_text.to_lower() or "apologize" in current_text.to_lower() or "apologise" in current_text.to_lower():
+		current_text = "Apologize"
+	elif current_text.is_empty():
+		if "apolagize" in normalized_name or "apologize" in normalized_name:
+			current_text = "Apologize"
+		elif "enter grounds" in normalized_name:
+			current_text = "Enter Grounds"
+		elif "exit grounds" in normalized_name:
+			current_text = "Exit Grounds"
+		elif normalized_name == "play":
+			current_text = "Play"
+		else:
+			current_text = String(name).replace("_", " ").capitalize()
+	if not current_text.begins_with("["):
+		current_text = "[F] " + current_text
+	prompt.text = current_text
+
+
+func _find_cafeteria_action() -> String:
+	if not target_scene_path.is_empty():
+		return ""
+
+	var trigger_text: String = (" " + String(name) + " " + prompt.text + " ").to_lower().replace("_", " ")
+
+	if task_id == "eat_lunch" or " eat " in trigger_text:
+		return "eat"
+
+	if " buy " in trigger_text:
+		return "buy"
+
+	return ""
+
+
+func _create_cafeteria_sound_player() -> void:
+	cafeteria_sound_player = AudioStreamPlayer.new()
+	cafeteria_sound_player.name = "CafeteriaSoundPlayer"
+	cafeteria_sound_player.volume_db = cafeteria_volume_db
+	cafeteria_sound_player.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(cafeteria_sound_player)
+	cafeteria_sound_player.finished.connect(_on_cafeteria_sound_finished)
+
+
+func _play_cafeteria_sound() -> void:
+	if cafeteria_sound_player == null:
+		return
+
+	var chosen_sound: AudioStream = null
+	if _cafeteria_action == "buy":
+		chosen_sound = buy_sound
+	elif _cafeteria_action == "eat":
+		chosen_sound = eat_sound
+
+	if chosen_sound == null:
+		var default_path: String = "res://Sounds/buy.wav" if _cafeteria_action == "buy" else "res://Sounds/eat.wav"
+		if ResourceLoader.exists(default_path):
+			chosen_sound = load(default_path) as AudioStream
+
+	if chosen_sound == null:
+		return
+
+	cafeteria_sound_player.volume_db = cafeteria_volume_db
+	cafeteria_sound_player.stream = chosen_sound
+	_eat_audio_active = _cafeteria_action == "eat"
+	cafeteria_sound_player.play()
+
+
+func _on_cafeteria_sound_finished() -> void:
+	if _eat_audio_active and repeat_eating_sound and not _cafeteria_action.is_empty():
+		if cafeteria_sound_player != null and cafeteria_sound_player.stream != null:
+			cafeteria_sound_player.play()
+
+
+func _stop_cafeteria_sound() -> void:
+	_eat_audio_active = false
+	if cafeteria_sound_player != null and cafeteria_sound_player.playing:
+		cafeteria_sound_player.stop()
 
 
 func _configure_key() -> void:
@@ -156,8 +300,18 @@ func _physics_process(_delta: float) -> void:
 			current_player = body as CharacterBody3D
 			break
 
+	if current_player == null and proximity_fallback:
+		var player: CharacterBody3D = get_tree().get_first_node_in_group(&"player") as CharacterBody3D
+		if is_instance_valid(player) and _is_close_to_player(player):
+			current_player = player
+
 	player_near = is_instance_valid(current_player)
 	_update_visibility()
+
+
+func _is_close_to_player(player: CharacterBody3D) -> bool:
+	var distance: Vector3 = player.global_position - global_position
+	return absf(distance.x) <= proximity_horizontal and absf(distance.y) <= proximity_vertical and absf(distance.z) <= proximity_depth
 
 
 func _process(_delta: float) -> void:
@@ -202,10 +356,22 @@ func _can_interact() -> bool:
 
 	if target_scene_path == CLASS_NOTEBOOK_SCENE:
 		return not bool(
-			game_state.call(
-				"is_school_task_complete",
-                "attend_class"
-			)
+			game_state.call("is_school_task_complete", "attend_class")
+		)
+
+	if target_scene_path == COMPUTER_ACTIVITY_SCENE:
+		return not bool(
+			game_state.call("is_school_task_complete", "computer_activity")
+		)
+
+	if target_scene_path == LIBRARY_BORROWING_SCENE:
+		return not bool(
+			game_state.call("is_school_task_complete", "borrow_book")
+		)
+
+	if target_scene_path == CLINIC_HEALTH_SCENE:
+		return not bool(
+			game_state.call("is_school_task_complete", "health_form")
 		)
 
 	if not target_scene_path.is_empty():
@@ -358,6 +524,35 @@ func _create_black_screen() -> void:
 	)
 	black_screen.hide()
 
+	eating_progress_container = CenterContainer.new()
+	eating_progress_container.name = "EatingProgress"
+	eating_progress_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	eating_progress_container.process_mode = Node.PROCESS_MODE_ALWAYS
+	black_layer.add_child(eating_progress_container)
+	eating_progress_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var content: VBoxContainer = VBoxContainer.new()
+	content.custom_minimum_size.x = 370.0
+	content.add_theme_constant_override("separation", 18)
+	eating_progress_container.add_child(content)
+
+	eating_progress_label = Label.new()
+	eating_progress_label.text = "Eating lunch..."
+	eating_progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	eating_progress_label.add_theme_font_size_override("font_size", 28)
+	eating_progress_label.add_theme_color_override("font_color", Color.WHITE)
+	content.add_child(eating_progress_label)
+
+	eating_progress_bar = ProgressBar.new()
+	eating_progress_bar.custom_minimum_size = Vector2(370.0, 24.0)
+	eating_progress_bar.min_value = 0.0
+	eating_progress_bar.max_value = 100.0
+	eating_progress_bar.value = 0.0
+	eating_progress_bar.show_percentage = true
+	content.add_child(eating_progress_bar)
+
+	eating_progress_container.hide()
+
 
 func _activate_interaction() -> void:
 	if not _can_interact():
@@ -365,7 +560,7 @@ func _activate_interaction() -> void:
 
 	if not target_scene_path.is_empty() and not ResourceLoader.exists(
 		target_scene_path,
-        "PackedScene"
+		"PackedScene"
 	):
 		push_error("Scene not found: " + target_scene_path)
 		return
@@ -409,25 +604,48 @@ func _run_transition(generation: int) -> void:
 
 	black_screen.modulate.a = 0.0
 	black_screen.show()
+	eating_progress_container.hide()
+
+	if _cafeteria_action == "buy":
+		_play_cafeteria_sound()
 
 	await _fade_to(1.0)
 
-	if generation != _transition_generation:
+	if generation != _transition_generation or not is_inside_tree():
 		return
 
-	await get_tree().create_timer(
-		clampf(transition_duration, 2.0, 4.0),
-		true,
-		false,
-		true
-	).timeout
+	var wait_time: float = clampf(transition_duration, 2.0, 4.0)
 
-	if generation != _transition_generation:
+	if _cafeteria_action == "eat":
+		_play_cafeteria_sound()
+
+		if show_eating_progress:
+			eating_progress_bar.value = 0.0
+			eating_progress_container.show()
+			_loading_tween = create_tween()
+			_loading_tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+			_loading_tween.set_ignore_time_scale(true)
+			_loading_tween.tween_property(
+				eating_progress_bar,
+				"value",
+				100.0,
+				wait_time
+			).set_trans(Tween.TRANS_LINEAR)
+			await _loading_tween.finished
+		else:
+			await get_tree().create_timer(wait_time, true, false, true).timeout
+	else:
+		await get_tree().create_timer(wait_time, true, false, true).timeout
+
+	if generation != _transition_generation or not is_inside_tree():
 		return
+
+	_stop_cafeteria_sound()
+	eating_progress_container.hide()
 
 	await _fade_to(0.0)
 
-	if generation != _transition_generation:
+	if generation != _transition_generation or not is_inside_tree():
 		return
 
 	black_screen.hide()
@@ -504,6 +722,14 @@ func _on_school_tasks_reset() -> void:
 	if _fade_tween != null and _fade_tween.is_valid():
 		_fade_tween.kill()
 
+	if _loading_tween != null and _loading_tween.is_valid():
+		_loading_tween.kill()
+
+	_stop_cafeteria_sound()
+
+	if eating_progress_container != null:
+		eating_progress_container.hide()
+
 	if black_screen != null:
 		black_screen.hide()
 
@@ -564,7 +790,7 @@ func _change_scene() -> void:
 		return
 
 	var transition: Node = get_node_or_null(
-        "/root/SceneTransition"
+		"/root/SceneTransition"
 	)
 
 	if transition != null and transition.has_method("transition_to"):
@@ -597,5 +823,6 @@ func _change_scene() -> void:
 
 func _exit_tree() -> void:
 	_transition_generation += 1
+	_stop_cafeteria_sound()
 	_release_interaction()
 	_reset_hover()

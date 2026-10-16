@@ -11,6 +11,7 @@ config_version=5
 [application]
 
 config/name="Integrated Programming"
+run/main_scene="uid://bog123y25pbdj"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
@@ -18,7 +19,7 @@ config/icon="res://icon.svg"
 
 GameState="*uid://dgu678ywurnd0"
 SceneTransition="*uid://dr3cwnepo8c0p"
-SchoolHud="*uid://bmt5xfxpk85yu"
+SchoolHUD="*uid://dj88ioas0nksu"
 
 [display]
 

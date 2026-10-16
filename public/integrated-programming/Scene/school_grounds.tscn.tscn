@@ -26,15 +26,15 @@ size = 9.0
 transform = Transform3D(1.8805103, 0, 0, 0, 1.8805103, 0, 0, 0, 1.8805103, -0.48191786, -1.356918, 0.9608103)
 
 [node name="Enter_grounds" type="Area3D" parent="." unique_id=751651959]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1958191, -0.908, 0.16224253)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7300293, -0.908, 0.16224253)
 script = ExtResource("3_6ao61")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Enter_grounds" unique_id=1390373249]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.588568, -0.45056796, 0.638754)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5902226, -0.45056796, 0.638754)
 shape = SubResource("BoxShape3D_7pbsr")
 
 [node name="FPrompt" type="Label3D" parent="Enter_grounds" unique_id=320296195]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.8460333, -0.39305544, 0.7384466)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.58213115, -0.39305544, 0.7384466)
 visible = false
 text = "[F] Enter Hallway"
 
