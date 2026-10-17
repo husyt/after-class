@@ -25,7 +25,7 @@ size = 9.0
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=557507545]
 
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_3kbmx")]
-transform = Transform3D(2.680529, 0, 0, 0, 2.680529, 0, 0, 0, 2.680529, -5.313197, 0.3266828, 0.16125298)
+transform = Transform3D(2.680529, 0, 0, 0, 2.680529, 0, 0, 0, 2.680529, -5.313197, 0.3266828, 1.9124246)
 
 [node name="Exit_library" type="Area3D" parent="." unique_id=2043842475]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
@@ -45,7 +45,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.105643, 1.4300313, 0.162242
 script = ExtResource("5_h1uy8")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_library/Borrow_Book" unique_id=1143950174]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5865407, -0.2439692, 0.39227533)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 10.152992, -3.8331838, -0.2439692, 0.39227533)
 shape = SubResource("BoxShape3D_ms3ir")
 
 [node name="FPrompt" type="Label3D" parent="Exit_library/Borrow_Book" unique_id=1993547931]
@@ -67,7 +67,7 @@ transform = Transform3D(1, 0, 0, 0, 4.6010427, 0, 0, 0, 1, -3.4945564, -1.167651
 shape = SubResource("BoxShape3D_h1uy8")
 
 [node name="Character2" parent="." unique_id=1788388508 instance=ExtResource("5_q487d")]
-transform = Transform3D(-2.938838, 0, 0.27889067, 0, 2.9520414, 0, -0.27889067, 0, -2.938838, 6.1841397, 0.35533214, 1.2884388)
+transform = Transform3D(-2.938838, 0, 0.27889067, 0, 2.9520414, 0, -0.27889067, 0, -2.938838, 6.1841397, 0.35533214, 0.85202396)
 
 [node name="CameraLeftStop" type="Marker3D" parent="." unique_id=394638979]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.202641, 0, 0.3013674)

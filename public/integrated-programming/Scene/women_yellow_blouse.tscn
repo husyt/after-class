@@ -1,0 +1,56 @@
+[gd_scene format=3 uid="uid://cmsvhc8xwylo"]
+
+[ext_resource type="Script" uid="uid://do1m1lkpfh71k" path="res://Script/walking_npc.gd" id="1_uvdfn"]
+[ext_resource type="Texture2D" uid="uid://b724gneyspmxm" path="res://Character/woman_yellow_blouse/walk_01.png" id="2_xfr40"]
+[ext_resource type="Texture2D" uid="uid://cne5yroy7oq7p" path="res://Character/woman_yellow_blouse/walk_02.png" id="3_ikjki"]
+[ext_resource type="Texture2D" uid="uid://dtdqptxwqxnu0" path="res://Character/woman_yellow_blouse/walk_03.png" id="4_m7jwx"]
+[ext_resource type="Texture2D" uid="uid://bd6tm20mr3lo0" path="res://Character/woman_yellow_blouse/walk_04.png" id="5_0x3bv"]
+[ext_resource type="Texture2D" uid="uid://bevtkayhmjwlf" path="res://Character/woman_yellow_blouse/walk_05.png" id="6_i2tys"]
+[ext_resource type="Texture2D" uid="uid://bn1uf0hnyyext" path="res://Character/woman_yellow_blouse/walk_06.png" id="7_oncgc"]
+[ext_resource type="Texture2D" uid="uid://c0dm045arubc7" path="res://Character/woman_yellow_blouse/walk_07.png" id="8_n8eij"]
+[ext_resource type="Texture2D" uid="uid://een1mn1vcg1b" path="res://Character/woman_yellow_blouse/walk_08.png" id="9_kpwb0"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_x244t"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_xfr40")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ikjki")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_m7jwx")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_0x3bv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_i2tys")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_oncgc")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_n8eij")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_kpwb0")
+}],
+"loop": 1,
+"name": &"Walking",
+"speed": 5.0
+}]
+
+[node name="Character" type="Node3D" unique_id=719971783]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+script = ExtResource("1_uvdfn")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
+transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
+flip_h = true
+sprite_frames = SubResource("SpriteFrames_x244t")
+animation = &"Walking"
+frame_progress = 0.27853882

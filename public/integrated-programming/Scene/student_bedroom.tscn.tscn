@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://cj1mvpmjbnvxl" path="res://Background/Student’s House  Bedroom.png" id="1_muoxo"]
 [ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_pgkja"]
 [ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_31wlc"]
+[ext_resource type="AudioStream" uid="uid://bwlbtiyhfnuoe" path="res://Music/(Audio) Average Filipino Sunday be Like.mp3" id="4_8er82"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_8er82"]
 
@@ -34,6 +35,11 @@ shape = SubResource("BoxShape3D_8er82")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.6271346, 0.43158358, 0.7384466)
 visible = false
 text = "[F] Sleep"
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1153582050]
+stream = ExtResource("4_8er82")
+volume_db = -20.673
+autoplay = true
 
 [node name="CameraLeftStop" type="Marker3D" parent="." unique_id=896440679]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.074772, 0, 0.3013674)

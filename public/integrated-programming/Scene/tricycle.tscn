@@ -70,7 +70,7 @@ animations = [{
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_2lb0n"]
 
-[node name="Jeep" type="Node3D" unique_id=719971783]
+[node name="Tricycle" type="Node3D" unique_id=719971783]
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)

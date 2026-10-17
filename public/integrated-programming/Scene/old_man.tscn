@@ -1,0 +1,55 @@
+[gd_scene format=3 uid="uid://cx2xo1bxkxog7"]
+
+[ext_resource type="Script" uid="uid://do1m1lkpfh71k" path="res://Script/walking_npc.gd" id="1_vrfsl"]
+[ext_resource type="Texture2D" uid="uid://cwijt1lmjfyvp" path="res://Character/older_man_beige_polo/walk_01.png" id="2_dr4a0"]
+[ext_resource type="Texture2D" uid="uid://b48y6s05axjba" path="res://Character/older_man_beige_polo/walk_02.png" id="2_vrfsl"]
+[ext_resource type="Texture2D" uid="uid://c06d7s7yh2lvb" path="res://Character/older_man_beige_polo/walk_03.png" id="3_dr4a0"]
+[ext_resource type="Texture2D" uid="uid://c37dpuva10tyi" path="res://Character/older_man_beige_polo/walk_04.png" id="4_uvuy0"]
+[ext_resource type="Texture2D" uid="uid://dysybbfa8asur" path="res://Character/older_man_beige_polo/walk_05.png" id="5_iclpa"]
+[ext_resource type="Texture2D" uid="uid://0f3320dx433a" path="res://Character/older_man_beige_polo/walk_06.png" id="6_fmv28"]
+[ext_resource type="Texture2D" uid="uid://bgpa02d1pxoxl" path="res://Character/older_man_beige_polo/walk_07.png" id="7_lvqet"]
+[ext_resource type="Texture2D" uid="uid://krivnfgy6hf2" path="res://Character/older_man_beige_polo/walk_08.png" id="8_p0c38"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2in47"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_dr4a0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_vrfsl")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_dr4a0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_uvuy0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_iclpa")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_fmv28")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_lvqet")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_p0c38")
+}],
+"loop": 1,
+"name": &"Walking",
+"speed": 5.0
+}]
+
+[node name="Character" type="Node3D" unique_id=719971783]
+
+[node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
+script = ExtResource("1_vrfsl")
+
+[node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
+transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
+sprite_frames = SubResource("SpriteFrames_2in47")
+animation = &"Walking"
+frame_progress = 0.86320513

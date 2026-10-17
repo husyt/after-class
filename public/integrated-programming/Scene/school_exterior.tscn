@@ -2,12 +2,18 @@
 
 [ext_resource type="Texture2D" uid="uid://c5rn0bj7obuix" path="res://Background/School Exterior4.png" id="1_pdh1k"]
 [ext_resource type="PackedScene" uid="uid://dki7xsbq356mc" path="res://Scene/character.tscn" id="2_r3fqk"]
-[ext_resource type="Script" uid="uid://c71mkfprqtsmu" path="res://Script/stage.gd" id="3_phkjw"]
+[ext_resource type="Script" uid="uid://kg160ggm8dw5" path="res://Script/SceneInteraction.gd" id="3_gup0k"]
+[ext_resource type="AudioStream" uid="uid://iyevw6rrx8ni" path="res://Music/TITO CHAL ASMR_ ASMR Busy Street Ambience in the Philippines _ City Sound, Traffic & Urban Vibes [MzafR8kiW-U] (mp3cut.net).mp3" id="4_j6eq6"]
+[ext_resource type="PackedScene" uid="uid://dbitk75ed7lvy" path="res://Scene/man_green.tscn" id="6_w5wuu"]
+[ext_resource type="PackedScene" uid="uid://cx2xo1bxkxog7" path="res://Scene/old_man.tscn" id="7_i1lo8"]
+[ext_resource type="PackedScene" uid="uid://b27f4l8sbdvho" path="res://Scene/women_red_top.tscn" id="8_74ejh"]
+[ext_resource type="PackedScene" uid="uid://cmsvhc8xwylo" path="res://Scene/women_yellow_blouse.tscn" id="9_qpb40"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_1scgm"]
 
 [sub_resource type="SystemFont" id="SystemFont_26xku"]
 font_names = PackedStringArray("PT Sans Caption")
+subpixel_positioning = 0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_phkjw"]
 size = Vector3(1, 1, 2.8155518)
@@ -20,18 +26,18 @@ texture = ExtResource("1_pdh1k")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1270308278]
 
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_r3fqk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.083, -0.9900284, 0.4254926)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.083, -0.9655403, 1.2525557)
 
 [node name="SchoolEntrance" type="Area3D" parent="." unique_id=28903567]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.16224253)
-script = ExtResource("3_phkjw")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.14005876)
+script = ExtResource("3_gup0k")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="SchoolEntrance" unique_id=1022880517]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.40100002, 0.39227533)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.08509284, 0.52774155)
 shape = SubResource("BoxShape3D_1scgm")
 
 [node name="FPrompt" type="Label3D" parent="SchoolEntrance" unique_id=2018918172]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.20838118, -0.16224253)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.16397238, 0.06815761)
 visible = false
 text = "[F] Enter School"
 font = SubResource("SystemFont_26xku")
@@ -56,3 +62,19 @@ gizmo_extents = 1.45
 [node name="CameraRightStop" type="Marker3D" parent="." unique_id=1455749402]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3114805, 0, 0)
 gizmo_extents = 2.36
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1422674473]
+stream = ExtResource("4_j6eq6")
+autoplay = true
+
+[node name="Character2" parent="." unique_id=418701836 instance=ExtResource("6_w5wuu")]
+transform = Transform3D(1.2131773, 0, 0, 0, 1.2115897, 0, 0, 0, 1, 6.189312, -0.98458344, 0.9144542)
+
+[node name="Character3" parent="." unique_id=1875747800 instance=ExtResource("7_i1lo8")]
+transform = Transform3D(1.0206698, 0, 0, 0, 1.1752509, 0, 0, 0, 1, -8.251626, -1.0163584, 0.8240823)
+
+[node name="Character4" parent="." unique_id=812521803 instance=ExtResource("8_74ejh")]
+transform = Transform3D(1.1836973, 0, 0, 0, 1.1717196, 0, 0, 0, 1, -3.0873086, -0.9987292, 0.74443746)
+
+[node name="Character5" parent="." unique_id=379913882 instance=ExtResource("9_qpb40")]
+transform = Transform3D(1.0200056, 0, 0, 0, 1.1007215, 0, 0, 0, 1, 7.9029818, -1.051294, 0.9400753)

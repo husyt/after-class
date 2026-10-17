@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://dnc2emfsvwko4" path="res://Script/player.gd" id="1_tgux0"]
 [ext_resource type="Texture2D" uid="uid://df4qrilsp0l6f" path="res://Character/Idle/idle_01.png" id="2_73ll3"]
-[ext_resource type="Texture2D" uid="uid://dmdpknyp6ofd2" path="res://Character/Walk/walk_01.png" id="3_cp0d1"]
 [ext_resource type="Texture2D" uid="uid://cdsb3y5jueeum" path="res://Character/Idle/idle_02.png" id="3_ljc6b"]
 [ext_resource type="AudioStream" uid="uid://cqcqodah1rmu3" path="res://Music/Footsteps Sound Effect.mp3" id="4_46cb6"]
 [ext_resource type="Texture2D" uid="uid://jxxwqulxsgvu" path="res://Character/Idle/idle_03.png" id="4_ilft0"]
@@ -54,9 +53,6 @@ animations = [{
 }, {
 "frames": [{
 "duration": 1.0,
-"texture": ExtResource("3_cp0d1")
-}, {
-"duration": 1.0,
 "texture": ExtResource("4_uk2ye")
 }, {
 "duration": 1.0,
@@ -79,36 +75,44 @@ animations = [{
 }],
 "loop": 1,
 "name": &"Walk",
-"speed": 5.0
+"speed": 4.0
 }]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_phkjw"]
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_qt4ce"]
 
 [node name="Character" type="Node3D" unique_id=719971783]
 
 [node name="CharacterBody3D" type="CharacterBody3D" parent="." unique_id=1057914969 groups=["player"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1)
 script = ExtResource("1_tgux0")
+move_speed = null
+preserve_scene_depth = null
+fixed_z_if_needed = null
+restore_saved_position = null
+debug_player = null
+original_art_faces_right = null
 
 [node name="AnimatedSprite3D" type="AnimatedSprite3D" parent="CharacterBody3D" unique_id=1921798314]
 transform = Transform3D(0.2987957, 0, 0, 0, 0.2987957, 0, 0, 0, 0.2987957, -0.10367973, -0.1143353, -1.0319389)
 sprite_frames = SubResource("SpriteFrames_2ht62")
-animation = &"Idle"
-frame_progress = 0.14396346
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1447788063]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.079, -0.105, -1.0663438)
-shape = SubResource("CapsuleShape3D_phkjw")
+animation = &"Walk"
+frame_progress = 0.7794203
 
 [node name="Camera3D" type="Camera3D" parent="CharacterBody3D" unique_id=1915779834]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
+transform = Transform3D(0.7692308, 0, 0, 0, 0.7692308, 0, 0, 0, 0.7692308, 0, 0, 12.274789)
 projection = 1
 current = true
 size = 4.5
 script = ExtResource("18_ilft0")
 
-[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1936770790]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D" unique_id=1560275865]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+shape = SubResource("CapsuleShape3D_qt4ce")
+
+[node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="CharacterBody3D" unique_id=1936770790]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 stream = ExtResource("4_46cb6")
+max_db = -17.504
 max_distance = 50.0
 parameters/looping = false
 

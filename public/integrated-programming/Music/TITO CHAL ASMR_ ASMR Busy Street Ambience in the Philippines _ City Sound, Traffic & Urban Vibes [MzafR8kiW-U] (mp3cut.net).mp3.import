@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://iyevw6rrx8ni"
+path="res://.godot/imported/TITO CHAL ASMR_ ASMR Busy Street Ambience in the Philippines _ City Sound, Traffic & Urban Vibes [MzafR8kiW-U] (mp3cut.net).mp3-52faaf6f6b808b9f2607370e13ca45bc.mp3str"
+
+[deps]
+
+source_file="res://Music/TITO CHAL ASMR_ ASMR Busy Street Ambience in the Philippines _ City Sound, Traffic & Urban Vibes [MzafR8kiW-U] (mp3cut.net).mp3"
+dest_files=["res://.godot/imported/TITO CHAL ASMR_ ASMR Busy Street Ambience in the Philippines _ City Sound, Traffic & Urban Vibes [MzafR8kiW-U] (mp3cut.net).mp3-52faaf6f6b808b9f2607370e13ca45bc.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

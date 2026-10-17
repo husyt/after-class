@@ -23,7 +23,7 @@ size = 9.0
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1929482839]
 
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_npnue")]
-transform = Transform3D(2.3713825, 0, 0, 0, 2.3713825, 0, 0, 0, 2.3713825, 4.1917067, -0.39161044, 0.5003445)
+transform = Transform3D(2.3713825, 0, 0, 0, 2.3713825, 0, 0, 0, 2.3713825, 4.1917067, -0.39161044, 1.3136871)
 
 [node name="Exit_cafeteria" type="Area3D" parent="." unique_id=509288230]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.650625, -0.908, 0.16224253)

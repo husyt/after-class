@@ -1,22 +1,15 @@
 
 extends Camera3D
 
-# ============================================
-# EQUALPATH - SIDE SCROLLING CAMERA
-# ============================================
-
 @export var follow_speed: float = 8.0
 @export var smooth_camera: bool = true
 @export var horizontal_offset: float = 0.0
-
 @export var use_camera_limits: bool = true
 @export var edge_padding: float = 0.05
-
 @export var preserve_initial_horizontal_offset: bool = false
 @export var correct_player_behind_camera: bool = true
 
 var player: CharacterBody3D = null
-
 var left_marker: Marker3D = null
 var right_marker: Marker3D = null
 
@@ -28,13 +21,10 @@ var camera_ready: bool = false
 
 
 func _ready() -> void:
-
 	player = get_parent() as CharacterBody3D
 
 	if player == null:
-		push_error(
-            "Camera3D must be a child of CharacterBody3D."
-		)
+		push_error("Camera3D must be a child of CharacterBody3D.")
 		return
 
 	var initial_transform: Transform3D = global_transform
@@ -55,14 +45,12 @@ func _ready() -> void:
 		starting_offset_x = 0.0
 
 	process_priority = 100
-
 	make_current()
 
 	call_deferred("_initialize_camera")
 
 
 func _initialize_camera() -> void:
-
 	await get_tree().process_frame
 
 	if not is_inside_tree():
@@ -74,43 +62,35 @@ func _initialize_camera() -> void:
 	var scene: Node = get_tree().current_scene
 
 	if scene != null:
+		left_marker = scene.get_node_or_null(
+			"CameraLeftStop"
+		) as Marker3D
 
-		left_marker = (
-			scene.get_node_or_null("CameraLeftStop")
-			as Marker3D
-		)
+		right_marker = scene.get_node_or_null(
+			"CameraRightStop"
+		) as Marker3D
 
-		right_marker = (
-			scene.get_node_or_null("CameraRightStop")
-			as Marker3D
-		)
+		if left_marker == null:
+			left_marker = scene.find_child(
+				"CameraLeftStop",
+				true,
+				false
+			) as Marker3D
 
-	if use_camera_limits:
-
-		if left_marker == null or right_marker == null:
-			push_warning(
-                "Add CameraLeftStop and CameraRightStop "
-				+ "Marker3D nodes to the scene root."
-			)
-
-	if projection != PROJECTION_ORTHOGONAL:
-		push_warning(
-            "Use Orthogonal projection for accurate "
-			+ "background edge limits."
-		)
-
-	# Keep player visible if camera was
-	# accidentally positioned too close.
+		if right_marker == null:
+			right_marker = scene.find_child(
+				"CameraRightStop",
+				true,
+				false
+			) as Marker3D
 
 	if correct_player_behind_camera:
-
 		var sprite: AnimatedSprite3D = (
 			player.get_node_or_null("AnimatedSprite3D")
 			as AnimatedSprite3D
 		)
 
 		if sprite != null:
-
 			var forward: Vector3 = -global_basis.z.normalized()
 
 			var depth: float = (
@@ -118,19 +98,16 @@ func _initialize_camera() -> void:
 			).dot(forward)
 
 			if depth < 1.5:
-
 				global_position -= forward * (1.5 - depth)
 
 				fixed_y = global_position.y
 				fixed_z = global_position.z
 
 	camera_ready = true
-
 	_update_camera(0.0, true)
 
 
 func _process(delta: float) -> void:
-
 	if not camera_ready:
 		return
 
@@ -140,12 +117,7 @@ func _process(delta: float) -> void:
 	_update_camera(delta, false)
 
 
-# ============================================
-# CAMERA VISIBLE WIDTH
-# ============================================
-
 func _get_half_camera_width() -> float:
-
 	var viewport_size: Vector2 = (
 		get_viewport().get_visible_rect().size
 	)
@@ -156,7 +128,6 @@ func _get_half_camera_width() -> float:
 	var visible_width: float = size
 
 	if keep_aspect == Camera3D.KEEP_HEIGHT:
-
 		var aspect_ratio: float = (
 			viewport_size.x / viewport_size.y
 		)
@@ -166,15 +137,10 @@ func _get_half_camera_width() -> float:
 	return visible_width * 0.5
 
 
-# ============================================
-# CAMERA MOVEMENT AND LIMITS
-# ============================================
-
 func _update_camera(
 	delta: float,
 	instant: bool
 ) -> void:
-
 	var target_x: float = (
 		player.global_position.x
 		+ starting_offset_x
@@ -183,6 +149,7 @@ func _update_camera(
 
 	var limits_available: bool = (
 		use_camera_limits
+		and projection == PROJECTION_ORTHOGONAL
 		and is_instance_valid(left_marker)
 		and is_instance_valid(right_marker)
 	)
@@ -191,7 +158,6 @@ func _update_camera(
 	var max_camera_x: float = 0.0
 
 	if limits_available:
-
 		var image_left: float = minf(
 			left_marker.global_position.x,
 			right_marker.global_position.x
@@ -202,12 +168,7 @@ func _update_camera(
 			right_marker.global_position.x
 		)
 
-		var half_width: float = (
-			_get_half_camera_width()
-		)
-
-		# Keep the ENTIRE camera view
-		# inside the background edges.
+		var half_width: float = _get_half_camera_width()
 
 		min_camera_x = (
 			image_left
@@ -222,18 +183,13 @@ func _update_camera(
 		)
 
 		if min_camera_x > max_camera_x:
-
-			# Background is narrower than
-			# the camera's visible area.
 			target_x = (
 				image_left + image_right
 			) * 0.5
 
 			min_camera_x = target_x
 			max_camera_x = target_x
-
 		else:
-
 			target_x = clampf(
 				target_x,
 				min_camera_x,
@@ -243,11 +199,8 @@ func _update_camera(
 	var target_position: Vector3 = global_position
 
 	if instant or not smooth_camera:
-
 		target_position.x = target_x
-
 	else:
-
 		var blend: float = (
 			1.0 - exp(
 				-maxf(0.0, follow_speed) * delta
@@ -261,14 +214,12 @@ func _update_camera(
 		)
 
 	if limits_available:
-
 		target_position.x = clampf(
 			target_position.x,
 			min_camera_x,
 			max_camera_x
 		)
 
-	# Lock vertical and depth positions.
 	target_position.y = fixed_y
 	target_position.z = fixed_z
 
@@ -276,5 +227,4 @@ func _update_camera(
 
 
 func _exit_tree() -> void:
-
 	camera_ready = false

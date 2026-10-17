@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://dpd5ctp1crosj"]
+
+[ext_resource type="VideoStream" uid="uid://du8rag763k5w" path="res://Video/After_Class_Ending.ogv" id="1_tfs4n"]
+
+[node name="Ending" type="Node3D" unique_id=1297991008]
+
+[node name="VideoStreamPlayer" type="VideoStreamPlayer" parent="." unique_id=266673776]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -64.0
+offset_top = -1.000001
+offset_right = 384.0
+offset_bottom = 251.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.8299201, 0.7454782)
+stream = ExtResource("1_tfs4n")
+autoplay = true
