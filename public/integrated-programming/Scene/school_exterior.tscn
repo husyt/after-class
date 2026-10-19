@@ -26,7 +26,7 @@ texture = ExtResource("1_pdh1k")
 [node name="CanvasLayer" type="CanvasLayer" parent="." unique_id=1270308278]
 
 [node name="Character" parent="." unique_id=719971783 instance=ExtResource("2_r3fqk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.083, -0.9655403, 1.2525557)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.083, -1.020165, 0.45203793)
 
 [node name="SchoolEntrance" type="Area3D" parent="." unique_id=28903567]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.908, 0.14005876)
