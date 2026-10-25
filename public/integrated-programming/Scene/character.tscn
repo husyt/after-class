@@ -112,6 +112,7 @@ shape = SubResource("CapsuleShape3D_qt4ce")
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="CharacterBody3D" unique_id=1936770790]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 stream = ExtResource("4_46cb6")
+volume_db = 8.058
 max_db = -17.504
 max_distance = 50.0
 parameters/looping = false

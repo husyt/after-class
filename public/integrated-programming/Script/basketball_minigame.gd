@@ -9,6 +9,7 @@ extends Control
 @export_range(1.05, 1.65, 0.05) var shot_arc_time: float = 1.25
 # Approximate straight-up drag distance for a clean basket.
 @export_range(120.0, 260.0, 5.0) var perfect_swipe_pixels: float = 180.0
+@export_range(1, 20, 1) var baskets_for_medal: int = 1
 
 const VIEW: Vector2 = Vector2(960.0, 600.0)
 const CAMERA_Z: float = 12.0
@@ -286,6 +287,10 @@ func _check_basket(previous: Vector3) -> void:
 		_score_flash = 1.0
 		_score_label.text = str(_score)
 		_play(_score_player)
+		if _score == baskets_for_medal:
+			var achievements: Node = get_node_or_null("/root/Achievements")
+			if achievements != null and achievements.has_method("unlock_basketball_medal"):
+				achievements.call("unlock_basketball_medal")
 
 
 func _check_floor() -> void:
