@@ -40,15 +40,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7607017, 1.0314863, 0.7384
 visible = false
 text = "[F] Exit Library"
 
-[node name="Borrow_Book" type="Area3D" parent="Exit_library" unique_id=656122754]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.105643, 1.4300313, 0.16224253)
+[node name="Borrow_Book" type="Area3D" parent="." unique_id=656122754]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.105643, 0.5220313, 0.32448506)
 script = ExtResource("5_h1uy8")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Exit_library/Borrow_Book" unique_id=1143950174]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Borrow_Book" unique_id=1143950174]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 10.152992, -3.8331838, -0.2439692, 0.39227533)
 shape = SubResource("BoxShape3D_ms3ir")
 
-[node name="FPrompt" type="Label3D" parent="Exit_library/Borrow_Book" unique_id=1993547931]
+[node name="FPrompt" type="Label3D" parent="Borrow_Book" unique_id=1993547931]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.6694236, -0.05431223, 0.7384466)
 text = "[F] Borrow"
 

@@ -4,6 +4,11 @@ signal school_task_updated
 signal school_task_completed(task_id: String)
 signal school_tasks_reset
 
+# Only these FIVE tasks are required to exit school.
+# Homework is the sixth OVERALL task, completed later at home.
+const HOME_ASSIGNMENT_ID: String = "home_assignment"
+const HOMEWORK_COMPLETE_META: StringName = &"equalpath_bedroom_homework_complete"
+
 const TASK_IDS: Array[String] = [
 	"attend_class",
 	"borrow_book",
@@ -12,6 +17,15 @@ const TASK_IDS: Array[String] = [
 	"computer_activity"
 ]
 
+# Final results: 100 points per completed task and 10 per made basket.
+# Attempts count valid released basketball shots, not mouse drags.
+const POINTS_PER_TASK: int = 100
+const POINTS_PER_BASKET: int = 10
+const BASKETS_FOR_HOOP_MEDAL: int = 10
+
+var basketball_attempts: int = 0
+var basketball_baskets: int = 0
+
 var saved_positions: Dictionary = {}
 
 var school_tasks: Dictionary = {
@@ -19,7 +33,8 @@ var school_tasks: Dictionary = {
 	"borrow_book": false,
 	"health_form": false,
 	"eat_lunch": false,
-	"computer_activity": false
+	"computer_activity": false,
+	"home_assignment": false
 }
 
 var notebook_progress: Dictionary = {}
@@ -35,7 +50,7 @@ func normalize_school_task_id(task_id: String) -> String:
 
 func can_complete_school_task(task_id: String) -> bool:
 	var id: String = normalize_school_task_id(task_id)
-	return school_tasks.has(id) and not bool(school_tasks[id])
+	return school_tasks.has(id) and not is_school_task_complete(id)
 
 
 func complete_school_task(task_id: String) -> bool:
@@ -44,6 +59,8 @@ func complete_school_task(task_id: String) -> bool:
 		return false
 
 	school_tasks[id] = true
+	if id == HOME_ASSIGNMENT_ID:
+		set_meta(HOMEWORK_COMPLETE_META, true)
 	school_task_updated.emit()
 	school_task_completed.emit(id)
 	print("CHECKMARK ADDED: ", id, " (", get_school_task_count(), "/", get_school_task_total(), ")")
@@ -51,7 +68,10 @@ func complete_school_task(task_id: String) -> bool:
 
 
 func is_school_task_complete(task_id: String) -> bool:
-	return bool(school_tasks.get(normalize_school_task_id(task_id), false))
+	var id: String = normalize_school_task_id(task_id)
+	if id == HOME_ASSIGNMENT_ID:
+		return bool(school_tasks.get(id, false)) or bool(get_meta(HOMEWORK_COMPLETE_META, false))
+	return bool(school_tasks.get(id, false))
 
 
 func get_school_task_count() -> int:
@@ -67,13 +87,89 @@ func get_school_task_total() -> int:
 
 
 func school_tasks_complete() -> bool:
+	# Do not include homework here: the student must be able to leave school first.
 	return get_school_task_count() == get_school_task_total()
+
+
+func complete_home_assignment() -> bool:
+	return complete_school_task(HOME_ASSIGNMENT_ID)
+
+
+func get_all_task_count() -> int:
+	return get_school_task_count() + (1 if is_school_task_complete(HOME_ASSIGNMENT_ID) else 0)
+
+
+func get_all_task_total() -> int:
+	return get_school_task_total() + 1
+
+
+func all_tasks_complete() -> bool:
+	return school_tasks_complete() and is_school_task_complete(HOME_ASSIGNMENT_ID)
+
+
+func record_basketball_attempt() -> void:
+	basketball_attempts += 1
+
+
+func record_basketball_basket() -> void:
+	# Never record more made baskets than attempted shots.
+	var previous_baskets: int = basketball_baskets
+	basketball_baskets = mini(basketball_baskets + 1, basketball_attempts)
+
+	# Unlock only on the TENTH successful basket, not on an attempt.
+	# Achievements listens for this existing signal.
+	if previous_baskets < BASKETS_FOR_HOOP_MEDAL and basketball_baskets >= BASKETS_FOR_HOOP_MEDAL:
+		school_task_completed.emit("basketball")
+		print("MEDAL UNLOCKED: Hoop Champion (10 made baskets)")
+
+
+func get_basketball_attempts() -> int:
+	return basketball_attempts
+
+
+func get_basketball_baskets() -> int:
+	return basketball_baskets
+
+
+func get_basketball_misses() -> int:
+	return maxi(0, basketball_attempts - basketball_baskets)
+
+
+func get_basketball_accuracy() -> float:
+	if basketball_attempts <= 0:
+		return 0.0
+	return 100.0 * float(basketball_baskets) / float(basketball_attempts)
+
+
+func get_task_points(task_id: String) -> int:
+	return POINTS_PER_TASK if is_school_task_complete(task_id) else 0
+
+
+func get_school_score() -> int:
+	return get_school_task_count() * POINTS_PER_TASK
+
+
+func get_homework_score() -> int:
+	return get_task_points(HOME_ASSIGNMENT_ID)
+
+
+func get_basketball_score() -> int:
+	return basketball_baskets * POINTS_PER_BASKET
+
+
+func get_final_score() -> int:
+	return get_school_score() + get_homework_score() + get_basketball_score()
 
 
 func reset_school_tasks() -> void:
 	for id: String in TASK_IDS:
 		school_tasks[id] = false
+	school_tasks[HOME_ASSIGNMENT_ID] = false
+	if has_meta(HOMEWORK_COMPLETE_META):
+		remove_meta(HOMEWORK_COMPLETE_META)
 	clear_notebook_progress()
+	basketball_attempts = 0
+	basketball_baskets = 0
 	school_tasks_reset.emit()
 	school_task_updated.emit()
 

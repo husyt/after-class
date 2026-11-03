@@ -66,6 +66,7 @@ gizmo_extents = 2.36
 [node name="AudioStreamPlayer3D" type="AudioStreamPlayer3D" parent="." unique_id=1422674473]
 stream = ExtResource("4_j6eq6")
 autoplay = true
+parameters/looping = false
 
 [node name="Character2" parent="." unique_id=418701836 instance=ExtResource("6_w5wuu")]
 transform = Transform3D(1.2131773, 0, 0, 0, 1.2115897, 0, 0, 0, 1, 6.189312, -0.98458344, 0.9144542)

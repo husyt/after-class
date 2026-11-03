@@ -1,4 +1,6 @@
 extends CanvasLayer
+## EqualPath achievements UI. Hide button/notifications when any mini-game or form is shown.
+## This replaces the existing Achievements script; do not add a second Autoload.
 
 signal achievement_unlocked(task_id: String)
 
@@ -25,24 +27,19 @@ class MedalBadge:
 		var bright: Color = Color("#FFF2CC") if unlocked else Color("#737782")
 
 		var left_ribbon: PackedVector2Array = PackedVector2Array([
-			Vector2(w * 0.33, h * 0.10),
-			Vector2(w * 0.49, h * 0.10),
-			Vector2(w * 0.54, h * 0.51),
-			Vector2(w * 0.42, h * 0.72),
+			Vector2(w * 0.33, h * 0.10), Vector2(w * 0.49, h * 0.10),
+			Vector2(w * 0.54, h * 0.51), Vector2(w * 0.42, h * 0.72),
 			Vector2(w * 0.34, h * 0.51)
 		])
 		var right_ribbon: PackedVector2Array = PackedVector2Array([
-			Vector2(w * 0.51, h * 0.10),
-			Vector2(w * 0.67, h * 0.10),
-			Vector2(w * 0.66, h * 0.51),
-			Vector2(w * 0.58, h * 0.72),
+			Vector2(w * 0.51, h * 0.10), Vector2(w * 0.67, h * 0.10),
+			Vector2(w * 0.66, h * 0.51), Vector2(w * 0.58, h * 0.72),
 			Vector2(w * 0.46, h * 0.51)
 		])
 		draw_colored_polygon(left_ribbon, ribbon)
 		draw_colored_polygon(right_ribbon, ribbon.darkened(0.25))
 		draw_line(Vector2(w * 0.40, h * 0.11), Vector2(w * 0.45, h * 0.46), ribbon.lightened(0.25), 2.0)
 		draw_line(Vector2(w * 0.60, h * 0.11), Vector2(w * 0.55, h * 0.46), ribbon.lightened(0.20), 2.0)
-
 		draw_circle(center + Vector2(1.4, 2.4), radius + 4.0, Color(0.02, 0.025, 0.04, 0.5))
 		draw_circle(center, radius + 3.0, metal.darkened(0.40))
 		draw_circle(center, radius, metal)
@@ -56,60 +53,50 @@ class MedalBadge:
 			star_points.append(center + Vector2(cos(angle), sin(angle)) * star_radius)
 		draw_colored_polygon(star_points, bright)
 
+
 const TASK_ORDER: Array[String] = [
-	"attend_class",
-	"borrow_book",
-	"health_form",
-	"eat_lunch",
-	"computer_activity",
-	"basketball"
+	"attend_class", "borrow_book", "health_form", "eat_lunch",
+	"computer_activity", "basketball"
 ]
 
 const TASK_DATA: Dictionary = {
 	"attend_class": {
-		"title": "Class Champion",
-		"description": "You attended your class!",
-		"medal": "BRONZE MEDAL",
-		"metal": "#DB9966",
-		"ribbon": "#B15E45"
+		"title": "Class Champion", "description": "You attended your class!",
+		"medal": "BRONZE MEDAL", "metal": "#DB9966", "ribbon": "#B15E45"
 	},
 	"borrow_book": {
-		"title": "Book Explorer",
-		"description": "You borrowed a book from the library!",
-		"medal": "SILVER MEDAL",
-		"metal": "#CDD8E4",
-		"ribbon": "#4277B3"
+		"title": "Book Explorer", "description": "You borrowed a book from the library!",
+		"medal": "SILVER MEDAL", "metal": "#CDD8E4", "ribbon": "#4277B3"
 	},
 	"health_form": {
-		"title": "Healthy Learner",
-		"description": "You completed your health form!",
-		"medal": "EMERALD MEDAL",
-		"metal": "#65D5AC",
-		"ribbon": "#28876F"
+		"title": "Healthy Learner", "description": "You completed your health form!",
+		"medal": "EMERALD MEDAL", "metal": "#65D5AC", "ribbon": "#28876F"
 	},
 	"eat_lunch": {
-		"title": "Well-Fueled Student",
-		"description": "You finished your lunch!",
-		"medal": "GOLD MEDAL",
-		"metal": "#F2C663",
-		"ribbon": "#C87735"
+		"title": "Well-Fueled Student", "description": "You finished your lunch!",
+		"medal": "GOLD MEDAL", "metal": "#F2C663", "ribbon": "#C87735"
 	},
 	"computer_activity": {
-		"title": "Digital Explorer",
-		"description": "You completed the computer activity!",
-		"medal": "SAPPHIRE MEDAL",
-		"metal": "#77BAEF",
-		"ribbon": "#5D59BD"
+		"title": "Digital Explorer", "description": "You completed the computer activity!",
+		"medal": "SAPPHIRE MEDAL", "metal": "#77BAEF", "ribbon": "#5D59BD"
 	},
 	"basketball": {
-		"title": "Hoop Champion",
-		"description": "You scored a basket in the basketball mini-game!",
-		"medal": "CHAMPION MEDAL",
-		"metal": "#F5AC46",
-		"ribbon": "#C94C34",
-		"locked": "LOCKED - SCORE A BASKET"
+		"title": "Hoop Champion", "description": "You made 10 baskets in the basketball mini-game!",
+		"medal": "CHAMPION MEDAL", "metal": "#F5AC46", "ribbon": "#C94C34",
+		"locked": "LOCKED - MAKE 10 BASKETS"
 	}
 }
+
+# Include all scenes that have a full-screen form/mini-game.
+# The menu, medal popup, and medal collection should not cover these UIs.
+const HIDDEN_SCENE_KEYWORDS: Array[String] = [
+	"main_menu", "mainmenu", "ending_video",
+	"clinic_health_checkup", "health_checkup", "student_health",
+	"health_form", "class_activity", "computer_activity",
+	"library_borrowing", "clinic_sleep", "guidance_warning",
+	"guidance_logbook", "basketball_minigame", "basketball_game",
+	"homework", "assignment", "wifi_challenge"
+]
 
 @export_range(1.0, 10.0, 0.5) var popup_duration: float = 3.5
 @export var show_achievements_button: bool = true
@@ -120,6 +107,7 @@ var game_state: Node = null
 var _unlocked: Dictionary = {}
 var _pending: Array[String] = []
 var _showing_notification: bool = false
+var _active_notification_id: String = ""
 var _notification_tween: Tween = null
 
 var _screen: Control = null
@@ -144,19 +132,17 @@ func _ready() -> void:
 	if game_state == null:
 		push_error("Achievements: Add GameState as an Autoload before Achievements.")
 		return
-
 	if game_state.has_signal("school_task_completed"):
 		game_state.connect("school_task_completed", _on_school_task_completed)
 	else:
 		push_error("Achievements: GameState needs school_task_completed(task_id).")
-
 	if game_state.has_signal("school_tasks_reset"):
 		game_state.connect("school_tasks_reset", _on_school_tasks_reset)
-
 	for task_id: String in TASK_ORDER:
 		if task_id == "basketball":
-			continue
-		if bool(game_state.call("is_school_task_complete", task_id)):
+			if game_state.has_method("get_basketball_baskets") and int(game_state.call("get_basketball_baskets")) >= 10:
+				_unlocked[task_id] = true
+		elif bool(game_state.call("is_school_task_complete", task_id)):
 			_unlocked[task_id] = true
 	_update_display()
 
@@ -164,15 +150,19 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if _menu_button == null:
 		return
-	var scene: Node = get_tree().current_scene
-	var not_gameplay: bool = false
-	if scene != null:
-		var file_name: String = scene.scene_file_path.get_file().to_lower()
-		not_gameplay = (
-			"main_menu" in file_name
-			or "mainmenu" in file_name
-			or "ending_video" in file_name
-		)
+
+	var hidden: bool = _should_hide_over_gameplay_ui()
+	if hidden:
+		_menu_button.hide()
+		if _collection_layer.visible:
+			_close_collection()
+		# If a medal popup was playing when a form opened, save it for later.
+		if _showing_notification:
+			_suspend_notification()
+		else:
+			_notification.hide()
+		return
+
 	var settings_open: bool = false
 	var hud: Node = get_node_or_null("/root/SchoolHUD")
 	if hud != null:
@@ -181,9 +171,42 @@ func _process(_delta: float) -> void:
 			settings_open = overlay.visible
 		if align_with_settings_button:
 			_align_button_to_hud(hud)
-	_menu_button.visible = show_achievements_button and not not_gameplay and not settings_open
-	if not_gameplay and _collection_layer.visible:
-		_close_collection()
+
+	_menu_button.visible = show_achievements_button and not settings_open
+	if settings_open:
+		if _collection_layer.visible:
+			_close_collection()
+		if _showing_notification:
+			_suspend_notification()
+		return
+
+	if not _pending.is_empty() and not _showing_notification:
+		_show_next_notification()
+
+
+func _should_hide_over_gameplay_ui() -> bool:
+	var scene: Node = get_tree().current_scene
+	if scene == null:
+		return true
+	var filename: String = scene.scene_file_path.get_file().to_lower()
+	for keyword: String in HIDDEN_SCENE_KEYWORDS:
+		if keyword in filename:
+			return true
+	# Fullscreen Control is a UI-only scene (e.g. an activity or health form).
+	# Do not cover it with the persistent achievements button.
+	if scene is Control:
+		return true
+	return false
+
+
+func _suspend_notification() -> void:
+	if _notification_tween != null and _notification_tween.is_running():
+		_notification_tween.kill()
+	if not _active_notification_id.is_empty():
+		_pending.push_front(_active_notification_id)
+	_active_notification_id = ""
+	_showing_notification = false
+	_notification.hide()
 
 
 func _align_button_to_hud(hud: Node) -> void:
@@ -196,11 +219,9 @@ func _align_button_to_hud(hud: Node) -> void:
 	var screen_rect: Rect2 = _screen.get_global_rect()
 	var reference_rect: Rect2 = reference_button.get_global_rect()
 	var gap: float = 12.0
-
 	if settings_button != null and tasks_button != null:
 		var settings_rect: Rect2 = settings_button.get_global_rect()
 		gap = maxf(6.0, reference_rect.position.y - settings_rect.end.y)
-
 	var left_x: float = maxf(0.0, reference_rect.position.x - screen_rect.position.x)
 	var top_y: float = maxf(0.0, reference_rect.end.y - screen_rect.position.y + gap)
 	var button_width: float = reference_rect.size.x
@@ -229,11 +250,9 @@ func _align_button_to_hud(hud: Node) -> void:
 
 	var notification_width: float = minf(425.0, maxf(220.0, _screen.size.x - left_x - 8.0))
 	_notification.set_anchors_preset(Control.PRESET_TOP_LEFT)
-	_notification.position = Vector2(
-		left_x,
-		top_y + button_height + notification_gap
-	)
+	_notification.position = Vector2(left_x, top_y + button_height + notification_gap)
 	_notification.size = Vector2(notification_width, 140.0)
+
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if not event is InputEventKey:
@@ -243,28 +262,41 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		return
 	if get_tree().paused or _menu_button == null or not _menu_button.visible:
 		return
+	if _should_hide_over_gameplay_ui():
+		return
 	_toggle_collection()
 	get_viewport().set_input_as_handled()
 
 
 func unlock_basketball_medal() -> void:
-	_on_school_task_completed("basketball")
+	# Protect against old mini-game scripts calling this prematurely.
+	if game_state != null and game_state.has_method("get_basketball_baskets"):
+		if int(game_state.call("get_basketball_baskets")) >= 10:
+			_on_school_task_completed("basketball")
 
 
 func _on_school_task_completed(task_id: String) -> void:
+	if task_id == "basketball":
+		if game_state == null or not game_state.has_method("get_basketball_baskets"):
+			return
+		if int(game_state.call("get_basketball_baskets")) < 10:
+			return
 	if not TASK_DATA.has(task_id) or _unlocked.has(task_id):
 		return
 	_unlocked[task_id] = true
 	achievement_unlocked.emit(task_id)
 	_pending.append(task_id)
 	_update_display()
-	_show_next_notification()
+	# Keep the earned medal, but do not show its popup on top of a form.
+	if not _should_hide_over_gameplay_ui():
+		_show_next_notification()
 
 
 func _on_school_tasks_reset() -> void:
 	_unlocked.clear()
 	_pending.clear()
 	_showing_notification = false
+	_active_notification_id = ""
 	if _notification_tween != null and _notification_tween.is_running():
 		_notification_tween.kill()
 	_notification.hide()
@@ -272,9 +304,10 @@ func _on_school_tasks_reset() -> void:
 
 
 func _show_next_notification() -> void:
-	if _showing_notification or _pending.is_empty():
+	if _should_hide_over_gameplay_ui() or _showing_notification or _pending.is_empty():
 		return
 	var task_id: String = _pending.pop_front()
+	_active_notification_id = task_id
 	var details: Dictionary = TASK_DATA.get(task_id, {})
 	_notification_medal.text = String(details.get("medal", "MEDAL UNLOCKED"))
 	_notification_title.text = String(details.get("title", "Task Completed"))
@@ -295,10 +328,13 @@ func _show_next_notification() -> void:
 func _finish_notification() -> void:
 	_notification.hide()
 	_showing_notification = false
+	_active_notification_id = ""
 	_show_next_notification()
 
 
 func _toggle_collection() -> void:
+	if _should_hide_over_gameplay_ui():
+		return
 	if _collection_layer.visible:
 		_close_collection()
 	else:
@@ -459,11 +495,7 @@ func _build_interface() -> void:
 		line_text.add_child(medal_name)
 		var medal_status: Label = _label("LOCKED", 13, Color("#858A94"))
 		line_text.add_child(medal_status)
-		_achievement_rows[task_id] = {
-			"icon": medal,
-			"name": medal_name,
-			"status": medal_status
-		}
+		_achievement_rows[task_id] = {"icon": medal, "name": medal_name, "status": medal_status}
 
 	var close_button: Button = Button.new()
 	close_button.text = "CLOSE [H]"

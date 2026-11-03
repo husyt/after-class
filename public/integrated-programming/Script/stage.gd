@@ -11,6 +11,13 @@ signal waiting_for_transport
 @export_file("*.tscn") var play_again_scene: String = "res://Scene/school_exterior.tscn"
 @export var require_all_tasks_to_sleep: bool = false
 
+@export_group("Bedroom Homework - Wi-Fi Challenge")
+@export var require_homework_before_sleep: bool = true
+
+# Stored in the existing GameState autoload, so both Bedroom and Laptop
+# Area3D nodes share the same progress without another script or autoload.
+const HOMEWORK_COMPLETE_META: StringName = &"equalpath_bedroom_homework_complete"
+
 @export_group("Existing Ending Video")
 @export_file("*.tscn") var ending_video_scene_path: String = ""
 @export_range(0.2, 3.0, 0.1) var video_fade_seconds: float = 0.9
@@ -27,6 +34,18 @@ var _ending_layer: CanvasLayer = null
 var _paused_huds: Array[Node] = []
 var _ending_video_finished: bool = false
 
+# Home Wi-Fi / homework panel. Created only when the player presses F.
+var _wifi_layer: CanvasLayer = null
+var _wifi_title: Label = null
+var _wifi_status: Label = null
+var _wifi_primary: Button = null
+var _wifi_secondary: Button = null
+var _wifi_close: Button = null
+var _wifi_stage: int = 0
+var _wifi_mode: String = ""
+var _wifi_paused_before: bool = false
+var _wifi_quiz_feedback: String = ""
+
 
 func _is_neighborhood_house() -> bool:
 	return (
@@ -36,13 +55,41 @@ func _is_neighborhood_house() -> bool:
 
 
 func _is_bedroom_sleep() -> bool:
+	# The existing bed interaction node is called "Bedroom" in StudentBedroom.
+	# Recognize that Area3D even when FPrompt was left blank in the editor.
+	# The CollisionShape3D (not a distance calculation) controls availability.
+	var scene_path: String = _source_scene_path().to_lower()
+	var interaction_name: String = String(name).strip_edges().to_lower().replace(" ", "_")
+	var prompt_text: String = prompt.text.to_lower() if prompt != null else ""
+	var is_bed_node: bool = interaction_name in [
+		"bedroom", "bed", "sleep", "sleep_area", "sleep_trigger", "bed_interaction"
+	]
+	return "bedroom" in scene_path and (is_bed_node or "sleep" in prompt_text)
+
+
+func _is_bedroom_laptop() -> bool:
+	# Only the Laptop Area3D in a bedroom can activate this mission.
+	# Proximity/interaction still comes from its CollisionShape3D.
 	var scene_path: String = _source_scene_path().to_lower()
 	var interaction_name: String = String(name).strip_edges().to_lower()
 	var prompt_text: String = prompt.text.to_lower() if prompt != null else ""
 	return (
 		"bedroom" in scene_path
-		and ("sleep" in interaction_name or "sleep" in prompt_text)
+		and (
+			interaction_name == "laptop"
+			or interaction_name == "computer"
+			or "use laptop" in prompt_text
+		)
 	)
+
+
+func _homework_is_complete() -> bool:
+	if game_state == null:
+		return false
+	if game_state.has_method("is_school_task_complete"):
+		if bool(game_state.call("is_school_task_complete", "home_assignment")):
+			return true
+	return bool(game_state.get_meta(HOMEWORK_COMPLETE_META, false))
 
 
 func _is_bus_wait_area() -> bool:
@@ -53,6 +100,17 @@ func _is_bus_wait_area() -> bool:
 
 
 func _configure_interaction() -> void:
+	if _is_bedroom_laptop():
+		task_id = ""
+		target_scene_path = ""
+		action_only = true
+		action_used = false
+		proximity_fallback = false
+		if prompt != null:
+			prompt.text = "[F] Use Laptop"
+			prompt.no_depth_test = true
+		return
+
 	if _is_bedroom_sleep():
 		task_id = ""
 		target_scene_path = ""
@@ -167,22 +225,39 @@ func _scan_bedroom_scenes(directory: String, depth: int, exact_name: bool) -> St
 
 
 func _can_interact() -> bool:
-	if _is_bedroom_sleep():
-		if _ending_started:
-			return false
-		if require_all_tasks_to_sleep and game_state != null:
-			if game_state.has_method("school_tasks_complete"):
-				if not bool(game_state.call("school_tasks_complete")):
-					return false
+	if _is_bedroom_laptop() and is_instance_valid(_wifi_layer):
+		return false
+
+	# Do not hide [F] Sleep because homework or other tasks are incomplete.
+	# Parent school_task.gd still requires actual CollisionShape3D overlap,
+	# an idle interaction state and an unpaused scene.
+	if _is_bedroom_sleep() and _ending_started:
+		return false
+
 	if _is_bus_wait_area() and _waiting_for_transport:
 		return false
 	return super._can_interact()
 
 
 func _activate_interaction() -> void:
+	if _is_bedroom_laptop():
+		if not _can_interact():
+			return
+		_open_wifi_panel("laptop")
+		return
+
 	if _is_bedroom_sleep():
 		if not _can_interact():
 			return
+		if require_homework_before_sleep and not _homework_is_complete():
+			# Keep the sleep prompt visible; explain the unmet requirement on F.
+			_open_wifi_panel("sleep_notice")
+			return
+		if require_all_tasks_to_sleep and game_state != null:
+			if game_state.has_method("school_tasks_complete"):
+				if not bool(game_state.call("school_tasks_complete")):
+					_open_wifi_panel("school_notice")
+					return
 		if game_state == null:
 			push_error("Sleep ending needs the GameState Autoload.")
 			return
@@ -276,6 +351,182 @@ func get_selected_transport() -> String:
 
 
 
+# -----------------------------------------------------------------------------
+# Homework / Wi-Fi access mission in the existing stage.gd.
+# Called only after the parent school_task.gd verifies CollisionShape3D overlap.
+# -----------------------------------------------------------------------------
+func _open_wifi_panel(mode: String) -> void:
+	if is_instance_valid(_wifi_layer) or game_state == null:
+		return
+	if not bool(game_state.call("try_begin_interaction", self)):
+		return
+
+	_wifi_mode = mode
+	_wifi_stage = 4 if _homework_is_complete() else 0
+	_wifi_quiz_feedback = ""
+	busy = true
+	_reset_hover()
+	_update_visibility()
+
+	# Pause movement, time and other door interactions while the modal is open.
+	_wifi_paused_before = get_tree().paused
+	get_tree().paused = true
+
+	_wifi_layer = CanvasLayer.new()
+	_wifi_layer.name = "HomeworkWifiPanel"
+	_wifi_layer.layer = 220
+	_wifi_layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	get_tree().current_scene.add_child(_wifi_layer)
+
+	var dimmer: ColorRect = ColorRect.new()
+	dimmer.name = "DimBackground"
+	dimmer.color = Color(0.02, 0.04, 0.08, 0.88)
+	dimmer.mouse_filter = Control.MOUSE_FILTER_STOP
+	_wifi_layer.add_child(dimmer)
+	dimmer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var center: CenterContainer = CenterContainer.new()
+	center.name = "Center"
+	_wifi_layer.add_child(center)
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+
+	var panel: PanelContainer = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(480.0, 0.0)
+	var panel_style: StyleBoxFlat = StyleBoxFlat.new()
+	panel_style.bg_color = Color("#172434")
+	panel_style.border_color = Color("#6696b4")
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(12)
+	panel_style.set_content_margin_all(24)
+	panel.add_theme_stylebox_override("panel", panel_style)
+	center.add_child(panel)
+
+	var stack: VBoxContainer = VBoxContainer.new()
+	stack.add_theme_constant_override("separation", 18)
+	panel.add_child(stack)
+
+	_wifi_title = Label.new()
+	_wifi_title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_wifi_title.add_theme_font_size_override("font_size", 28)
+	_wifi_title.add_theme_color_override("font_color", Color.WHITE)
+	stack.add_child(_wifi_title)
+
+	_wifi_status = Label.new()
+	_wifi_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_wifi_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_wifi_status.custom_minimum_size = Vector2(420.0, 85.0)
+	_wifi_status.add_theme_font_size_override("font_size", 18)
+	_wifi_status.add_theme_color_override("font_color", Color("#d5e6f6"))
+	stack.add_child(_wifi_status)
+
+	_wifi_primary = Button.new()
+	_wifi_primary.custom_minimum_size.y = 44.0
+	_wifi_primary.pressed.connect(_on_wifi_primary_pressed)
+	stack.add_child(_wifi_primary)
+
+	_wifi_secondary = Button.new()
+	_wifi_secondary.text = "Ignore the classmate"
+	_wifi_secondary.custom_minimum_size.y = 42.0
+	_wifi_secondary.pressed.connect(_on_wifi_wrong_answer)
+	stack.add_child(_wifi_secondary)
+
+	_wifi_close = Button.new()
+	_wifi_close.text = "Close"
+	_wifi_close.custom_minimum_size.y = 42.0
+	_wifi_close.pressed.connect(_close_wifi_panel)
+	stack.add_child(_wifi_close)
+
+	_refresh_wifi_panel()
+	if _wifi_primary.visible:
+		_wifi_primary.grab_focus()
+	else:
+		_wifi_close.grab_focus()
+
+
+func _refresh_wifi_panel() -> void:
+	if not is_instance_valid(_wifi_layer):
+		return
+
+	_wifi_primary.show()
+	_wifi_secondary.hide()
+	_wifi_close.text = "Close"
+
+	if _wifi_mode == "sleep_notice":
+		_wifi_title.text = "Homework Not Finished"
+		_wifi_status.text = "You need to finish your homework before sleeping.\nGo to the desk and press [F] Use Laptop."
+		_wifi_primary.hide()
+		_wifi_close.text = "Okay"
+		return
+
+	if _wifi_mode == "school_notice":
+		_wifi_title.text = "Finish Your School Tasks"
+		_wifi_status.text = "Complete the five school activities before sleeping."
+		_wifi_primary.hide()
+		_wifi_close.text = "Okay"
+		return
+
+	match _wifi_stage:
+		0:
+			_wifi_title.text = "No Internet Connection"
+			_wifi_status.text = "You need the internet for tonight's homework, but the laptop is offline. First, check the Wi-Fi connection."
+			_wifi_primary.text = "Check Wi-Fi"
+		1:
+			_wifi_title.text = "Check the Router"
+			_wifi_status.text = "The Wi-Fi connection is down. The router has power, but it needs to reconnect."
+			_wifi_primary.text = "Restart Wi-Fi Router"
+		2:
+			_wifi_title.text = "Wi-Fi Connected!"
+			_wifi_status.text = "You restored the connection. Now finish a short homework question about equal access to education."
+			_wifi_primary.text = "Start Homework"
+		3:
+			_wifi_title.text = "Homework: SDG 4 and SDG 10"
+			_wifi_status.text = "A classmate has no internet at home. What could help them keep learning?" + _wifi_quiz_feedback
+			_wifi_primary.text = "Share Offline Notes"
+			_wifi_secondary.show()
+		4:
+			_wifi_title.text = "Homework Completed!"
+			_wifi_status.text = "You solved the Wi-Fi problem and finished your homework. You can now use the bed to sleep."
+			_wifi_primary.hide()
+			_wifi_close.text = "Done"
+
+
+func _on_wifi_primary_pressed() -> void:
+	if _wifi_mode != "laptop":
+		return
+	if _wifi_stage < 3:
+		_wifi_stage += 1
+	elif _wifi_stage == 3:
+		# Only the helpful choice completes task 6 and notifies TaskUI.
+		if game_state != null:
+			if game_state.has_method("complete_home_assignment"):
+				game_state.call("complete_home_assignment")
+			elif game_state.has_method("complete_school_task"):
+				game_state.call("complete_school_task", "home_assignment")
+			# Keep compatibility with the earlier bedroom progress flag.
+			game_state.set_meta(HOMEWORK_COMPLETE_META, true)
+		_wifi_stage = 4
+	_refresh_wifi_panel()
+
+
+func _on_wifi_wrong_answer() -> void:
+	_wifi_quiz_feedback = "\n\nTry again: think about how to help someone who has fewer resources."
+	_refresh_wifi_panel()
+
+
+func _close_wifi_panel() -> void:
+	if is_instance_valid(_wifi_layer):
+		_wifi_layer.queue_free()
+	_wifi_layer = null
+	_wifi_title = null
+	_wifi_status = null
+	_wifi_primary = null
+	_wifi_secondary = null
+	_wifi_close = null
+	get_tree().paused = _wifi_paused_before
+	_release_interaction()
+	_update_visibility()
+
+
 func _suspend_school_hud() -> void:
 	_paused_huds.clear()
 	var huds: Array[Node] = get_tree().get_nodes_in_group(&"school_hud")
@@ -329,6 +580,8 @@ func _build_ending_overlay() -> void:
 
 
 func _make_builtin_end_screen() -> Control:
+	# Fixed 2-column results layout for the game's 1152x648 viewport.
+	# Neither the rows nor their value labels can collapse into a narrow column.
 	var screen: Control = Control.new()
 	screen.name = "EndingScreen"
 	screen.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -338,28 +591,142 @@ func _make_builtin_end_screen() -> Control:
 	screen.add_child(center)
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
+	var panel: PanelContainer = PanelContainer.new()
+	panel.custom_minimum_size = Vector2(860.0, 0.0)
+	var panel_style: StyleBoxFlat = StyleBoxFlat.new()
+	panel_style.bg_color = Color("#0d1119")
+	panel_style.border_color = Color("#9b7a45")
+	panel_style.set_border_width_all(2)
+	panel_style.set_corner_radius_all(12)
+	panel_style.content_margin_left = 25.0
+	panel_style.content_margin_right = 25.0
+	panel_style.content_margin_top = 12.0
+	panel_style.content_margin_bottom = 12.0
+	panel.add_theme_stylebox_override("panel", panel_style)
+	center.add_child(panel)
+
 	var content: VBoxContainer = VBoxContainer.new()
 	content.name = "Content"
-	content.custom_minimum_size = Vector2(500.0, 0.0)
-	content.add_theme_constant_override("separation", 19)
-	center.add_child(content)
+	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 5)
+	panel.add_child(content)
 
-	var eyebrow: Label = _make_end_label("AFTER CLASS", 23, Color(0.85, 0.68, 0.42))
-	content.add_child(eyebrow)
+	content.add_child(_make_end_label("AFTER CLASS", 17, Color("#debd7f")))
+	content.add_child(_make_end_label("THE END", 38, Color.WHITE))
+	content.add_child(_make_end_label(
+		"Another day, another chance to learn.", 14, Color("#bfc6d1")
+	))
 
-	var title: Label = _make_end_label("THE END", 60, Color(1.0, 1.0, 1.0))
-	content.add_child(title)
-
-	var message: Label = _make_end_label("Another day, another chance to learn.", 19, Color(0.77, 0.79, 0.86))
-	content.add_child(message)
-
-	var count: int = 0
-	var total: int = 5
+	# Read all results from the existing GameState. No gameplay changes.
+	var total_score: int = 0
+	var school_score: int = 0
+	var homework_score: int = 0
+	var basketball_score: int = 0
+	var attempts: int = 0
+	var baskets: int = 0
+	var school_count: int = 0
+	var school_total: int = 5
 	if game_state != null:
+		if game_state.has_method("get_final_score"):
+			total_score = int(game_state.call("get_final_score"))
+		if game_state.has_method("get_school_score"):
+			school_score = int(game_state.call("get_school_score"))
+		if game_state.has_method("get_homework_score"):
+			homework_score = int(game_state.call("get_homework_score"))
+		if game_state.has_method("get_basketball_score"):
+			basketball_score = int(game_state.call("get_basketball_score"))
+		if game_state.has_method("get_basketball_attempts"):
+			attempts = int(game_state.call("get_basketball_attempts"))
+		if game_state.has_method("get_basketball_baskets"):
+			baskets = int(game_state.call("get_basketball_baskets"))
 		if game_state.has_method("get_school_task_count"):
-			count = int(game_state.call("get_school_task_count"))
+			school_count = int(game_state.call("get_school_task_count"))
 		if game_state.has_method("get_school_task_total"):
-			total = int(game_state.call("get_school_task_total"))
+			school_total = int(game_state.call("get_school_task_total"))
+
+	content.add_child(_make_end_label(
+		"FINAL SCORE  %d POINTS" % total_score, 27, Color("#f3d084")
+	))
+	content.add_child(_make_end_label(
+		"School %d/%d   |   Home %s   |   Basketball %d baskets" % [
+			school_count, school_total,
+			"Done" if _homework_is_complete() else "Incomplete", baskets
+		], 13, Color("#b8c6d3")
+	))
+
+	# All scores visible at once: no ScrollContainer, no cramped text.
+	var columns: HBoxContainer = HBoxContainer.new()
+	columns.name = "ResultsColumns"
+	columns.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	columns.add_theme_constant_override("separation", 18)
+	content.add_child(columns)
+
+	var tasks_panel: PanelContainer = _make_score_card(405.0)
+	columns.add_child(tasks_panel)
+	var tasks_list: VBoxContainer = VBoxContainer.new()
+	tasks_list.add_theme_constant_override("separation", 3)
+	tasks_panel.add_child(tasks_list)
+	tasks_list.add_child(_make_end_label(
+		"TASK SCORE BREAKDOWN", 16, Color("#e1c28a")
+	))
+
+	var tasks: Array[Dictionary] = [
+		{"id": "attend_class", "name": "Attend Class"},
+		{"id": "borrow_book", "name": "Borrow Books"},
+		{"id": "health_form", "name": "Get Health Form"},
+		{"id": "eat_lunch", "name": "Eat Lunch"},
+		{"id": "computer_activity", "name": "Computer Activity"},
+		{"id": "home_assignment", "name": "Home Assignment"}
+	]
+	for task: Dictionary in tasks:
+		var task_id_value: String = String(task["id"])
+		var done: bool = false
+		if task_id_value == "home_assignment":
+			done = _homework_is_complete()
+		elif game_state != null and game_state.has_method("is_school_task_complete"):
+			done = bool(game_state.call("is_school_task_complete", task_id_value))
+
+		var earned: int = 100 if done else 0
+		tasks_list.add_child(_make_end_score_row(
+			String(task["name"]),
+			("Done  +%d" % earned) if done else "Not done  +0",
+			Color("#a7dfb5") if done else Color("#a1a6b1")
+		))
+
+	tasks_list.add_child(HSeparator.new())
+	tasks_list.add_child(_make_end_score_row(
+		"School task points", "%d pts" % school_score, Color.WHITE
+	))
+	tasks_list.add_child(_make_end_score_row(
+		"Home assignment points", "%d pts" % homework_score, Color.WHITE
+	))
+
+	var basketball_panel: PanelContainer = _make_score_card(340.0)
+	columns.add_child(basketball_panel)
+	var ball_list: VBoxContainer = VBoxContainer.new()
+	ball_list.add_theme_constant_override("separation", 5)
+	basketball_panel.add_child(ball_list)
+	ball_list.add_child(_make_end_label(
+		"BASKETBALL RESULTS", 16, Color("#e1c28a")
+	))
+	ball_list.add_child(_make_end_score_row("Shots attempted", str(attempts), Color.WHITE))
+	ball_list.add_child(_make_end_score_row("Baskets made", str(baskets), Color("#a7dfb5")))
+	ball_list.add_child(_make_end_score_row(
+		"Missed shots", str(maxi(0, attempts - baskets)), Color("#bfc6d1")
+	))
+	var accuracy: float = 0.0
+	if attempts > 0:
+		accuracy = 100.0 * float(baskets) / float(attempts)
+	ball_list.add_child(_make_end_score_row(
+		"Shooting accuracy", "%.1f%%" % accuracy, Color.WHITE
+	))
+	ball_list.add_child(HSeparator.new())
+	ball_list.add_child(_make_end_score_row(
+		"Basketball bonus", "+%d pts" % basketball_score, Color("#f3d084")
+	))
+	ball_list.add_child(_make_end_label(
+		"10 points per successful basket", 12, Color("#939aa6")
+	))
 
 	var seconds_played: float = -1.0
 	if game_state != null and game_state.has_meta("equalpath_school_completion_seconds"):
@@ -371,26 +738,66 @@ func _make_builtin_end_screen() -> Control:
 			if hud_seconds is float or hud_seconds is int:
 				seconds_played = float(hud_seconds)
 
-	var stats: VBoxContainer = VBoxContainer.new()
-	stats.add_theme_constant_override("separation", 10)
-	content.add_child(stats)
-	stats.add_child(_make_end_label("School tasks completed: %d / %d" % [count, total], 18, Color.WHITE))
-	stats.add_child(_make_end_label("Time: %s" % (_end_time_text(seconds_played) if seconds_played >= 0.0 else "--:--"), 18, Color.WHITE))
-
-	content.add_child(_make_end_label("Thank you for playing!", 17, Color(0.68, 0.70, 0.77)))
+	content.add_child(_make_end_label(
+		"School time: %s    |    Tasks: %d / %d" % [
+			_end_time_text(seconds_played) if seconds_played >= 0.0 else "--:--",
+			school_count, school_total
+		], 14, Color("#c4cbd3")
+	))
+	content.add_child(_make_end_label(
+		"100 points per task + 10 per basket made", 12, Color("#939aa6")
+	))
 
 	var replay_row: HBoxContainer = HBoxContainer.new()
 	replay_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	content.add_child(replay_row)
-
 	var replay_button: Button = Button.new()
 	replay_button.name = "PlayAgainButton"
 	replay_button.text = "PLAY AGAIN"
-	replay_button.custom_minimum_size = Vector2(290.0, 52.0)
-	replay_button.add_theme_font_size_override("font_size", 21)
+	replay_button.custom_minimum_size = Vector2(265.0, 42.0)
+	replay_button.add_theme_font_size_override("font_size", 18)
 	replay_row.add_child(replay_button)
 
 	return screen
+
+
+func _make_score_card(min_width: float) -> PanelContainer:
+	var card: PanelContainer = PanelContainer.new()
+	card.custom_minimum_size = Vector2(min_width, 0.0)
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var style: StyleBoxFlat = StyleBoxFlat.new()
+	style.bg_color = Color("#151b27")
+	style.border_color = Color("#343e4f")
+	style.set_border_width_all(1)
+	style.set_corner_radius_all(8)
+	style.content_margin_left = 13.0
+	style.content_margin_right = 13.0
+	style.content_margin_top = 9.0
+	style.content_margin_bottom = 9.0
+	card.add_theme_stylebox_override("panel", style)
+	return card
+
+
+func _make_end_score_row(label_text: String, value_text: String, value_color: Color) -> HBoxContainer:
+	var row: HBoxContainer = HBoxContainer.new()
+	row.custom_minimum_size.y = 23.0
+	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_theme_constant_override("separation", 10)
+
+	var description: Label = _make_end_label(label_text, 14, Color("#e0e4e9"))
+	description.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	description.autowrap_mode = TextServer.AUTOWRAP_OFF
+	description.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(description)
+
+	var value: Label = _make_end_label(value_text, 14, value_color)
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	value.autowrap_mode = TextServer.AUTOWRAP_OFF
+	value.custom_minimum_size.x = 105.0
+	value.size_flags_horizontal = Control.SIZE_SHRINK_END
+	row.add_child(value)
+	return row
+
 
 func _make_end_label(message: String, size: int, tint: Color) -> Label:
 	var result: Label = Label.new()
@@ -591,6 +998,8 @@ func _on_play_again_pressed() -> void:
 		return
 
 	if game_state != null:
+		if game_state.has_meta(HOMEWORK_COMPLETE_META):
+			game_state.remove_meta(HOMEWORK_COMPLETE_META)
 		if game_state.has_method("clear_positions"):
 			game_state.call("clear_positions")
 		if game_state.has_meta("equalpath_school_completion_seconds"):
